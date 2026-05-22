@@ -453,12 +453,13 @@
 /* Crowned avatar (easter egg): royal purple tunic + a floating crown. */
 .hero-crown {
   position: absolute;
-  top: -45%;
+  top: -30%;
   left: 50%;
   transform: translateX(-50%);
-  font-size: calc(var(--tile) * 0.5);
+  font-size: calc(var(--tile) * 0.45);
   filter: drop-shadow(0 0 6px rgba(248, 216, 120, 0.9));
-  animation: bob 1.4s ease-in-out infinite;
+  /* No own animation: it inherits the sprite's bob, so it stays glued to the
+     head instead of drifting out of sync. */
 }
 .hero.crowned .hero-cap {
   background: #f8d030;
