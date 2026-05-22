@@ -68,6 +68,14 @@ export const PROJECTS: Project[] = [
     icon: "🗺️",
     tech: ["Python", "PyInstaller", "Desktop"],
     repoUrl: "https://github.com/julsql/exif-tools",
+    links: [
+      {
+        kind: "store",
+        labelKey: "download",
+        url: "https://github.com/julsql/exif-tools/releases/latest",
+      },
+      { kind: "code", labelKey: "code", url: "https://github.com/julsql/exif-tools" },
+    ],
   },
 
   // ── TheCode castle (entered from the overworld) ──────────────────────────
@@ -98,6 +106,14 @@ export const PROJECTS: Project[] = [
     tech: ["Swift", "iOS", "macOS", "Safari Extension"],
     group: "thecode",
     repoUrl: "https://github.com/TheCodeDevLab/thecode-apple",
+    links: [
+      {
+        kind: "store",
+        labelKey: "appstore",
+        url: "https://apps.apple.com/app/thecode-password-manager/id6753169043",
+      },
+      { kind: "code", labelKey: "code", url: "https://github.com/TheCodeDevLab/thecode-apple" },
+    ],
   },
   {
     id: "thecode-android",
@@ -107,6 +123,14 @@ export const PROJECTS: Project[] = [
     tech: ["Java", "Material 3", "Autofill"],
     group: "thecode",
     repoUrl: "https://github.com/TheCodeDevLab/thecode-android",
+    links: [
+      {
+        kind: "store",
+        labelKey: "playstore",
+        url: "https://play.google.com/store/apps/details?id=fr.juliette.thecode&hl=fr",
+      },
+      { kind: "code", labelKey: "code", url: "https://github.com/TheCodeDevLab/thecode-android" },
+    ],
   },
   {
     id: "thecode-cli",

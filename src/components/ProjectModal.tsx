@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Project, ProjectLink } from "../types";
 import { sound } from "../audio/sound";
+import { EXTENSION_URL, getBrowser } from "../data/browser";
 
 interface Props {
   project: Project;
@@ -16,6 +17,14 @@ const LINK_ICON: Record<string, string> = {
 };
 
 function projectLinks(project: Project): ProjectLink[] {
+  // The extension points to the store for the visitor's current browser.
+  if (project.id === "thecode-extension") {
+    const b = getBrowser();
+    return [
+      { kind: "store", labelKey: `ext_${b}`, url: EXTENSION_URL[b] },
+      { kind: "code", labelKey: "code", url: project.repoUrl },
+    ];
+  }
   if (project.links) return project.links;
   const links: ProjectLink[] = [];
   if (project.liveUrl) links.push({ kind: "live", labelKey: "live", url: project.liveUrl });
@@ -35,23 +44,44 @@ export default function ProjectModal({ project, onClose }: Props) {
     [links],
   );
   const [sel, setSel] = useState(0);
+  const actionsRef = useRef<HTMLDivElement>(null);
+
+  // How many links sit on the first row (the layout can be 1 or 2 rows).
+  const columns = () => {
+    const btns = actionsRef.current?.querySelectorAll<HTMLElement>("a.btn");
+    if (!btns || btns.length < 2) return 1;
+    const top0 = btns[0].offsetTop;
+    let c = 0;
+    for (const b of btns) {
+      if (b.offsetTop === top0) c++;
+      else break;
+    }
+    return Math.max(c, 1);
+  };
 
   useEffect(() => {
     const n = ordered.length;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
-      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-        e.preventDefault();
-        sound.sfx("cursor");
-        setSel((s) => (s + 1) % n);
-      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-        e.preventDefault();
-        sound.sfx("cursor");
-        setSel((s) => (s - 1 + n) % n);
-      } else if (e.key === "Enter" || e.key === " ") {
+        return;
+      }
+      if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         window.open(ordered[sel].url, "_blank", "noopener,noreferrer");
+        return;
+      }
+      const cols = columns();
+      let next = sel;
+      if (e.key === "ArrowRight") next = Math.min(sel + 1, n - 1);
+      else if (e.key === "ArrowLeft") next = Math.max(sel - 1, 0);
+      else if (e.key === "ArrowDown") next = Math.min(sel + cols, n - 1);
+      else if (e.key === "ArrowUp") next = Math.max(sel - cols, 0);
+      else return;
+      e.preventDefault();
+      if (next !== sel) {
+        sound.sfx("cursor");
+        setSel(next);
       }
     };
     window.addEventListener("keydown", onKey);
@@ -110,7 +140,7 @@ export default function ProjectModal({ project, onClose }: Props) {
           </ul>
         </div>
 
-        <div className="modal-actions">
+        <div className="modal-actions" ref={actionsRef}>
           {ordered.length <= 2 ? (
             <div className="modal-row">{ordered.map(renderLink)}</div>
           ) : (
