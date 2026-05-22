@@ -1,9 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 import { useMovement, type MoveHandlers } from "./useMovement";
-import { OVERWORLD_ID, SCENES } from "../data/scenes";
+import { GANON_ID, OVERWORLD_ID, SCENES } from "../data/scenes";
 
 const overworld = SCENES[OVERWORLD_ID];
+const ganon = SCENES[GANON_ID];
 
 function handlers(over: Partial<MoveHandlers> = {}): MoveHandlers {
   return {
@@ -51,15 +52,12 @@ describe("useMovement", () => {
 
   it("collects a rupee by walking over it", () => {
     const onPickup = vi.fn();
-    const rupee = overworld.landmarks.find((l) => l.kind === "rupee")!;
+    // Ganon's lair always holds rupees (the overworld ones are optional).
+    const rupee = ganon.landmarks.find((l) => l.kind === "rupee")!; // (1,6)
     const { result } = renderHook(() =>
-      useMovement(
-        overworld,
-        { x: rupee.x - 1, y: rupee.y, facing: "right" },
-        handlers({ onPickup }),
-      ),
+      useMovement(ganon, { x: rupee.x + 1, y: rupee.y, facing: "left" }, handlers({ onPickup })),
     );
-    act(() => result.current.move("right"));
+    act(() => result.current.move("left"));
     expect(onPickup).toHaveBeenCalledWith(rupee);
     expect(result.current.hero).toMatchObject({ x: rupee.x, y: rupee.y });
   });
