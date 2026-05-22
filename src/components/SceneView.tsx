@@ -68,7 +68,7 @@ export default function SceneView(props: Props) {
     [],
   );
   const drown = useCallback(() => {
-    sound.sfx("drown");
+    sound.sfx("hurt"); // same feedback as taking a hit from an enemy
     onHit();
   }, [onHit]);
 
