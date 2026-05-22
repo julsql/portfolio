@@ -41,6 +41,9 @@ export function buildOverworld(): TileKind[][] {
     if (y === H - 1) return "water";
     if ((x === 0 && y > 6) || (x === W - 1 && y > 3 && y < 9)) return "tree";
 
+    // A wooden pier reaching from the shore out into the sea (walkable).
+    if (x >= 14 && x <= 17 && y === 11) return "dock";
+
     // Central plaza around the castle.
     const dx = Math.abs(x - cx);
     const dy = Math.abs(y - cy);

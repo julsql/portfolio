@@ -67,6 +67,15 @@ class SoundEngine {
     this.master = this.ctx.createGain();
     this.master.gain.value = this.muted ? 0 : 0.85;
     this.master.connect(this.ctx.destination);
+
+    // Browsers suspend the context on tab-switch / focus loss; resume it on
+    // any interaction or when the tab becomes visible again.
+    const resume = () => void this.ctx?.resume();
+    window.addEventListener("pointerdown", resume);
+    window.addEventListener("keydown", resume);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) resume();
+    });
   }
 
   setMuted(m: boolean) {

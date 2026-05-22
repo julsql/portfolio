@@ -49,6 +49,7 @@ export type TileKind =
   | "flower"
   | "rock"
   | "mountain"
+  | "dock"
   | "floor"
   | "wall"
   | "carpet";
