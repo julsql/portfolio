@@ -66,7 +66,7 @@ export default function SceneView(props: Props) {
   );
   const onDrown = useCallback(() => onHit(), [onHit]);
 
-  const { hero, steps, move, setEnabled } = useMovement(scene, initialHero, {
+  const { hero, move, setEnabled } = useMovement(scene, initialHero, {
     onInteract,
     onPickup,
     onDrown,
@@ -77,7 +77,13 @@ export default function SceneView(props: Props) {
   });
   useEffect(() => setEnabled(!paused), [paused, setEnabled]);
 
-  const frame: 1 | 2 = steps % 2 === 1 ? 2 : 1;
+  // Idle "breathing": continuously alternate the walk frames so Link feels alive.
+  const [frame, setFrame] = useState<1 | 2>(1);
+  useEffect(() => {
+    if (paused) return;
+    const id = setInterval(() => setFrame((f) => (f === 1 ? 2 : 1)), 380);
+    return () => clearInterval(id);
+  }, [paused]);
 
   // ── Fire hazard: progressive damage while standing on a fire tile ─────────
   const onFire = scene.decor.some((d) => d.hazard && d.x === hero.x && d.y === hero.y);
