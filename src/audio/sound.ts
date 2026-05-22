@@ -65,6 +65,9 @@ class SoundEngine {
         this.master = this.ctx.createGain();
         this.master.gain.value = this.muted ? 0 : 0.85;
         this.master.connect(this.ctx.destination);
+        // init() runs from the START gesture — unlock the context now so the
+        // synthesized SFX (select/cursor/attack…) actually produce sound.
+        void this.ctx.resume();
       }
       // Pause music when the tab is hidden (background timers/throttling) and
       // resume the same track when it comes back.
@@ -87,6 +90,7 @@ class SoundEngine {
 
   sfx(name: Sfx) {
     if (this.muted) return;
+    void this.ctx?.resume();
     const url = FILES[name];
     if (url) {
       const a = new Audio(url);
