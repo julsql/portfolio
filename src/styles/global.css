@@ -86,5 +86,6 @@ a {
   justify-content: center;
   justify-content: safe center;
   overflow: auto;
-  padding: 8px;
+  /* No padding here: each view manages its own so the footer can sit flush
+     against the very bottom of the screen. */
 }
