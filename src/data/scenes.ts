@@ -33,9 +33,9 @@ const overworld: Scene = {
     { x: 10, y: 11, kind: "rupee", ref: "rupee-ow-4", pickup: true, rupee: "green" },
   ],
   decor: [
-    { x: 2, y: 2, icon: SPRITES.cactus },
+    { x: 2, y: 2, icon: SPRITES.cactusFlower },
     { x: 5, y: 2, icon: SPRITES.cactus },
-    { x: 8, y: 3, icon: SPRITES.cactus },
+    { x: 8, y: 3, icon: SPRITES.cactusFlower },
   ],
   rocks: [
     { id: "rock-1", x: 14, y: 7 },
