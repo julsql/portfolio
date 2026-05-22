@@ -8,6 +8,9 @@ export const RUPEE_VALUE: Record<RupeeColor, number> = { red: 20, blue: 5, green
 export const SPRITES = {
   swordPedestal: `${B}/sword-pedestal.png`,
   swordStrike: `${B}/sword-strike.png`,
+  mountain: `${B}/mountain.svg`,
+  cactus: `${B}/cactus.svg`,
+  rock: `${B}/rock.svg`,
   linkHeart: `${B}/link-heart.svg`,
   linkTriforce: `${B}/link-triforce.png`,
   heart: {

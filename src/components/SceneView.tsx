@@ -209,21 +209,29 @@ export default function SceneView(props: Props) {
           )}
         </div>
 
-        {scene.decor.map((d, i) => (
-          <span
-            key={`d-${i}`}
-            className={`decor${d.hazard ? " hazard" : ""}`}
-            style={tileStyle(d.x, d.y)}
-            aria-hidden="true"
-          >
-            {d.icon}
-          </span>
-        ))}
+        {scene.decor.map((d, i) =>
+          d.icon.startsWith("/") ? (
+            <img key={`d-${i}`} className="decor" style={tileStyle(d.x, d.y)} src={d.icon} alt="" />
+          ) : (
+            <span
+              key={`d-${i}`}
+              className={`decor${d.hazard ? " hazard" : ""}`}
+              style={tileStyle(d.x, d.y)}
+              aria-hidden="true"
+            >
+              {d.icon}
+            </span>
+          ),
+        )}
 
         {rocks.map((r) => (
-          <span key={r.id} className="rock-obj" style={tileStyle(r.x, r.y)} aria-hidden="true">
-            🪨
-          </span>
+          <img
+            key={r.id}
+            className="rock-obj"
+            style={tileStyle(r.x, r.y)}
+            src={SPRITES.rock}
+            alt=""
+          />
         ))}
 
         {scene.landmarks.map((l) => renderLandmark(l))}

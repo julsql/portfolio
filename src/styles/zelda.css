@@ -216,28 +216,19 @@
   font-size: calc(var(--tile) * 0.8);
 }
 .tile-rock {
-  background: var(--c-grass-dark);
-  position: relative;
-}
-.tile-rock::after {
-  content: "🪨";
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font-size: calc(var(--tile) * 0.7);
+  background-color: var(--c-grass-dark);
+  background-image: url("/sprites/rock.svg");
+  background-size: 86% 86%;
+  background-position: center;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
 }
 .tile-mountain {
-  background: #6b5a3a;
-  position: relative;
-}
-.tile-mountain::after {
-  content: "⛰️";
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font-size: calc(var(--tile) * 0.8);
+  background-color: var(--c-grass-dark);
+  background-image: url("/sprites/mountain.svg");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
 }
 .tile-flower {
   background: var(--c-grass);
@@ -308,17 +299,22 @@
 .decor.hazard {
   animation: flicker 0.6s steps(2) infinite;
 }
+img.decor {
+  object-fit: contain;
+  padding: calc(var(--tile) * 0.05);
+  image-rendering: pixelated;
+}
 
 /* ----- Game objects: rocks, coins, enemies ----- */
 .rock-obj {
   position: absolute;
   width: var(--tile);
   height: var(--tile);
-  display: grid;
-  place-items: center;
-  font-size: calc(var(--tile) * 0.82);
+  object-fit: contain;
+  padding: calc(var(--tile) * 0.08);
   z-index: 5;
-  filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.45));
+  image-rendering: pixelated;
+  filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.4));
 }
 .rupee {
   position: absolute;
