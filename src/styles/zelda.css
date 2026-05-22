@@ -213,7 +213,7 @@
 }
 .tile-rock {
   background-color: var(--c-grass-dark);
-  background-image: url("/sprites/rock.svg");
+  background-image: url("/sprites/pierre.png");
   background-size: 86% 86%;
   background-position: center;
   background-repeat: no-repeat;
