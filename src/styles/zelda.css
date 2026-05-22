@@ -497,16 +497,16 @@ img.decor {
   line-height: 1;
   text-align: center;
   filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.5));
-  animation: bob 2s ease-in-out infinite;
   /* Keep the icon in front of its label. */
   position: relative;
   z-index: 8;
 }
-/* Projects are the stars of the show — make them big and obvious. */
+/* Projects are the stars of the show — bigger, and the only ones that bob. */
 .cat-web .landmark-icon,
 .cat-app .landmark-icon,
 .cat-tool .landmark-icon {
   font-size: calc(var(--tile) * 0.95);
+  animation: bob 2s ease-in-out infinite;
 }
 img.landmark-icon {
   width: calc(var(--tile) * 0.82);
