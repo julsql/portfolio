@@ -66,14 +66,14 @@ describe("useMovement", () => {
 
   it("throws a rock into water, removing it", () => {
     const removeRock = vi.fn();
-    const rocks = [{ id: "r", x: 13, y: 12 }];
-    // Hero at (13,11); rock at (13,12); beyond (13,13) is the water frame row.
+    const rocks = [{ id: "r", x: 13, y: 10 }];
+    // Hero at (12,10); rock at (13,10); beyond (14,10) is the SE sea.
     const { result } = renderHook(() =>
-      useMovement(overworld, { x: 13, y: 11, facing: "down" }, handlers({ rocks, removeRock })),
+      useMovement(overworld, { x: 12, y: 10, facing: "right" }, handlers({ rocks, removeRock })),
     );
-    act(() => result.current.move("down"));
+    act(() => result.current.move("right"));
     expect(removeRock).toHaveBeenCalledWith("r");
-    expect(result.current.hero).toMatchObject({ x: 13, y: 12 });
+    expect(result.current.hero).toMatchObject({ x: 13, y: 10 });
   });
 
   it("cannot push a rock directly onto an enemy", () => {

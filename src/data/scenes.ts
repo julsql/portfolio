@@ -35,7 +35,7 @@ const overworld: Scene = {
   decor: [
     { x: 2, y: 2, icon: SPRITES.cactus },
     { x: 5, y: 2, icon: SPRITES.cactus },
-    { x: 16, y: 6, icon: SPRITES.cactus },
+    { x: 1, y: 4, icon: SPRITES.cactus },
   ],
   rocks: [
     { id: "rock-1", x: 14, y: 7 },
@@ -43,7 +43,7 @@ const overworld: Scene = {
   ],
   enemies: [
     { id: "bat", x: 13, y: 5, axis: "h", min: 11, max: 16, sprites: [SPRITES.bat] },
-    { id: "scorpion", x: 8, y: 3, axis: "v", min: 2, max: 5, sprites: [SPRITES.scorpion] },
+    { id: "scorpion", x: 4, y: 3, axis: "v", min: 2, max: 4, sprites: [SPRITES.scorpion] },
   ],
 };
 
