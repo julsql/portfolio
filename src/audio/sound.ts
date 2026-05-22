@@ -39,6 +39,7 @@ const FILES: Partial<Record<Sfx, string>> = {
   enterLair: `${S}/enter-lair.wav`,
   victory: `${S}/victory.wav`,
   lowHealth: `${S}/low-health.wav`,
+  gameover: `${S}/gameover.wav`,
 };
 const MUSIC_VOL = 0.4;
 const SFX_VOL = 0.7;
@@ -130,9 +131,6 @@ class SoundEngine {
         break;
       case "burn":
         this.noise(0.28, 0.12);
-        break;
-      case "gameover":
-        [392, 330, 262, 196].forEach((f, i) => this.tone(f, 0.3, "triangle", 0.2, i * 0.24));
         break;
     }
   }
