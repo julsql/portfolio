@@ -20,7 +20,8 @@ export type Sfx =
   | "burn"
   | "gameover"
   | "victory"
-  | "lowHealth";
+  | "lowHealth"
+  | "cursor";
 
 const S = "/sound";
 const MUSIC: Record<Track, string> = {
@@ -138,6 +139,9 @@ class SoundEngine {
         break;
       case "burn":
         this.noise(0.28, 0.12);
+        break;
+      case "cursor":
+        this.tone(880, 0.04, "square", 0.12);
         break;
     }
   }

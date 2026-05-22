@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Project, ProjectLink } from "../types";
+import { sound } from "../audio/sound";
 
 interface Props {
   project: Project;
@@ -42,9 +43,11 @@ export default function ProjectModal({ project, onClose }: Props) {
         onClose();
       } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
         e.preventDefault();
+        sound.sfx("cursor");
         setSel((s) => (s + 1) % n);
       } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
         e.preventDefault();
+        sound.sfx("cursor");
         setSel((s) => (s - 1 + n) % n);
       } else if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
