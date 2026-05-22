@@ -335,7 +335,6 @@ img.decor {
   pointer-events: none;
   image-rendering: pixelated;
   filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
-  animation: bob 1.2s ease-in-out infinite;
 }
 .enemy {
   position: absolute;
