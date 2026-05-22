@@ -24,8 +24,11 @@
   --cat-tool: #f86840;
 
   /* Sized so the largest scene (the 20x14 overworld) fits the window in both
-     directions, leaving room for the HUD / status bar / hint above it. */
-  --tile: min(calc((100vw - 16px) / 20), calc((100vh - 168px) / 14), 54px);
+     directions, leaving room (--chrome) for the HUD / status bar / hint. The
+     second declaration uses dvh (correct on mobile) where supported. */
+  --chrome: 168px;
+  --tile: min(calc((100vw - 16px) / 20), calc((100vh - var(--chrome)) / 14), 54px);
+  --tile: min(calc((100vw - 16px) / 20), calc((100dvh - var(--chrome)) / 14), 54px);
 
   --font-pixel: "Press Start 2P", monospace;
   --font-body: "VT323", "Courier New", monospace;
@@ -43,6 +46,9 @@ html,
 body,
 #root {
   height: 100%;
+}
+body {
+  height: 100dvh;
 }
 
 body {

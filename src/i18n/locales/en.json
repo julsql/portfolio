@@ -22,7 +22,7 @@
   },
   "npc": {
     "name": "Old Sage",
-    "hint": "Pull the sword from the desert, then find the heart hidden behind TheCode's throne. Then you may face Ganondorf. Beware fire, deep water and creatures! You can push rocks (and shove them into water).",
+    "hint": "Pull the sword from the desert, then find the heart hidden behind TheCode's throne. Then you may face Ganondorf. Beware fire, deep water and creatures!",
     "ok": "Thanks"
   },
   "item": {

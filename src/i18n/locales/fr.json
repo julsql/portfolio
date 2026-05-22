@@ -22,7 +22,7 @@
   },
   "npc": {
     "name": "Vieux Sage",
-    "hint": "Empare-toi de l'épée plantée dans le désert, puis cherche le cœur caché derrière le trône de TheCode. Tu pourras alors affronter Ganondorf. Méfie-toi du feu, de l'eau profonde et des créatures ! On peut pousser les rochers (et les jeter à l'eau).",
+    "hint": "Empare-toi de l'épée plantée dans le désert, puis cherche le cœur caché derrière le trône de TheCode. Tu pourras alors affronter Ganondorf. Méfie-toi du feu, de l'eau profonde et des créatures !",
     "ok": "Merci"
   },
   "item": {

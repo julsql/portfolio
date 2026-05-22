@@ -1145,11 +1145,66 @@ img.landmark-icon {
   .hint-touch {
     display: inline;
   }
+  /* Anchor the map to the top so the on-screen controls have room below it. */
+  .stage {
+    align-items: flex-start;
+    align-items: safe flex-start;
+  }
+  .dpad,
+  .attack-btn {
+    opacity: 0.9;
+  }
 }
 
 @media (max-width: 560px) {
+  .hud {
+    padding: 6px 10px;
+    gap: 8px;
+  }
   .hud-sub {
     display: none;
+  }
+  .hud-name {
+    font-size: 13px;
+  }
+  .seg-btn {
+    font-size: 14px;
+    padding: 3px 8px;
+  }
+  .lang-btn {
+    font-size: 9px;
+    padding: 6px 8px;
+  }
+  .status {
+    gap: 12px;
+  }
+  .heart-img {
+    width: 22px;
+    height: 22px;
+  }
+  .explore-hint {
+    font-size: 15px;
+  }
+  .overworld {
+    gap: 5px;
+    padding: 5px;
+  }
+  /* Smaller labels so they don't overflow the smaller tiles on a phone. */
+  .landmark-label {
+    font-size: 8px;
+    padding: 2px 4px;
+    border-width: 1px;
+  }
+  .landmark-castle .landmark-label {
+    font-size: 8px;
+  }
+  .dpad {
+    bottom: 12px;
+    left: 12px;
+  }
+  .attack-btn {
+    bottom: 28px;
+    right: 14px;
   }
 }
 
