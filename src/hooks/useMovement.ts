@@ -29,23 +29,28 @@ export interface MoveHandlers {
   onPickup: (l: LandmarkRef) => void;
   onDrown: () => void;
   rocks: Rock[];
+  enemies: { x: number; y: number }[];
   pushRock: (id: string, x: number, y: number) => void;
+  removeRock: (id: string) => void;
 }
 
 interface UseMovement {
   hero: Hero;
+  /** Increments on every successful step — drives the walk-frame animation. */
+  steps: number;
   move: (dir: Dir) => void;
   setEnabled: (v: boolean) => void;
 }
 
 /**
  * Owns the hero position within a scene. Handles bump-to-interact landmarks,
- * walk-over pickups (coins), pushable rocks and drowning in water.
+ * walk-over pickups (rupees), pushable rocks (which sink in water) and drowning.
  */
 export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMovement {
   const [hero, setHero] = useState<Hero>(initial);
+  const [steps, setSteps] = useState(0);
   const [enabled, setEnabled] = useState(true);
-  const { onInteract, onPickup, onDrown, rocks, pushRock } = h;
+  const { onInteract, onPickup, onDrown, rocks, enemies, pushRock, removeRock } = h;
 
   const move = useCallback(
     (dir: Dir) => {
@@ -56,7 +61,10 @@ export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMo
         const ny = prev.y + dy;
         const facing = dir;
         const stay = { ...prev, facing };
-        const step = { x: nx, y: ny, facing };
+        const stepTo = (x: number, y: number) => {
+          setSteps((s) => s + 1);
+          return { x, y, facing };
+        };
 
         if (nx < 0 || ny < 0 || nx >= scene.width || ny >= scene.height) return stay;
 
@@ -64,7 +72,7 @@ export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMo
         if (landmark) {
           if (landmark.pickup) {
             onPickup(landmark);
-            return step;
+            return stepTo(nx, ny);
           }
           onInteract(landmark);
           return stay;
@@ -75,16 +83,21 @@ export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMo
           const bx = nx + dx;
           const by = ny + dy;
           const inBounds = bx >= 0 && by >= 0 && bx < scene.width && by < scene.height;
-          const beyond = inBounds ? scene.tiles[by][bx] : null;
-          const blocked =
-            !inBounds ||
-            beyond === "water" ||
-            BLOCKED.includes(beyond as never) ||
+          if (!inBounds) return stay;
+          const beyond = scene.tiles[by][bx];
+          if (beyond === "water") {
+            // Heave the boulder into the water — it sinks and vanishes.
+            removeRock(rock.id);
+            return stepTo(nx, ny);
+          }
+          const obstructed =
+            BLOCKED.includes(beyond) ||
             rocks.some((r) => r.x === bx && r.y === by) ||
-            scene.landmarks.some((l) => l.x === bx && l.y === by);
-          if (blocked) return stay;
+            scene.landmarks.some((l) => l.x === bx && l.y === by) ||
+            enemies.some((e) => e.x === bx && e.y === by);
+          if (obstructed) return stay;
           pushRock(rock.id, bx, by);
-          return step;
+          return stepTo(nx, ny);
         }
 
         const tile = scene.tiles[ny][nx];
@@ -93,10 +106,10 @@ export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMo
           return stay;
         }
         if (BLOCKED.includes(tile)) return stay;
-        return step;
+        return stepTo(nx, ny);
       });
     },
-    [enabled, scene, rocks, onInteract, onPickup, onDrown, pushRock],
+    [enabled, scene, rocks, enemies, onInteract, onPickup, onDrown, pushRock, removeRock],
   );
 
   useEffect(() => {
@@ -110,5 +123,5 @@ export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMo
     return () => window.removeEventListener("keydown", handler);
   }, [move]);
 
-  return { hero, move, setEnabled };
+  return { hero, steps, move, setEnabled };
 }

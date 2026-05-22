@@ -10,7 +10,8 @@
     "view_map": "Map",
     "view_list": "List",
     "lang": "FR",
-    "sound": "Sound"
+    "sound": "Sound",
+    "hint_sword": "Arrows / WASD to move · Space to swing the sword"
   },
   "world": {
     "enter": "ENTER",
@@ -21,8 +22,12 @@
   },
   "npc": {
     "name": "Old Sage",
-    "hint": "A crown hides behind TheCode's throne... Beware fire, deep water and creatures, young hero! You can push the rocks.",
+    "hint": "Pull the sword from the desert, then find the heart hidden behind TheCode's throne. Then you may face Ganondorf. Beware fire, deep water and creatures! You can push rocks (and shove them into water).",
     "ok": "Thanks"
+  },
+  "item": {
+    "heart": "Heart container!",
+    "sword": "You got the Legendary Sword!"
   },
   "gameover": {
     "title": "GAME OVER",

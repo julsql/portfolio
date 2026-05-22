@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { EnemySpec, Hero as HeroType, LandmarkRef, Scene } from "../types";
+import type { EnemySpec, Hero as HeroType, LandmarkRef, Scene, TileKind } from "../types";
 import { castleById, projectById } from "../data/projects";
+import { BLOCKED } from "../data/map";
+import { SPRITES } from "../data/sprites";
 import { useMovement } from "../hooks/useMovement";
 import Hero from "./Hero";
 import TouchControls from "./TouchControls";
@@ -11,99 +13,173 @@ interface Props {
   initialHero: HeroType;
   onInteract: (l: LandmarkRef) => void;
   onPickup: (l: LandmarkRef) => void;
-  onHit: (fatal: boolean) => void;
+  onHit: () => void;
   paused: boolean;
-  crowned: boolean;
-  hearts: number;
-  coins: number;
+  hasSword: boolean;
+  health: number;
+  rupees: number;
+  invulnerable: boolean;
 }
 
-type Enemy = EnemySpec & { dir: number };
+type Enemy = EnemySpec & { dir: number; frame: number };
+type Dir = HeroType["facing"];
 
 const MAX_HEARTS = 3;
-const BURN_LIMIT = 6;
-const BURN_MS = 350;
+const BURN_MS = 300;
 const ENEMY_MS = 600;
+const ATTACK_MS = 260;
+const DELTA: Record<Dir, [number, number]> = {
+  up: [0, -1],
+  down: [0, 1],
+  left: [-1, 0],
+  right: [1, 0],
+};
 
 function tileStyle(x: number, y: number) {
   return { left: `calc(${x} * var(--tile))`, top: `calc(${y} * var(--tile))` };
 }
 
+const heartSrc = (health: number, i: number) => {
+  const units = Math.max(Math.min(health - i * 2, 2), 0);
+  return units >= 2 ? SPRITES.heart.full : units === 1 ? SPRITES.heart.half : SPRITES.heart.empty;
+};
+
 export default function SceneView(props: Props) {
-  const { scene, initialHero, onInteract, onPickup, onHit, paused, crowned, hearts, coins } = props;
+  const { scene, initialHero, onInteract, onPickup, onHit } = props;
+  const { paused, hasSword, health, rupees, invulnerable } = props;
   const { t } = useTranslation();
 
   const [rocks, setRocks] = useState(scene.rocks ?? []);
   const [enemies, setEnemies] = useState<Enemy[]>(
-    (scene.enemies ?? []).map((e) => ({ ...e, dir: 1 })),
+    (scene.enemies ?? []).map((e) => ({ ...e, dir: 1, frame: 0 })),
   );
+  const [attacking, setAttacking] = useState(false);
 
   const pushRock = useCallback(
     (id: string, x: number, y: number) =>
       setRocks((rs) => rs.map((r) => (r.id === id ? { ...r, x, y } : r))),
     [],
   );
-  const onDrown = useCallback(() => onHit(false), [onHit]);
+  const removeRock = useCallback(
+    (id: string) => setRocks((rs) => rs.filter((r) => r.id !== id)),
+    [],
+  );
+  const onDrown = useCallback(() => onHit(), [onHit]);
 
-  const { hero, move, setEnabled } = useMovement(scene, initialHero, {
+  const { hero, steps, move, setEnabled } = useMovement(scene, initialHero, {
     onInteract,
     onPickup,
     onDrown,
     rocks,
+    enemies,
     pushRock,
+    removeRock,
   });
-
   useEffect(() => setEnabled(!paused), [paused, setEnabled]);
 
-  // ── Fire hazard: heat builds on a fire tile, costs a heart when it maxes ──
-  const [heat, setHeat] = useState(0);
+  const frame: 1 | 2 = steps % 2 === 1 ? 2 : 1;
+
+  // ── Fire hazard: progressive damage while standing on a fire tile ─────────
   const onFire = scene.decor.some((d) => d.hazard && d.x === hero.x && d.y === hero.y);
   useEffect(() => {
-    if (paused || !onFire) {
-      setHeat(0);
-      return;
-    }
-    const id = setInterval(() => setHeat((s) => s + 1), BURN_MS);
+    if (paused || !onFire) return;
+    const id = setInterval(() => onHit(), BURN_MS);
     return () => clearInterval(id);
-  }, [onFire, paused]);
-  useEffect(() => {
-    if (heat >= BURN_LIMIT) onHit(false);
-  }, [heat, onHit]);
+  }, [onFire, paused, onHit]);
 
-  // ── Enemies patrol back and forth ────────────────────────────────────────
+  // ── Enemies: patrol or random walk, blocked by rocks / walls / landmarks ──
+  const canEnter = useCallback(
+    (x: number, y: number, tiles: TileKind[][]) => {
+      if (x < 0 || y < 0 || x >= scene.width || y >= scene.height) return false;
+      if (tiles[y][x] === "water" || BLOCKED.includes(tiles[y][x])) return false;
+      if (rocks.some((r) => r.x === x && r.y === y)) return false;
+      if (scene.landmarks.some((l) => l.x === x && l.y === y)) return false;
+      return true;
+    },
+    [scene, rocks],
+  );
+
   useEffect(() => {
     if (paused) return;
     const id = setInterval(() => {
       setEnemies((prev) =>
         prev.map((e) => {
+          if (e.random) {
+            const dirs = (Object.keys(DELTA) as Dir[])
+              .map((d) => DELTA[d])
+              .filter(([dx, dy]) => canEnter(e.x + dx, e.y + dy, scene.tiles));
+            if (!dirs.length) return e;
+            const [dx, dy] = dirs[Math.floor(Math.random() * dirs.length)];
+            const len = e.sprites?.length ?? 1;
+            return { ...e, x: e.x + dx, y: e.y + dy, frame: (e.frame + 1) % len };
+          }
+          // Patrol along its axis, bouncing at bounds or obstacles.
           let dir = e.dir;
-          const pos = (e.axis === "h" ? e.x : e.y) + dir;
-          if (pos > e.max || pos < e.min) dir = -dir;
-          const next = (e.axis === "h" ? e.x : e.y) + dir;
-          return e.axis === "h" ? { ...e, x: next, dir } : { ...e, y: next, dir };
+          const tryStep = (d: number) => {
+            const x = e.axis === "h" ? e.x + d : e.x;
+            const y = e.axis === "h" ? e.y : e.y + d;
+            const pos = e.axis === "h" ? x : y;
+            return pos >= (e.min ?? 0) && pos <= (e.max ?? 0) && canEnter(x, y, scene.tiles)
+              ? { x, y }
+              : null;
+          };
+          let next = tryStep(dir);
+          if (!next) {
+            dir = -dir;
+            next = tryStep(dir);
+          }
+          return next ? { ...e, ...next, dir } : { ...e, dir };
         }),
       );
     }, ENEMY_MS);
     return () => clearInterval(id);
-  }, [paused]);
+  }, [paused, canEnter, scene]);
 
-  // Touching an enemy costs a heart.
+  // Contact with an enemy hurts.
   useEffect(() => {
     if (paused) return;
-    if (enemies.some((e) => e.x === hero.x && e.y === hero.y)) onHit(false);
+    if (enemies.some((e) => e.x === hero.x && e.y === hero.y)) onHit();
   }, [enemies, hero, paused, onHit]);
 
-  const heatRatio = Math.min(heat / BURN_LIMIT, 1);
+  // ── Sword: Space strikes the tile in front; kills enemies / wounds boss ──
+  useEffect(() => {
+    if (!hasSword || paused) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== " ") return;
+      e.preventDefault();
+      strike();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
+  const strike = useCallback(() => {
+    if (attacking) return;
+    setAttacking(true);
+    setTimeout(() => setAttacking(false), ATTACK_MS);
+    const [dx, dy] = DELTA[hero.facing];
+    const fx = hero.x + dx;
+    const fy = hero.y + dy;
+    setEnemies((prev) =>
+      prev.flatMap((e) => {
+        if (e.x !== fx || e.y !== fy) return [e];
+        const hp = (e.hp ?? 1) - 1;
+        return hp > 0 ? [{ ...e, hp }] : [];
+      }),
+    );
+  }, [attacking, hero]);
 
   return (
     <div className="overworld">
       <div className="status">
         <span className="hearts">
           {Array.from({ length: MAX_HEARTS }, (_, i) => (
-            <span key={i}>{i < hearts ? "❤️" : "🖤"}</span>
+            <img key={i} className="heart-img" src={heartSrc(health, i)} alt="" />
           ))}
         </span>
-        <span className="coins">🪙 {coins}</span>
+        <span className="rupees">
+          <img className="rupee-icon" src={SPRITES.rupee.green} alt="" /> {rupees}
+        </span>
       </div>
 
       <p className={`explore-hint${onFire ? " danger" : ""}`}>
@@ -111,7 +187,7 @@ export default function SceneView(props: Props) {
           t("world.hot")
         ) : (
           <>
-            <span className="hint-desktop">{t("hud.hint")}</span>
+            <span className="hint-desktop">{hasSword ? t("hud.hint_sword") : t("hud.hint")}</span>
             <span className="hint-touch">{t("hud.hint_touch")}</span>
           </>
         )}
@@ -121,10 +197,6 @@ export default function SceneView(props: Props) {
         className={`field scene-${scene.id}`}
         style={{ ["--cols" as string]: scene.width, ["--rows" as string]: scene.height }}
       >
-        {heat > 0 && (
-          <div className="heat-overlay" style={{ opacity: heatRatio }} aria-hidden="true" />
-        )}
-
         <div className="tilemap">
           {scene.tiles.flatMap((row, y) =>
             row.map((kind, x) => <div key={`${x}-${y}`} className={`tile tile-${kind}`} />),
@@ -150,53 +222,73 @@ export default function SceneView(props: Props) {
 
         {scene.landmarks.map((l) => renderLandmark(l))}
 
-        {enemies.map((e) => (
-          <span key={e.id} className="enemy" style={tileStyle(e.x, e.y)} aria-hidden="true">
-            {e.icon}
-          </span>
-        ))}
+        {enemies.map((e) =>
+          e.sprites ? (
+            <img
+              key={e.id}
+              className="enemy enemy-boss"
+              style={tileStyle(e.x, e.y)}
+              src={e.sprites[e.frame % e.sprites.length]}
+              alt=""
+            />
+          ) : (
+            <span key={e.id} className="enemy" style={tileStyle(e.x, e.y)} aria-hidden="true">
+              {e.icon}
+            </span>
+          ),
+        )}
 
-        <Hero hero={hero} crowned={crowned} burning={onFire} />
+        <Hero
+          hero={hero}
+          frame={frame}
+          hasSword={hasSword}
+          attacking={attacking}
+          burning={onFire}
+          invulnerable={invulnerable}
+        />
       </div>
 
-      <TouchControls onMove={move} />
+      <TouchControls onMove={move} onAttack={hasSword ? strike : undefined} />
     </div>
   );
 
   function renderLandmark(l: LandmarkRef) {
-    const key = `${l.kind}-${l.ref}-${l.x}-${l.y}`;
+    const key = `${l.kind}-${l.ref}`;
 
-    if (l.kind === "coin") {
+    if (l.kind === "rupee") {
       return (
-        <span key={key} className="coin" style={tileStyle(l.x, l.y)} aria-hidden="true">
-          🪙
-        </span>
+        <img
+          key={key}
+          className="rupee"
+          style={tileStyle(l.x, l.y)}
+          src={SPRITES.rupee[l.rupee ?? "green"]}
+          alt=""
+        />
       );
     }
-    if (l.kind === "crown") {
+    if (l.kind === "heart") {
       return (
         <button
           key={key}
-          className="landmark landmark-crown"
+          className="landmark landmark-item"
           style={tileStyle(l.x, l.y)}
           onClick={() => onInteract(l)}
-          aria-label="crown"
+          aria-label={t("item.heart")}
         >
-          <span className="landmark-icon">👑</span>
+          <img className="item-sprite" src={SPRITES.heart.full} alt="" />
         </button>
       );
     }
-    if (l.kind === "ganon") {
+    if (l.kind === "sword") {
       return (
         <button
           key={key}
-          className="landmark landmark-ganon"
+          className="landmark landmark-item"
           style={tileStyle(l.x, l.y)}
           onClick={() => onInteract(l)}
-          aria-label="Ganon"
+          aria-label={t("item.sword")}
         >
-          <span className="landmark-icon">👹</span>
-          <span className="landmark-label">Ganon</span>
+          <img className="item-sprite pedestal" src={SPRITES.swordPedestal} alt="" />
         </button>
       );
     }

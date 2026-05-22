@@ -95,7 +95,7 @@ const walkable = (scene: Scene, x: number, y: number) =>
 
 describe("game objects", () => {
   it.each(scenes)("$id: standable landmarks sit on walkable tiles", (scene) => {
-    const standable = ["project", "castle", "coin", "npc", "crown"];
+    const standable = ["project", "castle", "rupee", "npc", "heart", "sword"];
     for (const l of scene.landmarks) {
       if (standable.includes(l.kind)) {
         expect(walkable(scene, l.x, l.y), `${l.kind} ${l.ref}`).toBe(true);
@@ -110,16 +110,21 @@ describe("game objects", () => {
     }
   });
 
-  it.each(scenes)("$id: enemies patrol only walkable tiles, clear of landmarks", (scene) => {
+  it.each(scenes)("$id: enemies start on walkable tiles, clear of landmarks", (scene) => {
     for (const e of scene.enemies ?? []) {
-      const pos = e.axis === "h" ? e.x : e.y;
-      expect(pos).toBeGreaterThanOrEqual(e.min);
-      expect(pos).toBeLessThanOrEqual(e.max);
-      for (let p = e.min; p <= e.max; p++) {
-        const x = e.axis === "h" ? p : e.x;
-        const y = e.axis === "h" ? e.y : p;
-        expect(walkable(scene, x, y), `patrol ${e.id} @ ${x},${y}`).toBe(true);
-        expect(scene.landmarks.some((l) => l.x === x && l.y === y)).toBe(false);
+      expect(walkable(scene, e.x, e.y), `${e.id} start`).toBe(true);
+      expect(scene.landmarks.some((l) => l.x === e.x && l.y === e.y)).toBe(false);
+      // Patrol enemies must keep their whole range walkable and landmark-free.
+      if (e.axis && e.min !== undefined && e.max !== undefined) {
+        const pos = e.axis === "h" ? e.x : e.y;
+        expect(pos).toBeGreaterThanOrEqual(e.min);
+        expect(pos).toBeLessThanOrEqual(e.max);
+        for (let p = e.min; p <= e.max; p++) {
+          const x = e.axis === "h" ? p : e.x;
+          const y = e.axis === "h" ? e.y : p;
+          expect(walkable(scene, x, y), `patrol ${e.id} @ ${x},${y}`).toBe(true);
+          expect(scene.landmarks.some((l) => l.x === x && l.y === y)).toBe(false);
+        }
       }
     }
   });

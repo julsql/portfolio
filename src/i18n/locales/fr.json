@@ -10,7 +10,8 @@
     "view_map": "Carte",
     "view_list": "Liste",
     "lang": "EN",
-    "sound": "Son"
+    "sound": "Son",
+    "hint_sword": "Flèches / ZQSD pour bouger · Espace pour frapper à l'épée"
   },
   "world": {
     "enter": "ENTRER",
@@ -21,8 +22,12 @@
   },
   "npc": {
     "name": "Vieux Sage",
-    "hint": "Une couronne se cache derrière le trône de TheCode... Méfie-toi du feu, de l'eau profonde et des créatures, jeune héros ! Tu peux pousser les rochers.",
+    "hint": "Empare-toi de l'épée plantée dans le désert, puis cherche le cœur caché derrière le trône de TheCode. Tu pourras alors affronter Ganondorf. Méfie-toi du feu, de l'eau profonde et des créatures ! On peut pousser les rochers (et les jeter à l'eau).",
     "ok": "Merci"
+  },
+  "item": {
+    "heart": "Cœur de vie gagné !",
+    "sword": "Tu as obtenu l'Épée de Légende !"
   },
   "gameover": {
     "title": "GAME OVER",

@@ -11,7 +11,9 @@ function handlers(over: Partial<MoveHandlers> = {}): MoveHandlers {
     onPickup: vi.fn(),
     onDrown: vi.fn(),
     rocks: [],
+    enemies: [],
     pushRock: vi.fn(),
+    removeRock: vi.fn(),
     ...over,
   };
 }
@@ -47,15 +49,47 @@ describe("useMovement", () => {
     expect(result.current.hero).toMatchObject({ x: 9, y: 9 });
   });
 
-  it("collects a coin by walking over it", () => {
+  it("collects a rupee by walking over it", () => {
     const onPickup = vi.fn();
-    const coin = overworld.landmarks.find((l) => l.kind === "coin")!;
+    const rupee = overworld.landmarks.find((l) => l.kind === "rupee")!;
     const { result } = renderHook(() =>
-      useMovement(overworld, { x: coin.x - 1, y: coin.y, facing: "right" }, handlers({ onPickup })),
+      useMovement(
+        overworld,
+        { x: rupee.x - 1, y: rupee.y, facing: "right" },
+        handlers({ onPickup }),
+      ),
     );
     act(() => result.current.move("right"));
-    expect(onPickup).toHaveBeenCalledWith(coin);
-    expect(result.current.hero).toMatchObject({ x: coin.x, y: coin.y });
+    expect(onPickup).toHaveBeenCalledWith(rupee);
+    expect(result.current.hero).toMatchObject({ x: rupee.x, y: rupee.y });
+  });
+
+  it("throws a rock into water, removing it", () => {
+    const removeRock = vi.fn();
+    const rocks = [{ id: "r", x: 13, y: 12 }];
+    // Hero at (13,11); rock at (13,12); beyond (13,13) is the water frame row.
+    const { result } = renderHook(() =>
+      useMovement(overworld, { x: 13, y: 11, facing: "down" }, handlers({ rocks, removeRock })),
+    );
+    act(() => result.current.move("down"));
+    expect(removeRock).toHaveBeenCalledWith("r");
+    expect(result.current.hero).toMatchObject({ x: 13, y: 12 });
+  });
+
+  it("cannot push a rock directly onto an enemy", () => {
+    const pushRock = vi.fn();
+    const rocks = [{ id: "r", x: 9, y: 9 }];
+    const enemies = [{ x: 8, y: 9 }];
+    const { result } = renderHook(() =>
+      useMovement(
+        overworld,
+        { x: 10, y: 9, facing: "left" },
+        handlers({ rocks, enemies, pushRock }),
+      ),
+    );
+    act(() => result.current.move("left"));
+    expect(pushRock).not.toHaveBeenCalled();
+    expect(result.current.hero).toMatchObject({ x: 10, y: 9 });
   });
 
   it("interacts with a bump landmark instead of moving", () => {

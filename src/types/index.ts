@@ -59,17 +59,21 @@ export interface Hero {
   facing: "up" | "down" | "left" | "right";
 }
 
+import type { RupeeColor } from "../data/sprites";
+
 /** Something the hero can bump into (or walk over) within a scene. */
 export interface LandmarkRef {
   x: number;
   y: number;
-  kind: "project" | "castle" | "exit" | "crown" | "coin" | "npc" | "door" | "ganon";
-  /** project id, castle id, target scene id, coin id, or marker. */
+  kind: "project" | "castle" | "exit" | "npc" | "door" | "heart" | "sword" | "rupee";
+  /** project id, castle id, target scene id, rupee id, or marker. */
   ref: string;
   /** Where the hero should spawn after an exit/door transition. */
   spawn?: Hero;
-  /** Walk onto it (and collect) instead of bumping it — e.g. coins. */
+  /** Walk onto it (and collect) instead of bumping it — e.g. rupees. */
   pickup?: boolean;
+  /** For rupees: which colour (sets the value). */
+  rupee?: RupeeColor;
 }
 
 /** A pushable boulder. */
@@ -79,15 +83,22 @@ export interface Rock {
   y: number;
 }
 
-/** An enemy patrolling back and forth along one axis between min and max. */
+/**
+ * An enemy. Either patrols along an axis (axis/min/max) or walks randomly
+ * (`random`). Rendered from an emoji `icon` or cycling image `sprites`.
+ */
 export interface EnemySpec {
   id: string;
   x: number;
   y: number;
-  axis: "h" | "v";
-  min: number;
-  max: number;
-  icon: string;
+  icon?: string;
+  sprites?: string[];
+  axis?: "h" | "v";
+  min?: number;
+  max?: number;
+  random?: boolean;
+  /** Sword hits needed to defeat it (default 1). */
+  hp?: number;
 }
 
 /** Decorative sprite placed on a tile. When `hazard`, standing on it burns. */

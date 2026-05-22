@@ -1,18 +1,21 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Hero, LandmarkRef, Project } from "./types";
 import { castleSceneId, CASTLE_ID, GANON_ID, OVERWORLD_ID, SCENES } from "./data/scenes";
 import { projectById } from "./data/projects";
+import { RUPEE_VALUE } from "./data/sprites";
 import TitleScreen from "./components/TitleScreen";
 import SceneView from "./components/SceneView";
 import ListView from "./components/ListView";
 import ProjectModal from "./components/ProjectModal";
 import DialogBox from "./components/DialogBox";
+import ItemGet, { type Item } from "./components/ItemGet";
 import GameOver from "./components/GameOver";
 import Hud from "./components/Hud";
 
 type View = "map" | "list";
-const MAX_HEARTS = 3;
+const MAX_HEALTH = 6; // 3 hearts × 2 half-units
+const INVULN_MS = 800;
 
 export default function App() {
   const { i18n } = useTranslation();
@@ -20,35 +23,40 @@ export default function App() {
   const [view, setView] = useState<View>("map");
   const [active, setActive] = useState<Project | null>(null);
   const [dialogue, setDialogue] = useState(false);
+  const [itemGet, setItemGet] = useState<Item | null>(null);
 
-  // Current scene + the hero spawn to use when (re)entering it.
   const [sceneId, setSceneId] = useState(OVERWORLD_ID);
   const [spawn, setSpawn] = useState<Hero>(SCENES[OVERWORLD_ID].heroStart);
   const [runId, setRunId] = useState(0);
 
-  // Progress / survival state.
-  const [crowned, setCrowned] = useState(false);
+  // Progress / survival.
+  const [heartTaken, setHeartTaken] = useState(false);
+  const [hasSword, setHasSword] = useState(false);
   const [collected, setCollected] = useState<Set<string>>(new Set());
-  const [hearts, setHearts] = useState(MAX_HEARTS);
+  const [rupees, setRupees] = useState(0);
+  const [health, setHealth] = useState(MAX_HEALTH);
+  const [invuln, setInvuln] = useState(false);
+  const invulnRef = useRef(false);
   const [gameOver, setGameOver] = useState(false);
 
-  // Derive the live scene: drop grabbed crown & collected coins, and once
-  // crowned reveal the door to Ganon's lair behind the throne.
+  // Live scene: drop the grabbed heart, the taken sword and collected rupees;
+  // once the heart is taken, reveal the door to Ganon's lair behind the throne.
   const scene = useMemo(() => {
     const base = SCENES[sceneId];
     let landmarks = base.landmarks;
-    if (crowned) landmarks = landmarks.filter((l) => l.kind !== "crown");
+    if (heartTaken) landmarks = landmarks.filter((l) => l.kind !== "heart");
+    if (hasSword) landmarks = landmarks.filter((l) => l.kind !== "sword");
     if (collected.size) {
-      landmarks = landmarks.filter((l) => !(l.kind === "coin" && collected.has(l.ref)));
+      landmarks = landmarks.filter((l) => !(l.kind === "rupee" && collected.has(l.ref)));
     }
-    if (crowned && sceneId === CASTLE_ID) {
+    if (heartTaken && sceneId === CASTLE_ID) {
       landmarks = [
         ...landmarks,
         { x: 6, y: 1, kind: "door", ref: GANON_ID, spawn: SCENES[GANON_ID].heroStart },
       ];
     }
     return { ...base, landmarks };
-  }, [sceneId, crowned, collected]);
+  }, [sceneId, heartTaken, hasSword, collected]);
 
   const goToScene = (id: string, where: Hero) => {
     setSpawn(where);
@@ -56,23 +64,21 @@ export default function App() {
     setRunId((r) => r + 1);
   };
 
-  const takeHit = useCallback(
-    (fatal: boolean) => {
-      if (fatal) {
-        setHearts(0);
-        return;
-      }
-      setHearts((h) => Math.max(h - 1, 0));
-      // Knock the hero back to the start of the current scene.
-      setSpawn(SCENES[sceneId].heroStart);
-      setRunId((r) => r + 1);
-    },
-    [sceneId],
-  );
+  // A single half-heart of damage, with a brief invulnerability window.
+  const takeHit = useCallback(() => {
+    if (invulnRef.current) return;
+    invulnRef.current = true;
+    setInvuln(true);
+    setTimeout(() => {
+      invulnRef.current = false;
+      setInvuln(false);
+    }, INVULN_MS);
+    setHealth((h) => Math.max(h - 1, 0));
+  }, []);
 
   useEffect(() => {
-    if (started && hearts <= 0) setGameOver(true);
-  }, [started, hearts]);
+    if (started && health <= 0) setGameOver(true);
+  }, [started, health]);
 
   const onInteract = (l: LandmarkRef) => {
     switch (l.kind) {
@@ -90,26 +96,32 @@ export default function App() {
       case "door":
         goToScene(l.ref, l.spawn ?? SCENES[l.ref].heroStart);
         break;
-      case "crown":
-        setCrowned(true);
-        break;
       case "npc":
         setDialogue(true);
         break;
-      case "ganon":
-        takeHit(true);
+      case "heart":
+        setHeartTaken(true);
+        setHealth((h) => Math.min(h + 2, MAX_HEALTH));
+        setItemGet("heart");
+        break;
+      case "sword":
+        setHasSword(true);
+        setItemGet("sword");
         break;
     }
   };
 
   const onPickup = (l: LandmarkRef) => {
-    if (l.kind !== "coin" || collected.has(l.ref)) return;
+    if (l.kind !== "rupee" || collected.has(l.ref)) return;
     setCollected((c) => new Set(c).add(l.ref));
+    setRupees((n) => n + RUPEE_VALUE[l.rupee ?? "green"]);
   };
 
   const retry = () => {
     setGameOver(false);
-    setHearts(MAX_HEARTS);
+    setHealth(MAX_HEALTH);
+    invulnRef.current = false;
+    setInvuln(false);
     setSceneId(OVERWORLD_ID);
     setSpawn(SCENES[OVERWORLD_ID].heroStart);
     setRunId((r) => r + 1);
@@ -120,6 +132,8 @@ export default function App() {
   if (!started) {
     return <TitleScreen onStart={() => setStarted(true)} onToggleLang={toggleLang} />;
   }
+
+  const paused = active !== null || gameOver || dialogue || itemGet !== null;
 
   return (
     <div className="screen">
@@ -133,10 +147,11 @@ export default function App() {
             onInteract={onInteract}
             onPickup={onPickup}
             onHit={takeHit}
-            paused={active !== null || gameOver || dialogue}
-            crowned={crowned}
-            hearts={hearts}
-            coins={collected.size}
+            paused={paused}
+            hasSword={hasSword}
+            health={health}
+            rupees={rupees}
+            invulnerable={invuln}
           />
         ) : (
           <ListView onOpen={setActive} />
@@ -144,6 +159,7 @@ export default function App() {
       </main>
       {active && <ProjectModal project={active} onClose={() => setActive(null)} />}
       {dialogue && <DialogBox onClose={() => setDialogue(false)} />}
+      {itemGet && <ItemGet item={itemGet} onDone={() => setItemGet(null)} />}
       {gameOver && <GameOver onRetry={retry} />}
     </div>
   );
