@@ -1,0 +1,97 @@
+{
+  "title": "JulSql",
+  "subtitle": "Développeur web fullstack",
+  "press_start": "Appuie sur START",
+  "start": "START",
+  "hud": {
+    "explore": "Explore le monde",
+    "hint": "Flèches / ZQSD pour bouger · marche sur un lieu pour l'ouvrir",
+    "hint_touch": "Utilise la croix · touche un lieu pour l'ouvrir",
+    "view_map": "Carte",
+    "view_list": "Liste",
+    "lang": "EN",
+    "sound": "Son"
+  },
+  "legend": {
+    "web": "Sites web",
+    "app": "Applications",
+    "tool": "Outils",
+    "title": "Royaumes"
+  },
+  "modal": {
+    "live": "Voir le site",
+    "demo": "Démo en ligne",
+    "store": "Télécharger sur le store",
+    "code": "Code source",
+    "stack": "Stack technique",
+    "close": "Fermer",
+    "category": {
+      "web": "Site web",
+      "app": "Application",
+      "tool": "Outil"
+    }
+  },
+  "list": {
+    "title": "Mes projets en production",
+    "intro": "12 projets déployés et maintenus. Clique sur une carte pour explorer."
+  },
+  "footer": {
+    "made": "Conçu et codé par JulSql",
+    "tech": "React · TypeScript · Vite",
+    "github": "GitHub"
+  },
+  "about": {
+    "title": "À propos de l'aventurier",
+    "body": "Ingénieur passionné de code, basé en France. J'aime concevoir des produits complets — du backend dockerisé à l'interface soignée — et les mettre réellement en production. Voici la carte de mon royaume."
+  },
+  "projects": {
+    "codexio": {
+      "tagline": "Ma collection de BD, en ligne",
+      "description": "Site Django présentant ma collection de bandes dessinées, bâti sur une architecture hexagonale propre (domaine / application / infrastructure). Entièrement dockerisé pour un déploiement reproductible."
+    },
+    "rimbot": {
+      "tagline": "Générateur de poèmes français",
+      "description": "Monorepo dockerisé : API Flask + base PostgreSQL seedée + front React (Vite). Génère des poèmes aléatoires avec gestion des syllabes, le tout couvert par des tests unitaires, d'intégration et e2e en CI."
+    },
+    "thecode-website": {
+      "tagline": "Mots de passe déterministes, zéro stockage",
+      "description": "Site vitrine et générateur de mots de passe en ligne de TheCode. À partir d'une clé secrète et d'un nom de site, SHA-256 produit toujours le même mot de passe — rien n'est stocké ni transmis. Hub de doc et liens vers toutes les apps."
+    },
+    "speciarium": {
+      "tagline": "Cataloguer la biodiversité",
+      "description": "Plateforme Django de catalogage d'espèces : taxonomie synchronisée avec GBIF, carte interactive, galerie photo avec extraction EXIF, collections collaboratives et notifications temps réel via WebSockets (Channels + Redis)."
+    },
+    "lilianastrade": {
+      "tagline": "Gérer ses collections Magic",
+      "description": "Application Symfony pour gérer collections et decks de cartes Magic: The Gathering. Gestion multi-utilisateurs, déploiement automatisé avec Deployer."
+    },
+    "jimi-api": {
+      "tagline": "Assistant d'agenda piloté par LLM",
+      "description": "Backend Spring Boot 3 : l'utilisateur écrit en langage naturel (« planifie une réunion demain à 14h »), un LLM en extrait l'événement structuré et le CRUD en base MariaDB. Extraction multi-tours sans machine à états côté client."
+    },
+    "jimi-app": {
+      "tagline": "Chatbot de calendrier multiplateforme",
+      "description": "Client Expo / React Native unique tournant sur iOS, Android et Web. On chatte en langage naturel pour gérer son agenda ; une page planning lit directement la base, sans risque d'hallucination. Publié sur le Play Store."
+    },
+    "thecode-apple": {
+      "tagline": "TheCode pour iOS & macOS",
+      "description": "Applications natives Swift pour iPhone et Mac, avec extensions Safari intégrées. Génération de mots de passe locale et déterministe, sans aucun stockage — l'expérience TheCode dans l'écosystème Apple."
+    },
+    "thecode-android": {
+      "tagline": "TheCode pour Android",
+      "description": "Application Android en Java + Material Design 3 : génération déterministe SHA-256, indicateur d'entropie, remplissage automatique système (Android 8+) avec auth biométrique. 100 % hors ligne, aucun compte."
+    },
+    "thecode-extension": {
+      "tagline": "Mots de passe directement dans le navigateur",
+      "description": "Extension multi-navigateurs (Chrome, Edge, Brave, Firefox, Safari) qui détecte les champs de mot de passe et propose un mot de passe déterministe à partir de la clé de session + domaine. Algorithme testé unitairement, aucun stockage."
+    },
+    "thecode-cli": {
+      "tagline": "TheCode en ligne de commande",
+      "description": "Version CLI Python de TheCode, partageant la même logique que l'extension et le site. Installation pip, sortie scriptable, licence MIT, tests et CodeQL en CI."
+    },
+    "exif-tools": {
+      "tagline": "Visualiser et éditer les EXIF",
+      "description": "Application desktop Python (packagée avec PyInstaller) pour visualiser et modifier les métadonnées d'une photo : date de prise de vue, coordonnées GPS éditables sur une carte interactive."
+    }
+  }
+}

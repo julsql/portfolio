@@ -1,0 +1,97 @@
+{
+  "title": "JulSql",
+  "subtitle": "Fullstack web developer",
+  "press_start": "Press START",
+  "start": "START",
+  "hud": {
+    "explore": "Explore the world",
+    "hint": "Arrows / WASD to move · step onto a place to open it",
+    "hint_touch": "Use the D-pad · tap a place to open it",
+    "view_map": "Map",
+    "view_list": "List",
+    "lang": "FR",
+    "sound": "Sound"
+  },
+  "legend": {
+    "web": "Websites",
+    "app": "Applications",
+    "tool": "Tools",
+    "title": "Realms"
+  },
+  "modal": {
+    "live": "Visit website",
+    "demo": "Live demo",
+    "store": "Get it on the store",
+    "code": "Source code",
+    "stack": "Tech stack",
+    "close": "Close",
+    "category": {
+      "web": "Website",
+      "app": "Application",
+      "tool": "Tool"
+    }
+  },
+  "list": {
+    "title": "My production projects",
+    "intro": "12 deployed and maintained projects. Click a card to explore."
+  },
+  "footer": {
+    "made": "Designed and coded by JulSql",
+    "tech": "React · TypeScript · Vite",
+    "github": "GitHub"
+  },
+  "about": {
+    "title": "About the adventurer",
+    "body": "Engineer passionate about coding, based in France. I love building complete products — from a dockerized backend to a polished UI — and actually shipping them to production. Here is the map of my realm."
+  },
+  "projects": {
+    "codexio": {
+      "tagline": "My comics collection, online",
+      "description": "A Django site showcasing my comics collection, built on a clean hexagonal architecture (domain / application / infrastructure). Fully dockerized for reproducible deployments."
+    },
+    "rimbot": {
+      "tagline": "French poem generator",
+      "description": "A dockerized monorepo: Flask API + seeded PostgreSQL database + React (Vite) front. Generates random poems with syllable handling, all covered by unit, integration and e2e tests in CI."
+    },
+    "thecode-website": {
+      "tagline": "Deterministic passwords, zero storage",
+      "description": "TheCode's landing page and online password generator. From a secret key and a site name, SHA-256 always yields the same password — nothing is stored or transmitted. Doc hub with links to every app."
+    },
+    "speciarium": {
+      "tagline": "Cataloguing biodiversity",
+      "description": "A Django platform for cataloguing species: taxonomy synced with GBIF, interactive map, photo gallery with EXIF extraction, collaborative collections and real-time notifications over WebSockets (Channels + Redis)."
+    },
+    "lilianastrade": {
+      "tagline": "Manage your Magic collections",
+      "description": "A Symfony app to manage Magic: The Gathering card collections and decks. Multi-user management, automated deployment with Deployer."
+    },
+    "jimi-api": {
+      "tagline": "LLM-powered calendar assistant",
+      "description": "A Spring Boot 3 backend: the user writes in natural language (\"plan a meeting tomorrow at 2pm\"), an LLM extracts the structured event and CRUDs it in a MariaDB database. Multi-turn extraction with no client-side state machine."
+    },
+    "jimi-app": {
+      "tagline": "Cross-platform calendar chatbot",
+      "description": "A single Expo / React Native client running on iOS, Android and Web. Chat in natural language to manage your calendar; a schedule page reads straight from the database, with no risk of hallucination. Published on the Play Store."
+    },
+    "thecode-apple": {
+      "tagline": "TheCode for iOS & macOS",
+      "description": "Native Swift apps for iPhone and Mac, with built-in Safari extensions. Local, deterministic password generation with zero storage — the TheCode experience across the Apple ecosystem."
+    },
+    "thecode-android": {
+      "tagline": "TheCode for Android",
+      "description": "An Android app in Java + Material Design 3: deterministic SHA-256 generation, entropy meter, system autofill (Android 8+) with biometric auth. 100% offline, no account."
+    },
+    "thecode-extension": {
+      "tagline": "Passwords right inside your browser",
+      "description": "A cross-browser extension (Chrome, Edge, Brave, Firefox, Safari) that detects password fields and suggests a deterministic password from the session key + domain. Unit-tested algorithm, no storage."
+    },
+    "thecode-cli": {
+      "tagline": "TheCode on the command line",
+      "description": "The Python CLI version of TheCode, sharing the same logic as the extension and website. Pip install, scriptable output, MIT license, tests and CodeQL in CI."
+    },
+    "exif-tools": {
+      "tagline": "View and edit photo EXIF",
+      "description": "A Python desktop app (packaged with PyInstaller) to view and edit a photo's metadata: capture date, GPS coordinates editable on an interactive map."
+    }
+  }
+}

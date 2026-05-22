@@ -1,0 +1,7 @@
+services:
+  portfolio:
+    build: .
+    container_name: julsql_portfolio
+    restart: always
+    ports:
+      - "8011:80"

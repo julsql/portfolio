@@ -1,0 +1,84 @@
+:root {
+  /* NES Zelda-inspired palette */
+  --c-grass: #58a83c;
+  --c-grass-dark: #3c8228;
+  --c-path: #d8b878;
+  --c-water: #3878f8;
+  --c-water-dark: #2858d8;
+  --c-tree: #186818;
+  --c-tree-trunk: #7c4a02;
+  --c-sand: #e8d8a0;
+  --c-rock: #888888;
+  --c-flower: #f85858;
+
+  --c-ui-bg: #0b1c08;
+  --c-ui-panel: #20160a;
+  --c-ui-border: #f8d878;
+  --c-gold: #f8d878;
+  --c-cream: #f8f0d8;
+  --c-red: #d82800;
+  --c-blue: #3878f8;
+
+  --cat-web: #f8d030;
+  --cat-app: #58c8f8;
+  --cat-tool: #f86840;
+
+  --tile: clamp(20px, min(4.4vw, 5.6vh), 46px);
+
+  --font-pixel: "Press Start 2P", monospace;
+  --font-body: "VT323", "Courier New", monospace;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--c-ui-bg);
+  color: var(--c-cream);
+  overflow: hidden;
+  image-rendering: pixelated;
+  -webkit-font-smoothing: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+a {
+  color: var(--c-gold);
+  text-decoration: none;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background:
+    radial-gradient(circle at 50% 0%, #15300f 0%, var(--c-ui-bg) 70%),
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(0, 0, 0, 0.06) 3px 4px);
+}
+
+.stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  padding: 8px;
+}
