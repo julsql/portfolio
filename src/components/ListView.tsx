@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import type { Project } from "../types";
 import { PROJECTS } from "../data/projects";
+import Footer from "./Footer";
 
 interface Props {
   onOpen: (p: Project) => void;
@@ -31,6 +32,8 @@ export default function ListView({ onOpen }: Props) {
           </button>
         ))}
       </div>
+
+      <Footer />
     </section>
   );
 }

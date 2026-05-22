@@ -60,19 +60,40 @@ export default function ProjectModal({ project, onClose }: Props) {
 
         <div className="modal-actions">
           {project.links ? (
-            project.links.map((link) => (
-              <a
-                key={link.url}
-                className={`btn ${link.kind === "code" ? "btn-ghost" : "btn-primary"}`}
-                href={link.url}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {LINK_ICON[link.kind]} {t(`modal.${link.labelKey}`)}
-              </a>
-            ))
-          ) : (
             <>
+              <div className="modal-row">
+                {project.links
+                  .filter((l) => l.kind !== "code")
+                  .map((link) => (
+                    <a
+                      key={link.url}
+                      className="btn btn-primary"
+                      href={link.url}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {LINK_ICON[link.kind]} {t(`modal.${link.labelKey}`)}
+                    </a>
+                  ))}
+              </div>
+              <div className="modal-row">
+                {project.links
+                  .filter((l) => l.kind === "code")
+                  .map((link) => (
+                    <a
+                      key={link.url}
+                      className="btn btn-ghost"
+                      href={link.url}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {LINK_ICON[link.kind]} {t(`modal.${link.labelKey}`)}
+                    </a>
+                  ))}
+              </div>
+            </>
+          ) : (
+            <div className="modal-row">
               {project.liveUrl && (
                 <a
                   className="btn btn-primary"
@@ -96,7 +117,7 @@ export default function ProjectModal({ project, onClose }: Props) {
               <a className="btn btn-ghost" href={project.repoUrl} target="_blank" rel="noreferrer">
                 ⌥ {t("modal.code")}
               </a>
-            </>
+            </div>
           )}
         </div>
       </div>

@@ -23,6 +23,7 @@
     "store": "Télécharger sur le store",
     "code": "Code source",
     "api": "API (Swagger)",
+    "app": "App web",
     "android": "App Android (Play Store)",
     "code_api": "Code — API",
     "code_app": "Code — App",
@@ -41,7 +42,7 @@
   "footer": {
     "made": "Conçu et codé par JulSql",
     "tech": "React · TypeScript · Vite",
-    "github": "GitHub"
+    "github": "github.com/julsql"
   },
   "about": {
     "title": "À propos de l'aventurier",

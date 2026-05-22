@@ -53,16 +53,8 @@ export const PROJECTS: Project[] = [
     tech: ["Spring Boot 3", "React Native", "Expo", "MariaDB", "LLM"],
     repoUrl: "https://github.com/JIMIDevLab/jimi_api",
     links: [
-      {
-        kind: "live",
-        labelKey: "api",
-        url: "https://jimi-api.julsql.fr/swagger-ui/index.html#/",
-      },
-      {
-        kind: "store",
-        labelKey: "android",
-        url: "https://play.google.com/store/apps/details?id=fr.tsp.jimithechatbot",
-      },
+      { kind: "live", labelKey: "api", url: "https://jimi-api.julsql.fr/swagger-ui/index.html#/" },
+      { kind: "demo", labelKey: "app", url: "https://jimi.julsql.fr" },
       { kind: "code", labelKey: "code_api", url: "https://github.com/JIMIDevLab/jimi_api" },
       { kind: "code", labelKey: "code_app", url: "https://github.com/JIMIDevLab/jimi_app" },
     ],

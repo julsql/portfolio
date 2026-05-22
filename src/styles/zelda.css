@@ -619,6 +619,11 @@
 }
 .modal-actions {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.modal-row {
+  display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
@@ -719,6 +724,50 @@
   padding: 1px 7px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 3px;
+}
+
+/* ================================================================= FOOTER */
+.site-footer {
+  margin-top: 32px;
+  padding: 18px 16px;
+  border-top: 4px solid var(--c-ui-border);
+  background: linear-gradient(#241808, #16100a);
+  border-radius: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 16px;
+  text-align: center;
+}
+.footer-tri {
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 14px solid var(--c-gold);
+}
+.footer-made {
+  font-size: 19px;
+  color: #d8c8a0;
+}
+.footer-link {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  color: var(--c-gold);
+  padding: 8px 14px;
+  border: 3px solid var(--c-ui-border);
+  border-radius: 4px;
+  transition: transform 0.1s;
+}
+.footer-link:hover {
+  transform: translateY(-2px);
+  background: var(--c-ui-border);
+  color: #2a1c0c;
+}
+.footer-tech {
+  font-size: 17px;
+  color: #9a8a6a;
 }
 
 /* ============================================================== ANIMATIONS */
