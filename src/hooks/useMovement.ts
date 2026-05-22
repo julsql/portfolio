@@ -32,6 +32,7 @@ export interface MoveHandlers {
   enemies: { x: number; y: number }[];
   pushRock: (id: string, x: number, y: number) => void;
   removeRock: (id: string) => void;
+  onStep?: () => void;
 }
 
 interface UseMovement {
@@ -55,7 +56,7 @@ export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMo
   const heroRef = useRef<Hero>(initial);
   const [steps, setSteps] = useState(0);
   const [enabled, setEnabled] = useState(true);
-  const { onInteract, onPickup, onDrown, rocks, enemies, pushRock, removeRock } = h;
+  const { onInteract, onPickup, onDrown, rocks, enemies, pushRock, removeRock, onStep } = h;
 
   const move = useCallback(
     (dir: Dir) => {
@@ -76,6 +77,7 @@ export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMo
         heroRef.current = next;
         setHero(next);
         setSteps((s) => s + 1);
+        onStep?.();
       };
 
       if (nx < 0 || ny < 0 || nx >= scene.width || ny >= scene.height) return face();
@@ -120,7 +122,7 @@ export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMo
       if (BLOCKED.includes(tile)) return face();
       return stepTo(nx, ny);
     },
-    [enabled, scene, rocks, enemies, onInteract, onPickup, onDrown, pushRock, removeRock],
+    [enabled, scene, rocks, enemies, onInteract, onPickup, onDrown, pushRock, removeRock, onStep],
   );
 
   useEffect(() => {

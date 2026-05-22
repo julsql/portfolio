@@ -6,9 +6,11 @@ interface Props {
   view: View;
   onView: (v: View) => void;
   onToggleLang: () => void;
+  muted: boolean;
+  onToggleMute: () => void;
 }
 
-export default function Hud({ view, onView, onToggleLang }: Props) {
+export default function Hud({ view, onView, onToggleLang, muted, onToggleMute }: Props) {
   const { t } = useTranslation();
   return (
     <header className="hud">
@@ -33,6 +35,9 @@ export default function Hud({ view, onView, onToggleLang }: Props) {
             📜 {t("hud.view_list")}
           </button>
         </div>
+        <button className="lang-btn" onClick={onToggleMute} aria-label={t("hud.sound")}>
+          {muted ? "🔇" : "🔊"}
+        </button>
         <button className="lang-btn" onClick={onToggleLang}>
           {t("hud.lang")}
         </button>

@@ -37,9 +37,9 @@ export function buildOverworld(): TileKind[][] {
 
   function tile(x: number, y: number): TileKind {
     // Frame: mountains north, sea south, forest east/west.
-    if (y === 0) return "mountain";
+    if (y === 0 || (x === 0 && y < 7)) return "mountain";
     if (y === H - 1) return "water";
-    if (x === 0 || x === W - 1) return "tree";
+    if ((x === 0 && y > 6) || (x === W - 1 && y > 3 && y < 9)) return "tree";
 
     // Central plaza around the castle.
     const dx = Math.abs(x - cx);

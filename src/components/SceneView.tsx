@@ -4,6 +4,7 @@ import type { EnemySpec, Hero as HeroType, LandmarkRef, Scene, TileKind } from "
 import { castleById, projectById } from "../data/projects";
 import { BLOCKED } from "../data/map";
 import { SPRITES } from "../data/sprites";
+import { sound } from "../audio/sound";
 import { useMovement } from "../hooks/useMovement";
 import Hero from "./Hero";
 import TouchControls from "./TouchControls";
@@ -64,16 +65,39 @@ export default function SceneView(props: Props) {
     (id: string) => setRocks((rs) => rs.filter((r) => r.id !== id)),
     [],
   );
-  const onDrown = useCallback(() => onHit(), [onHit]);
+  // A hit that also plays the hurt blip.
+  const hit = useCallback(() => {
+    sound.sfx("hurt");
+    onHit();
+  }, [onHit]);
+
+  const interact = useCallback(
+    (l: LandmarkRef) => {
+      if (l.kind === "heart") sound.sfx("heart");
+      else if (l.kind === "sword") sound.sfx("item");
+      else if (l.kind === "door" || l.kind === "exit") sound.sfx("door");
+      onInteract(l);
+    },
+    [onInteract],
+  );
+
+  const pickup = useCallback(
+    (l: LandmarkRef) => {
+      sound.sfx("pickup");
+      onPickup(l);
+    },
+    [onPickup],
+  );
 
   const { hero, move, setEnabled } = useMovement(scene, initialHero, {
-    onInteract,
-    onPickup,
-    onDrown,
+    onInteract: interact,
+    onPickup: pickup,
+    onDrown: hit,
     rocks,
     enemies,
     pushRock,
     removeRock,
+    onStep: () => sound.sfx("step"),
   });
   useEffect(() => setEnabled(!paused), [paused, setEnabled]);
 
@@ -89,6 +113,7 @@ export default function SceneView(props: Props) {
   const onFire = scene.decor.some((d) => d.hazard && d.x === hero.x && d.y === hero.y);
   useEffect(() => {
     if (paused || !onFire) return;
+    sound.sfx("burn");
     const id = setInterval(() => onHit(), BURN_MS);
     return () => clearInterval(id);
   }, [onFire, paused, onHit]);
@@ -144,8 +169,8 @@ export default function SceneView(props: Props) {
   // Contact with an enemy hurts.
   useEffect(() => {
     if (paused) return;
-    if (enemies.some((e) => e.x === hero.x && e.y === hero.y)) onHit();
-  }, [enemies, hero, paused, onHit]);
+    if (enemies.some((e) => e.x === hero.x && e.y === hero.y)) hit();
+  }, [enemies, hero, paused, hit]);
 
   // ── Sword: Space strikes the tile in front; kills enemies / wounds boss ──
   useEffect(() => {
@@ -161,6 +186,7 @@ export default function SceneView(props: Props) {
 
   const strike = useCallback(() => {
     if (attacking) return;
+    sound.sfx("attack");
     setAttacking(true);
     setTimeout(() => setAttacking(false), ATTACK_MS);
     const [dx, dy] = DELTA[hero.facing];
@@ -292,7 +318,7 @@ export default function SceneView(props: Props) {
           key={key}
           className="landmark landmark-item"
           style={tileStyle(l.x, l.y)}
-          onClick={() => onInteract(l)}
+          onClick={() => interact(l)}
           aria-label={t("item.heart")}
         >
           <img className="item-sprite" src={SPRITES.heart.full} alt="" />
@@ -305,7 +331,7 @@ export default function SceneView(props: Props) {
           key={key}
           className="landmark landmark-item"
           style={tileStyle(l.x, l.y)}
-          onClick={() => onInteract(l)}
+          onClick={() => interact(l)}
           aria-label={t("item.sword")}
         >
           <img className="item-sprite pedestal" src={SPRITES.swordPedestal} alt="" />
@@ -318,7 +344,7 @@ export default function SceneView(props: Props) {
           key={key}
           className="landmark landmark-npc"
           style={tileStyle(l.x, l.y)}
-          onClick={() => onInteract(l)}
+          onClick={() => interact(l)}
           aria-label={t("npc.name")}
         >
           <span className="landmark-icon">🧙</span>
@@ -332,7 +358,7 @@ export default function SceneView(props: Props) {
           key={key}
           className="landmark landmark-door"
           style={tileStyle(l.x, l.y)}
-          onClick={() => onInteract(l)}
+          onClick={() => interact(l)}
           aria-label={t("world.ganon_door")}
         >
           <img className="landmark-icon door-icon" src={SPRITES.door} alt="" />
@@ -346,7 +372,7 @@ export default function SceneView(props: Props) {
           key={key}
           className="landmark landmark-exit"
           style={tileStyle(l.x, l.y)}
-          onClick={() => onInteract(l)}
+          onClick={() => interact(l)}
           aria-label={t("world.exit")}
         >
           <img className="landmark-icon door-icon" src={SPRITES.door} alt="" />
@@ -362,7 +388,7 @@ export default function SceneView(props: Props) {
           key={key}
           className="landmark landmark-castle"
           style={tileStyle(l.x, l.y)}
-          onClick={() => onInteract(l)}
+          onClick={() => interact(l)}
           aria-label={castle.name}
         >
           <span className="landmark-icon">{castle.icon}</span>
@@ -380,7 +406,7 @@ export default function SceneView(props: Props) {
         key={key}
         className={`landmark cat-${p.category}`}
         style={tileStyle(l.x, l.y)}
-        onClick={() => onInteract(l)}
+        onClick={() => interact(l)}
         aria-label={p.name}
       >
         <span className="landmark-icon">{p.icon}</span>

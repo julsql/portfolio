@@ -4,6 +4,7 @@ import type { Hero, LandmarkRef, Project } from "./types";
 import { castleSceneId, CASTLE_ID, GANON_ID, OVERWORLD_ID, SCENES } from "./data/scenes";
 import { projectById } from "./data/projects";
 import { RUPEE_VALUE } from "./data/sprites";
+import { sound } from "./audio/sound";
 import TitleScreen from "./components/TitleScreen";
 import SceneView from "./components/SceneView";
 import ListView from "./components/ListView";
@@ -39,6 +40,7 @@ export default function App() {
   const [invuln, setInvuln] = useState(false);
   const invulnRef = useRef(false);
   const [gameOver, setGameOver] = useState(false);
+  const [muted, setMuted] = useState(false);
 
   // Live scene: drop the grabbed heart, the taken sword and collected rupees;
   // once the heart is taken, reveal the door to Ganon's lair behind the throne.
@@ -80,6 +82,21 @@ export default function App() {
   useEffect(() => {
     if (started && health <= 0) setGameOver(true);
   }, [started, health]);
+
+  // Background music follows the current scene.
+  useEffect(() => {
+    if (!started || gameOver) return;
+    sound.music(sceneId === GANON_ID ? "ganon" : sceneId === CASTLE_ID ? "dungeon" : "overworld");
+  }, [started, sceneId, gameOver]);
+
+  useEffect(() => sound.setMuted(muted), [muted]);
+
+  useEffect(() => {
+    if (gameOver) {
+      sound.stopMusic();
+      sound.sfx("gameover");
+    }
+  }, [gameOver]);
 
   const onInteract = (l: LandmarkRef) => {
     switch (l.kind) {
@@ -134,15 +151,27 @@ export default function App() {
 
   const toggleLang = () => i18n.changeLanguage(i18n.language.startsWith("fr") ? "en" : "fr");
 
+  // Audio must be unlocked by a user gesture, so init on START.
+  const start = () => {
+    sound.init();
+    setStarted(true);
+  };
+
   if (!started) {
-    return <TitleScreen onStart={() => setStarted(true)} onToggleLang={toggleLang} />;
+    return <TitleScreen onStart={start} onToggleLang={toggleLang} />;
   }
 
   const paused = active !== null || gameOver || dialogue || itemGet !== null;
 
   return (
     <div className="screen">
-      <Hud view={view} onView={setView} onToggleLang={toggleLang} />
+      <Hud
+        view={view}
+        onView={setView}
+        onToggleLang={toggleLang}
+        muted={muted}
+        onToggleMute={() => setMuted((m) => !m)}
+      />
       <main className="stage">
         {view === "map" ? (
           <SceneView
