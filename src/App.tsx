@@ -97,6 +97,8 @@ export default function App() {
 
   useEffect(() => {
     if (started && health <= 0) setGameOver(true);
+    // Warn when down to the last full heart.
+    else if (started && health === 2) sound.sfx("lowHealth");
   }, [started, health]);
 
   const onBossDefeated = useCallback(() => {

@@ -67,9 +67,8 @@ export default function SceneView(props: Props) {
     (id: string) => setRocks((rs) => rs.filter((r) => r.id !== id)),
     [],
   );
-  // A hit that also plays the hurt blip.
-  const hit = useCallback(() => {
-    sound.sfx("hurt");
+  const drown = useCallback(() => {
+    sound.sfx("drown");
     onHit();
   }, [onHit]);
 
@@ -77,7 +76,8 @@ export default function SceneView(props: Props) {
     (l: LandmarkRef) => {
       if (l.kind === "heart") sound.sfx("heart");
       else if (l.kind === "sword") sound.sfx("item");
-      else if (l.kind === "door" || l.kind === "exit") sound.sfx("door");
+      else if (l.kind === "door") sound.sfx("enterLair");
+      else if (l.kind === "exit") sound.sfx("door");
       onInteract(l);
     },
     [onInteract],
@@ -94,7 +94,7 @@ export default function SceneView(props: Props) {
   const { hero, move, setEnabled } = useMovement(scene, initialHero, {
     onInteract: interact,
     onPickup: pickup,
-    onDrown: hit,
+    onDrown: drown,
     rocks,
     enemies,
     pushRock,
@@ -168,11 +168,15 @@ export default function SceneView(props: Props) {
     return () => clearInterval(id);
   }, [paused, canEnter, scene]);
 
-  // Contact with an enemy hurts.
+  // Contact with an enemy hurts (Ganondorf has his own hit sound).
   useEffect(() => {
     if (paused) return;
-    if (enemies.some((e) => e.x === hero.x && e.y === hero.y)) hit();
-  }, [enemies, hero, paused, hit]);
+    const touching = enemies.find((e) => e.x === hero.x && e.y === hero.y);
+    if (touching) {
+      sound.sfx(touching.random ? "hurtBoss" : "hurt");
+      onHit();
+    }
+  }, [enemies, hero, paused, onHit]);
 
   // ── Sword: Space strikes the tile in front; kills enemies / wounds boss ──
   useEffect(() => {
@@ -198,6 +202,7 @@ export default function SceneView(props: Props) {
     if (target?.random) {
       if ((target.hp ?? 1) <= 1) onBossDefeated();
       else {
+        sound.sfx("bossHit");
         setBossHurt(true);
         setTimeout(() => setBossHurt(false), 320);
       }
