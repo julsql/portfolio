@@ -76,9 +76,15 @@ a {
 
 .stage {
   flex: 1;
+  min-height: 0;
   display: flex;
+  /* Fallback first; `safe` keeps the content top-aligned (and scrollable) when
+     it is taller than the viewport instead of clipping the top (list view).
+     Browsers without `safe` support ignore the second declaration. */
   align-items: center;
+  align-items: safe center;
   justify-content: center;
+  justify-content: safe center;
   overflow: auto;
   padding: 8px;
 }
