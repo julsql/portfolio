@@ -488,6 +488,14 @@ img.decor {
 }
 .landmark-icon {
   font-size: calc(var(--tile) * 0.66);
+  /* Fill the tile and hard-center the glyph (line-height: 1 removes the
+     leading that was shifting big emojis off-centre). */
+  width: var(--tile);
+  height: var(--tile);
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  text-align: center;
   filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.5));
   animation: bob 2s ease-in-out infinite;
   /* Keep the icon in front of its label. */
