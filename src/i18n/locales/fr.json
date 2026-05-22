@@ -22,8 +22,8 @@
   },
   "npc": {
     "name": "Vieux Sage",
-    "hint": "Empare-toi de l'épée plantée dans le désert, puis cherche le cœur caché derrière le trône de TheCode. Tu pourras alors affronter Ganondorf. Méfie-toi du feu, de l'eau profonde et des créatures !",
-    "ok": "Merci"
+    "hint": "Vaillant héros ! Le terrible Ganondorf s'est emparé du royaume et retient la Princesse Zelda. Toi seul peux la délivrer... pars la libérer !",
+    "ok": "J'y vais"
   },
   "item": {
     "heart": "Cœur de vie gagné !",

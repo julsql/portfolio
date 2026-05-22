@@ -22,8 +22,8 @@
   },
   "npc": {
     "name": "Old Sage",
-    "hint": "Pull the sword from the desert, then find the heart hidden behind TheCode's throne. Then you may face Ganondorf. Beware fire, deep water and creatures!",
-    "ok": "Thanks"
+    "hint": "Brave hero! The dreaded Ganondorf has seized the realm and holds Princess Zelda captive. Only you can set her free... go and rescue her!",
+    "ok": "I'm on it"
   },
   "item": {
     "heart": "Heart container!",
