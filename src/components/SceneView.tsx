@@ -211,7 +211,13 @@ export default function SceneView(props: Props) {
 
         {scene.decor.map((d, i) =>
           d.icon.startsWith("/") ? (
-            <img key={`d-${i}`} className="decor" style={tileStyle(d.x, d.y)} src={d.icon} alt="" />
+            <img
+              key={`d-${i}`}
+              className={`decor${d.hazard ? " hazard" : ""}`}
+              style={tileStyle(d.x, d.y)}
+              src={d.icon}
+              alt=""
+            />
           ) : (
             <span
               key={`d-${i}`}
@@ -240,7 +246,7 @@ export default function SceneView(props: Props) {
           e.sprites ? (
             <img
               key={e.id}
-              className="enemy enemy-boss"
+              className={`enemy ${e.random ? "enemy-boss" : "enemy-sprite"}`}
               style={tileStyle(e.x, e.y)}
               src={e.sprites[e.frame % e.sprites.length]}
               alt=""
@@ -329,7 +335,7 @@ export default function SceneView(props: Props) {
           onClick={() => onInteract(l)}
           aria-label={t("world.ganon_door")}
         >
-          <span className="landmark-icon">🚪</span>
+          <img className="landmark-icon door-icon" src={SPRITES.door} alt="" />
           <span className="landmark-label">{t("world.ganon_door")}</span>
         </button>
       );
@@ -343,7 +349,7 @@ export default function SceneView(props: Props) {
           onClick={() => onInteract(l)}
           aria-label={t("world.exit")}
         >
-          <span className="landmark-icon">🚪</span>
+          <img className="landmark-icon door-icon" src={SPRITES.door} alt="" />
           <span className="landmark-label">{t("world.exit")}</span>
         </button>
       );

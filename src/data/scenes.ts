@@ -42,8 +42,8 @@ const overworld: Scene = {
     { id: "rock-2", x: 8, y: 9 },
   ],
   enemies: [
-    { id: "bat", x: 13, y: 5, axis: "h", min: 11, max: 16, icon: "🦇" },
-    { id: "scorpion", x: 8, y: 3, axis: "v", min: 2, max: 5, icon: "🦂" },
+    { id: "bat", x: 13, y: 5, axis: "h", min: 11, max: 16, sprites: [SPRITES.bat] },
+    { id: "scorpion", x: 8, y: 3, axis: "v", min: 2, max: 5, sprites: [SPRITES.scorpion] },
   ],
 };
 
@@ -68,10 +68,10 @@ const castle: Scene = {
     { x: 6, y: 1, kind: "heart", ref: "heart" },
   ],
   decor: [
-    { x: 1, y: 1, icon: "🔥", hazard: true },
-    { x: 11, y: 1, icon: "🔥", hazard: true },
-    { x: 1, y: 8, icon: "🔥", hazard: true },
-    { x: 11, y: 8, icon: "🔥", hazard: true },
+    { x: 1, y: 1, icon: SPRITES.fire, hazard: true },
+    { x: 11, y: 1, icon: SPRITES.fire, hazard: true },
+    { x: 1, y: 8, icon: SPRITES.fire, hazard: true },
+    { x: 11, y: 8, icon: SPRITES.fire, hazard: true },
   ],
 };
 
@@ -88,8 +88,8 @@ const ganonRoom: Scene = {
     { x: 9, y: 6, kind: "rupee", ref: "rupee-gn-2", pickup: true, rupee: "red" },
   ],
   decor: [
-    { x: 1, y: 1, icon: "🔥", hazard: true },
-    { x: 9, y: 1, icon: "🔥", hazard: true },
+    { x: 1, y: 1, icon: SPRITES.fire, hazard: true },
+    { x: 9, y: 1, icon: SPRITES.fire, hazard: true },
   ],
   enemies: [{ id: "ganondorf", x: 5, y: 3, random: true, hp: 3, sprites: SPRITES.ganondorf }],
 };

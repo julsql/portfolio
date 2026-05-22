@@ -35,7 +35,7 @@ export default function Hero({ hero, frame, hasSword, attacking, burning, invuln
       {attacking && (
         <img className={`strike strike-${hero.facing}`} src={SPRITES.swordStrike} alt="" />
       )}
-      {burning && <span className="hero-flame">🔥</span>}
+      {burning && <img className="hero-flame" src={SPRITES.fire} alt="" />}
       <img className="hero-img" src={linkFrame(hero.facing, frame, showSword)} alt="" />
     </div>
   );

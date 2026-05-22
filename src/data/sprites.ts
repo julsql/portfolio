@@ -11,6 +11,11 @@ export const SPRITES = {
   mountain: `${B}/mountain.svg`,
   cactus: `${B}/cactus.svg`,
   rock: `${B}/rock.svg`,
+  fire: `${B}/fire.svg`,
+  tree: `${B}/tree.svg`,
+  door: `${B}/door.svg`,
+  bat: `${B}/bat.svg`,
+  scorpion: `${B}/scorpion.svg`,
   linkHeart: `${B}/link-heart.svg`,
   linkTriforce: `${B}/link-triforce.png`,
   heart: {
