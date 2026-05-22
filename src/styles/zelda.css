@@ -652,7 +652,10 @@
 /* ============================================================== LIST VIEW */
 .list-view {
   width: min(1100px, 100%);
-  padding: 8px 4px 80px;
+  min-height: 100%;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
 }
 .list-head {
   text-align: center;
@@ -728,7 +731,7 @@
 
 /* ================================================================= FOOTER */
 .site-footer {
-  margin-top: 32px;
+  margin-top: auto;
   padding: 18px 16px;
   border-top: 4px solid var(--c-ui-border);
   background: linear-gradient(#241808, #16100a);

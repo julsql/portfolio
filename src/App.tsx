@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Hero, LandmarkRef, Project } from "./types";
 import { castleSceneId, OVERWORLD_ID, SCENES } from "./data/scenes";
@@ -23,7 +23,12 @@ export default function App() {
   // Easter egg: grabbing the crown in the castle changes the avatar.
   const [crowned, setCrowned] = useState(false);
 
-  const scene = SCENES[sceneId];
+  // Once grabbed, the crown vanishes from the room (and stays gone).
+  const scene = useMemo(() => {
+    const base = SCENES[sceneId];
+    if (!crowned) return base;
+    return { ...base, landmarks: base.landmarks.filter((l) => l.kind !== "crown") };
+  }, [sceneId, crowned]);
 
   const goToScene = (id: string, where: Hero) => {
     setSpawn(where);
@@ -40,7 +45,7 @@ export default function App() {
     } else if (l.kind === "exit") {
       goToScene(l.ref, l.spawn ?? SCENES[l.ref].heroStart);
     } else if (l.kind === "crown") {
-      setCrowned((c) => !c);
+      setCrowned(true);
     }
   };
 

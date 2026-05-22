@@ -44,7 +44,8 @@ const castle: Scene = {
     { x: 3, y: 6, kind: "project", ref: "thecode-android" },
     { x: 9, y: 6, kind: "project", ref: "thecode-cli" },
     { x: 6, y: 9, kind: "exit", ref: OVERWORLD_ID, spawn: { x: 9, y: 3, facing: "down" } },
-    { x: 3, y: 2, kind: "crown", ref: "crown" },
+    // Behind TheCode Web (the throne at 6,2): grab it once to wear the crown.
+    { x: 6, y: 1, kind: "crown", ref: "crown" },
   ],
   decor: [
     { x: 1, y: 1, icon: "🔥" },
