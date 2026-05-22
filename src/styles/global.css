@@ -23,7 +23,9 @@
   --cat-app: #58c8f8;
   --cat-tool: #f86840;
 
-  --tile: clamp(22px, min(5vw, 6.2vh), 56px);
+  /* Sized so the largest scene (the 20x14 overworld) fits the window in both
+     directions, leaving room for the HUD / status bar / hint above it. */
+  --tile: min(calc((100vw - 16px) / 20), calc((100vh - 168px) / 14), 54px);
 
   --font-pixel: "Press Start 2P", monospace;
   --font-body: "VT323", "Courier New", monospace;

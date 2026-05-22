@@ -395,7 +395,7 @@ export default function SceneView(props: Props) {
         >
           <span className="landmark-icon">{castle.icon}</span>
           <span className="landmark-label">
-            {castle.name} <span className="enter-tag">⤵ {t("world.enter")}</span>
+            <span>{castle.name}</span> <span className="enter-tag">⤵ {t("world.enter")}</span>
           </span>
         </button>
       );
