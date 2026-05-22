@@ -378,7 +378,7 @@ export default function SceneView(props: Props) {
           onClick={() => interact(l)}
           aria-label={t("npc.name")}
         >
-          <img className="landmark-icon" src={SPRITES.npc} alt="" />
+          <img className="landmark-icon npc-icon" src={SPRITES.npc} alt="" />
         </button>
       );
     }

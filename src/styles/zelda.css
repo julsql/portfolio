@@ -522,6 +522,15 @@ img.castle-icon {
   margin-left: calc(var(--tile) * -0.75);
   margin-top: calc(var(--tile) * -0.75);
 }
+img.npc-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--tile) * 1.25);
+  height: calc(var(--tile) * 1.25);
+  margin-left: calc(var(--tile) * -0.625);
+  margin-top: calc(var(--tile) * -0.625);
+}
 .door-icon {
   animation: none;
 }
