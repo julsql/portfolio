@@ -556,17 +556,19 @@
   z-index: 9;
   pointer-events: none;
 }
+/* Offset by ~0.6 tile so the hilt sits in Link's hands and the blade reaches
+   into the next tile — it reads as Link actually swinging it. */
 .strike-up {
-  transform: translateY(-100%) rotate(180deg);
+  transform: translateY(-60%) rotate(180deg);
 }
 .strike-down {
-  transform: translateY(100%);
+  transform: translateY(60%);
 }
 .strike-left {
-  transform: translateX(-100%) rotate(90deg);
+  transform: translateX(-60%) rotate(90deg);
 }
 .strike-right {
-  transform: translateX(100%) rotate(-90deg);
+  transform: translateX(60%) rotate(-90deg);
 }
 
 /* ----- Touch controls (D-pad + attack) ----- */
