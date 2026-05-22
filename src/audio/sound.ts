@@ -100,10 +100,17 @@ class SoundEngine {
     if (this.track === track && this.music_el && !this.music_el.paused) return;
     this.track = track;
     if (!this.music_el) {
-      this.music_el = new Audio();
-      this.music_el.loop = true;
-      this.music_el.volume = MUSIC_VOL;
+      const el = new Audio();
+      el.loop = true;
+      el.volume = MUSIC_VOL;
+      // Fallback if `loop` isn't honored: restart from the top when it ends.
+      el.addEventListener("ended", () => {
+        el.currentTime = 0;
+        void el.play().catch(() => {});
+      });
+      this.music_el = el;
     }
+    this.music_el.loop = true;
     this.music_el.muted = this.muted;
     this.music_el.src = MUSIC[track];
     void this.music_el.play().catch(() => {});
