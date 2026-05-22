@@ -14,7 +14,7 @@ import GameOver from "./components/GameOver";
 import Hud from "./components/Hud";
 
 type View = "map" | "list";
-const MAX_HEALTH = 6; // 3 hearts × 2 half-units
+const START_HEALTH = 6; // 3 hearts × 2 half-units
 const INVULN_MS = 800;
 
 export default function App() {
@@ -34,7 +34,8 @@ export default function App() {
   const [hasSword, setHasSword] = useState(false);
   const [collected, setCollected] = useState<Set<string>>(new Set());
   const [rupees, setRupees] = useState(0);
-  const [health, setHealth] = useState(MAX_HEALTH);
+  const [maxHealth, setMaxHealth] = useState(START_HEALTH);
+  const [health, setHealth] = useState(START_HEALTH);
   const [invuln, setInvuln] = useState(false);
   const invulnRef = useRef(false);
   const [gameOver, setGameOver] = useState(false);
@@ -99,11 +100,15 @@ export default function App() {
       case "npc":
         setDialogue(true);
         break;
-      case "heart":
+      case "heart": {
+        // A heart container: one more heart AND a full refill.
         setHeartTaken(true);
-        setHealth((h) => Math.min(h + 2, MAX_HEALTH));
+        const next = maxHealth + 2;
+        setMaxHealth(next);
+        setHealth(next);
         setItemGet("heart");
         break;
+      }
       case "sword":
         setHasSword(true);
         setItemGet("sword");
@@ -119,7 +124,7 @@ export default function App() {
 
   const retry = () => {
     setGameOver(false);
-    setHealth(MAX_HEALTH);
+    setHealth(maxHealth);
     invulnRef.current = false;
     setInvuln(false);
     setSceneId(OVERWORLD_ID);
@@ -150,6 +155,7 @@ export default function App() {
             paused={paused}
             hasSword={hasSword}
             health={health}
+            maxHearts={maxHealth / 2}
             rupees={rupees}
             invulnerable={invuln}
           />

@@ -25,7 +25,7 @@ const overworld: Scene = {
     { x: 7, y: 10, kind: "project", ref: "exif-tools" },
     { x: 6, y: 11, kind: "project", ref: "speciarium" },
     { x: 12, y: 11, kind: "project", ref: "jimi" },
-    { x: 7, y: 7, kind: "npc", ref: "sage" },
+    { x: 6, y: 7, kind: "npc", ref: "sage" },
     { x: 3, y: 5, kind: "sword", ref: "sword" },
     { x: 10, y: 3, kind: "rupee", ref: "rupee-ow-1", pickup: true, rupee: "green" },
     { x: 3, y: 7, kind: "rupee", ref: "rupee-ow-2", pickup: true, rupee: "blue" },

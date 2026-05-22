@@ -17,6 +17,7 @@ interface Props {
   paused: boolean;
   hasSword: boolean;
   health: number;
+  maxHearts: number;
   rupees: number;
   invulnerable: boolean;
 }
@@ -24,7 +25,6 @@ interface Props {
 type Enemy = EnemySpec & { dir: number; frame: number };
 type Dir = HeroType["facing"];
 
-const MAX_HEARTS = 3;
 const BURN_MS = 300;
 const ENEMY_MS = 600;
 const ATTACK_MS = 260;
@@ -46,7 +46,7 @@ const heartSrc = (health: number, i: number) => {
 
 export default function SceneView(props: Props) {
   const { scene, initialHero, onInteract, onPickup, onHit } = props;
-  const { paused, hasSword, health, rupees, invulnerable } = props;
+  const { paused, hasSword, health, maxHearts, rupees, invulnerable } = props;
   const { t } = useTranslation();
 
   const [rocks, setRocks] = useState(scene.rocks ?? []);
@@ -145,7 +145,7 @@ export default function SceneView(props: Props) {
   useEffect(() => {
     if (!hasSword || paused) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== " ") return;
+      if (e.key !== " " && e.key !== "Enter") return;
       e.preventDefault();
       strike();
     };
@@ -173,7 +173,7 @@ export default function SceneView(props: Props) {
     <div className="overworld">
       <div className="status">
         <span className="hearts">
-          {Array.from({ length: MAX_HEARTS }, (_, i) => (
+          {Array.from({ length: maxHearts }, (_, i) => (
             <img key={i} className="heart-img" src={heartSrc(health, i)} alt="" />
           ))}
         </span>
