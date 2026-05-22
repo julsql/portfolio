@@ -4,9 +4,11 @@ import { useTranslation } from "react-i18next";
 interface Props {
   onStart: () => void;
   onToggleLang: () => void;
+  muted: boolean;
+  onToggleMute: () => void;
 }
 
-export default function TitleScreen({ onStart, onToggleLang }: Props) {
+export default function TitleScreen({ onStart, onToggleLang, muted, onToggleMute }: Props) {
   const { t } = useTranslation();
 
   // Enter / Space start the game from anywhere on the title screen.
@@ -23,15 +25,27 @@ export default function TitleScreen({ onStart, onToggleLang }: Props) {
 
   return (
     <div className="title-screen" onClick={onStart} role="button" tabIndex={0}>
-      <button
-        className="lang-btn title-lang"
-        onClick={(e) => {
-          e.stopPropagation();
-          onToggleLang();
-        }}
-      >
-        {t("hud.lang")}
-      </button>
+      <div className="title-controls">
+        <button
+          className="lang-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleMute();
+          }}
+          aria-label={t("hud.sound")}
+        >
+          {muted ? "🔇" : "🔊"}
+        </button>
+        <button
+          className="lang-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleLang();
+          }}
+        >
+          {t("hud.lang")}
+        </button>
+      </div>
 
       <div className="triforce">
         <span />

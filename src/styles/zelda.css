@@ -60,10 +60,12 @@
   animation: blink 1.1s steps(1) infinite;
 }
 
-.title-lang {
+.title-controls {
   position: absolute;
   top: 16px;
   right: 16px;
+  display: flex;
+  gap: 8px;
 }
 
 /* =================================================================== HUD */

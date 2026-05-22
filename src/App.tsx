@@ -158,7 +158,14 @@ export default function App() {
   };
 
   if (!started) {
-    return <TitleScreen onStart={start} onToggleLang={toggleLang} />;
+    return (
+      <TitleScreen
+        onStart={start}
+        onToggleLang={toggleLang}
+        muted={muted}
+        onToggleMute={() => setMuted((m) => !m)}
+      />
+    );
   }
 
   const paused = active !== null || gameOver || dialogue || itemGet !== null;
