@@ -18,7 +18,9 @@ export default function ProjectModal({ project, onClose }: Props) {
   const { t } = useTranslation();
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" || e.key === "Enter" || e.key === " ") onClose();
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
