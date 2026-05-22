@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { SPRITES } from "../data/sprites";
+import { sound } from "../audio/sound";
 
 export type Item = "heart" | "sword";
 
@@ -21,7 +22,10 @@ export default function ItemGet({ item, onDone }: Props) {
   useEffect(() => {
     const timer = setTimeout(onDone, 1600);
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " " || e.key === "Escape") onDone();
+      if (e.key === "Enter" || e.key === " " || e.key === "Escape") {
+        sound.sfx("select");
+        onDone();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => {

@@ -135,10 +135,15 @@ export default function App() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Tab") {
         e.preventDefault();
-        if (!overlayOpen) setView((v) => (v === "map" ? "list" : "map"));
+        if (!overlayOpen) {
+          sound.sfx("select");
+          setView((v) => (v === "map" ? "list" : "map"));
+        }
       } else if (e.key === "m" || e.key === "M") {
+        sound.sfx("select");
         setMuted((m) => !m);
       } else if (e.key === "l" || e.key === "L") {
+        sound.sfx("select");
         i18n.changeLanguage(i18n.language.startsWith("fr") ? "en" : "fr");
       }
     };

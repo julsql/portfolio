@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { SPRITES } from "../data/sprites";
+import { sound } from "../audio/sound";
 
 interface Props {
   onClose: () => void;
@@ -24,7 +25,10 @@ export default function Victory({ onClose }: Props) {
   useEffect(() => {
     if (!ready) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " " || e.key === "Escape") onClose();
+      if (e.key === "Enter" || e.key === " " || e.key === "Escape") {
+        sound.sfx("select");
+        onClose();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);

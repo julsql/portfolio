@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { sound } from "../audio/sound";
 
 interface Props {
   onRetry: () => void;
@@ -12,6 +13,7 @@ export default function GameOver({ onRetry }: Props) {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
+        sound.sfx("select");
         onRetry();
       }
     };
