@@ -30,21 +30,21 @@ const PATTERNS: Record<Track, Pattern> = {
   overworld: {
     stepMs: 200,
     type: "square",
-    vol: 0.05,
+    vol: 0.09,
     notes: [523, 659, 784, 659, 587, 784, 587, 523, 659, 784, 1046, 784, 587, 659, 784, 0],
     bass: [131, 131, 196, 196, 147, 147, 196, 196, 165, 165, 131, 131, 196, 196, 131, 0],
   },
   dungeon: {
     stepMs: 320,
     type: "triangle",
-    vol: 0.06,
+    vol: 0.09,
     notes: [440, 0, 523, 0, 587, 0, 440, 0, 415, 0, 523, 0, 392, 0, 440, 0],
     bass: [110, 0, 0, 0, 117, 0, 0, 0, 104, 0, 0, 0, 98, 0, 0, 0],
   },
   ganon: {
     stepMs: 360,
     type: "sawtooth",
-    vol: 0.06,
+    vol: 0.09,
     notes: [98, 0, 104, 0, 92, 0, 98, 0, 110, 0, 104, 0, 98, 0, 87, 0],
     bass: [49, 0, 0, 0, 52, 0, 0, 0, 46, 0, 0, 0, 49, 0, 0, 0],
   },
@@ -65,8 +65,10 @@ class SoundEngine {
     if (!AC) return;
     this.ctx = new AC();
     this.master = this.ctx.createGain();
-    this.master.gain.value = this.muted ? 0 : 0.85;
+    this.master.gain.value = this.muted ? 0 : 1;
     this.master.connect(this.ctx.destination);
+    // Unlock right away — init() is called from the START gesture.
+    void this.ctx.resume();
 
     // Browsers suspend the context on tab-switch / focus loss; resume it on
     // any interaction or when the tab becomes visible again.
@@ -80,7 +82,7 @@ class SoundEngine {
 
   setMuted(m: boolean) {
     this.muted = m;
-    if (this.master) this.master.gain.value = m ? 0 : 0.85;
+    if (this.master) this.master.gain.value = m ? 0 : 1;
   }
 
   private tone(freq: number, dur: number, type: OscillatorType, vol: number, at = 0) {

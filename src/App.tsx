@@ -151,9 +151,10 @@ export default function App() {
 
   const toggleLang = () => i18n.changeLanguage(i18n.language.startsWith("fr") ? "en" : "fr");
 
-  // Audio must be unlocked by a user gesture, so init on START.
+  // Audio must be unlocked by a user gesture, so init + start music on START.
   const start = () => {
     sound.init();
+    sound.music("overworld");
     setStarted(true);
   };
 
