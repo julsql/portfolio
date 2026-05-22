@@ -68,6 +68,7 @@ export default function ProjectModal({ project, onClose }: Props) {
       }
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
+        sound.sfx("select");
         window.open(ordered[sel].url, "_blank", "noopener,noreferrer");
         return;
       }

@@ -21,7 +21,8 @@ export type Sfx =
   | "gameover"
   | "victory"
   | "lowHealth"
-  | "cursor";
+  | "cursor"
+  | "select";
 
 const S = "/sound";
 const MUSIC: Record<Track, string> = {
@@ -142,6 +143,10 @@ class SoundEngine {
         break;
       case "cursor":
         this.tone(880, 0.04, "square", 0.12);
+        break;
+      case "select":
+        this.tone(660, 0.04, "square", 0.14);
+        this.tone(990, 0.06, "square", 0.12, 0.04);
         break;
     }
   }

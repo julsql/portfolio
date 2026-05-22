@@ -41,6 +41,7 @@ export default function ListView({ onOpen, paused }: Props) {
       else if (e.key === "ArrowUp") next = Math.max(sel - columns(), 0);
       else if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
+        sound.sfx("select");
         onOpen(PROJECTS[sel]);
         return;
       } else return;

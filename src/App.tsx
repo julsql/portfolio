@@ -115,6 +115,19 @@ export default function App() {
 
   useEffect(() => sound.setMuted(muted), [muted]);
 
+  // Retro "select" blip on every UI action (clicking a button/link/card/place),
+  // except the movement D-pad / attack button.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const el = (e.target as HTMLElement | null)?.closest(
+        "button:not(.dpad-btn):not(.attack-btn), a.btn, .p-card, .landmark",
+      );
+      if (el) sound.sfx("select");
+    };
+    window.addEventListener("click", onClick);
+    return () => window.removeEventListener("click", onClick);
+  }, []);
+
   // Global keyboard shortcuts: Tab = Map/List, s = sound, l = language.
   useEffect(() => {
     if (!started) return;
