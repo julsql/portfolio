@@ -16,11 +16,17 @@
     "enter": "ENTER",
     "exit": "Exit",
     "castle": "Castle",
-    "hot": "🔥 Too hot! Step away from the fire!"
+    "hot": "🔥 Too hot! Step away from the fire!",
+    "ganon_door": "Ganon's lair"
+  },
+  "npc": {
+    "name": "Old Sage",
+    "hint": "A crown hides behind TheCode's throne... Beware fire, deep water and creatures, young hero! You can push the rocks.",
+    "ok": "Thanks"
   },
   "gameover": {
     "title": "GAME OVER",
-    "burned": "You caught fire...",
+    "burned": "You ran out of hearts...",
     "retry": "Retry"
   },
   "modal": {

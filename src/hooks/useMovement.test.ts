@@ -1,55 +1,73 @@
 import { describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
-import { useMovement } from "./useMovement";
+import { useMovement, type MoveHandlers } from "./useMovement";
 import { OVERWORLD_ID, SCENES } from "../data/scenes";
 
 const overworld = SCENES[OVERWORLD_ID];
 
+function handlers(over: Partial<MoveHandlers> = {}): MoveHandlers {
+  return {
+    onInteract: vi.fn(),
+    onPickup: vi.fn(),
+    onDrown: vi.fn(),
+    rocks: [],
+    pushRock: vi.fn(),
+    ...over,
+  };
+}
+
 describe("useMovement", () => {
   it("moves the hero onto a walkable tile and updates facing", () => {
-    const { result } = renderHook(() => useMovement(overworld, overworld.heroStart, () => {}));
-    // Hero starts at (9,9); moving left should land on (8,9).
+    const { result } = renderHook(() => useMovement(overworld, overworld.heroStart, handlers()));
+    // Hero starts at (10,9); moving left should land on (9,9).
     act(() => result.current.move("left"));
-    expect(result.current.hero).toMatchObject({ x: 8, y: 9, facing: "left" });
+    expect(result.current.hero).toMatchObject({ x: 9, y: 9, facing: "left" });
   });
 
-  it("does not leave the map but still turns to face a blocked direction", () => {
-    const { result } = renderHook(() => useMovement(overworld, overworld.heroStart, () => {}));
-    act(() => {
-      for (let i = 0; i < 30; i++) result.current.move("left");
-    });
-    expect(result.current.hero.x).toBeGreaterThanOrEqual(1);
-    expect(result.current.hero.facing).toBe("left");
-    expect(result.current.hero.y).toBe(overworld.heroStart.y);
-  });
-
-  it("interacts with a landmark instead of moving when bumping it", () => {
-    const onInteract = vi.fn();
-    const { result } = renderHook(() => useMovement(overworld, overworld.heroStart, onInteract));
-    // From (9,9): step left to (6,9), then up toward the castle at (9,2)?
-    // exif-tools sits at (6,11). Walk left to x=6 then down onto it.
-    act(() => {
-      result.current.move("left"); // 8,9
-      result.current.move("left"); // 7,9
-      result.current.move("left"); // 6,9
-      result.current.move("down"); // 6,10
-    });
-    expect(result.current.hero).toMatchObject({ x: 6, y: 10 });
-    act(() => result.current.move("down")); // bumps exif-tools at (6,11)
-    expect(onInteract).toHaveBeenCalledWith(
-      expect.objectContaining({ kind: "project", ref: "exif-tools" }),
-    );
-    expect(result.current.hero).toMatchObject({ x: 6, y: 10 });
-  });
-
-  it("triggers a castle landmark when bumped", () => {
-    const onInteract = vi.fn();
+  it("drowns instead of entering water and does not move", () => {
+    const onDrown = vi.fn();
+    // Spawn next to the sea (water at x>=14 && y>=9). (13,10) is grass; east is water.
     const { result } = renderHook(() =>
-      useMovement(overworld, { x: 9, y: 3, facing: "up" }, onInteract),
+      useMovement(overworld, { x: 13, y: 10, facing: "right" }, handlers({ onDrown })),
     );
-    act(() => result.current.move("up")); // castle sits at (9,2)
+    act(() => result.current.move("right"));
+    expect(onDrown).toHaveBeenCalledTimes(1);
+    expect(result.current.hero).toMatchObject({ x: 13, y: 10 });
+  });
+
+  it("pushes a rock onto the free tile beyond it", () => {
+    const pushRock = vi.fn();
+    const rocks = [{ id: "r", x: 9, y: 9 }];
+    // Hero at (10,9) facing left; rock at (9,9); beyond (8,9) is grass → push.
+    const { result } = renderHook(() =>
+      useMovement(overworld, { x: 10, y: 9, facing: "left" }, handlers({ rocks, pushRock })),
+    );
+    act(() => result.current.move("left"));
+    expect(pushRock).toHaveBeenCalledWith("r", 8, 9);
+    expect(result.current.hero).toMatchObject({ x: 9, y: 9 });
+  });
+
+  it("collects a coin by walking over it", () => {
+    const onPickup = vi.fn();
+    const coin = overworld.landmarks.find((l) => l.kind === "coin")!;
+    const { result } = renderHook(() =>
+      useMovement(overworld, { x: coin.x - 1, y: coin.y, facing: "right" }, handlers({ onPickup })),
+    );
+    act(() => result.current.move("right"));
+    expect(onPickup).toHaveBeenCalledWith(coin);
+    expect(result.current.hero).toMatchObject({ x: coin.x, y: coin.y });
+  });
+
+  it("interacts with a bump landmark instead of moving", () => {
+    const onInteract = vi.fn();
+    // Castle sits at (10,7); approach from below at (10,8) going up.
+    const { result } = renderHook(() =>
+      useMovement(overworld, { x: 10, y: 8, facing: "up" }, handlers({ onInteract })),
+    );
+    act(() => result.current.move("up"));
     expect(onInteract).toHaveBeenCalledWith(
       expect.objectContaining({ kind: "castle", ref: "thecode" }),
     );
+    expect(result.current.hero).toMatchObject({ x: 10, y: 8 });
   });
 });

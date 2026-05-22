@@ -89,3 +89,38 @@ describe("castle wiring", () => {
     }
   });
 });
+
+const walkable = (scene: Scene, x: number, y: number) =>
+  !isBlocked(scene.tiles[y][x]) && scene.tiles[y][x] !== "water";
+
+describe("game objects", () => {
+  it.each(scenes)("$id: standable landmarks sit on walkable tiles", (scene) => {
+    const standable = ["project", "castle", "coin", "npc", "crown"];
+    for (const l of scene.landmarks) {
+      if (standable.includes(l.kind)) {
+        expect(walkable(scene, l.x, l.y), `${l.kind} ${l.ref}`).toBe(true);
+      }
+    }
+  });
+
+  it.each(scenes)("$id: rocks rest on walkable, non-overlapping tiles", (scene) => {
+    for (const r of scene.rocks ?? []) {
+      expect(walkable(scene, r.x, r.y)).toBe(true);
+      expect(scene.landmarks.some((l) => l.x === r.x && l.y === r.y)).toBe(false);
+    }
+  });
+
+  it.each(scenes)("$id: enemies patrol only walkable tiles, clear of landmarks", (scene) => {
+    for (const e of scene.enemies ?? []) {
+      const pos = e.axis === "h" ? e.x : e.y;
+      expect(pos).toBeGreaterThanOrEqual(e.min);
+      expect(pos).toBeLessThanOrEqual(e.max);
+      for (let p = e.min; p <= e.max; p++) {
+        const x = e.axis === "h" ? p : e.x;
+        const y = e.axis === "h" ? e.y : p;
+        expect(walkable(scene, x, y), `patrol ${e.id} @ ${x},${y}`).toBe(true);
+        expect(scene.landmarks.some((l) => l.x === x && l.y === y)).toBe(false);
+      }
+    }
+  });
+});

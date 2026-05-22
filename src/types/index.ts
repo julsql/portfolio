@@ -48,6 +48,7 @@ export type TileKind =
   | "sand"
   | "flower"
   | "rock"
+  | "mountain"
   | "floor"
   | "wall"
   | "carpet";
@@ -58,15 +59,35 @@ export interface Hero {
   facing: "up" | "down" | "left" | "right";
 }
 
-/** Something the hero can bump into within a scene. */
+/** Something the hero can bump into (or walk over) within a scene. */
 export interface LandmarkRef {
   x: number;
   y: number;
-  kind: "project" | "castle" | "exit" | "crown";
-  /** project id, castle id, target scene id (for exits), or "crown". */
+  kind: "project" | "castle" | "exit" | "crown" | "coin" | "npc" | "door" | "ganon";
+  /** project id, castle id, target scene id, coin id, or marker. */
   ref: string;
-  /** Where the hero should spawn after an exit transition. */
+  /** Where the hero should spawn after an exit/door transition. */
   spawn?: Hero;
+  /** Walk onto it (and collect) instead of bumping it — e.g. coins. */
+  pickup?: boolean;
+}
+
+/** A pushable boulder. */
+export interface Rock {
+  id: string;
+  x: number;
+  y: number;
+}
+
+/** An enemy patrolling back and forth along one axis between min and max. */
+export interface EnemySpec {
+  id: string;
+  x: number;
+  y: number;
+  axis: "h" | "v";
+  min: number;
+  max: number;
+  icon: string;
 }
 
 /** Decorative sprite placed on a tile. When `hazard`, standing on it burns. */
@@ -86,4 +107,6 @@ export interface Scene {
   heroStart: Hero;
   landmarks: LandmarkRef[];
   decor: Decor[];
+  rocks?: Rock[];
+  enemies?: EnemySpec[];
 }

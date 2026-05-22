@@ -219,6 +219,18 @@
   place-items: center;
   font-size: calc(var(--tile) * 0.7);
 }
+.tile-mountain {
+  background: #6b5a3a;
+  position: relative;
+}
+.tile-mountain::after {
+  content: "⛰️";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--tile) * 0.8);
+}
 .tile-flower {
   background: var(--c-grass);
   position: relative;
@@ -273,7 +285,7 @@
     0 10px 30px rgba(0, 0, 0, 0.7);
 }
 
-/* ----- Decoration (torches, crown…) ----- */
+/* ----- Decoration (torches, cacti…) ----- */
 .decor {
   position: absolute;
   width: var(--tile);
@@ -284,7 +296,66 @@
   z-index: 4;
   pointer-events: none;
   filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.5));
+}
+.decor.hazard {
   animation: flicker 0.6s steps(2) infinite;
+}
+
+/* ----- Game objects: rocks, coins, enemies ----- */
+.rock-obj {
+  position: absolute;
+  width: var(--tile);
+  height: var(--tile);
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--tile) * 0.82);
+  z-index: 5;
+  filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.45));
+}
+.coin {
+  position: absolute;
+  width: var(--tile);
+  height: var(--tile);
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--tile) * 0.55);
+  z-index: 5;
+  pointer-events: none;
+  filter: drop-shadow(0 0 5px rgba(248, 208, 48, 0.9));
+  animation: bob 1.2s ease-in-out infinite;
+}
+.enemy {
+  position: absolute;
+  width: var(--tile);
+  height: var(--tile);
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--tile) * 0.7);
+  z-index: 7;
+  pointer-events: none;
+  transition:
+    left 0.2s linear,
+    top 0.2s linear;
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.5));
+  animation: bob 0.5s ease-in-out infinite;
+}
+
+/* ----- Status bar (hearts + coins) ----- */
+.status {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 18px;
+}
+.hearts {
+  display: flex;
+  gap: 2px;
+  letter-spacing: 1px;
+}
+.coins {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  color: var(--c-gold);
 }
 
 /* ----- Landmarks (projects) ----- */
@@ -353,11 +424,29 @@
   color: var(--c-cream);
   font-size: 7px;
 }
-.landmark-exit .landmark-icon {
+.landmark-exit .landmark-icon,
+.landmark-door .landmark-icon {
   font-size: calc(var(--tile) * 0.8);
 }
 .landmark-exit .landmark-label {
   color: var(--c-cream);
+}
+.landmark-npc .landmark-label {
+  color: #7ce0a0;
+}
+.landmark-door .landmark-label {
+  color: #c89cff;
+}
+.landmark-door .landmark-icon {
+  filter: drop-shadow(0 0 8px rgba(200, 156, 255, 0.9)) drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.5));
+}
+.landmark-ganon .landmark-icon {
+  font-size: calc(var(--tile) * 0.9);
+  filter: drop-shadow(0 0 10px rgba(216, 40, 0, 0.9)) drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.6));
+  animation: bob 1.5s ease-in-out infinite;
+}
+.landmark-ganon .landmark-label {
+  color: var(--c-red);
 }
 
 /* The grabbable crown shimmers to invite interaction. */
@@ -816,6 +905,51 @@
   100% {
     transform: translateX(1.5px);
   }
+}
+
+/* ================================================================ DIALOG */
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(4, 10, 4, 0.4);
+}
+.dialog-box {
+  width: min(620px, 96vw);
+  background: linear-gradient(#0c1c4a, #06112e);
+  border: 5px solid var(--c-cream);
+  border-radius: 6px;
+  box-shadow: 0 0 0 5px #0a1230;
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  animation: pop 0.18s ease-out;
+}
+.dialog-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.dialog-face {
+  font-size: 30px;
+}
+.dialog-name {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  color: var(--c-gold);
+}
+.dialog-text {
+  font-size: 21px;
+  line-height: 1.35;
+  color: var(--c-cream);
+  margin-bottom: 14px;
+}
+.dialog-ok {
+  font-size: 11px;
 }
 
 /* ============================================================== GAME OVER */

@@ -8,65 +8,51 @@ export const OVERWORLD_H = 14;
 export const CASTLE_W = 13;
 export const CASTLE_H = 10;
 
-/** Tiles the hero cannot walk onto. */
-export const BLOCKED: ReadonlyArray<TileKind> = ["tree", "water", "rock", "wall"];
+// ── Ganon's lair dimensions ────────────────────────────────────────────────
+export const GANON_W = 11;
+export const GANON_H = 8;
 
-const OVERWORLD_LAKE = { x0: 8, y0: 6, x1: 11, y1: 8 };
+/** Tiles the hero cannot walk onto. Water is walkable but drowns (see useMovement). */
+export const BLOCKED: ReadonlyArray<TileKind> = ["tree", "rock", "wall", "mountain"];
 
-const TREES: ReadonlyArray<[number, number]> = [
-  [2, 4],
-  [5, 4],
-  [8, 4],
-  [11, 4],
-  [14, 4],
-  [18, 4],
-  [2, 7],
-  [18, 7],
-  [5, 8],
-  [7, 8],
-  [13, 8],
-  [8, 10],
-];
-
-const FLOWERS: ReadonlyArray<[number, number]> = [
-  [4, 6],
-  [7, 5],
-  [11, 9],
-  [14, 6],
-  [15, 9],
-  [4, 9],
-];
-
-const ROCKS: ReadonlyArray<[number, number]> = [
-  [12, 6],
-  [3, 8],
-];
-
-const has = (list: ReadonlyArray<[number, number]>, x: number, y: number) =>
-  list.some(([tx, ty]) => tx === x && ty === y);
-
-/** Static terrain for the open-air overworld. */
+/**
+ * Themed overworld: a desert (NW), mountains (NE), a lake (SW) and the sea (SE),
+ * with TheCode castle on a grassy plaza in the centre.
+ */
 export function buildOverworld(): TileKind[][] {
+  const W = OVERWORLD_W;
+  const H = OVERWORLD_H;
+  const cx = 10;
+  const cy = 7;
   const grid: TileKind[][] = [];
-  for (let y = 0; y < OVERWORLD_H; y++) {
+
+  for (let y = 0; y < H; y++) {
     const row: TileKind[] = [];
-    for (let x = 0; x < OVERWORLD_W; x++) {
-      const border = x === 0 || y === 0 || x === OVERWORLD_W - 1 || y === OVERWORLD_H - 1;
-      const inLake =
-        x >= OVERWORLD_LAKE.x0 &&
-        x <= OVERWORLD_LAKE.x1 &&
-        y >= OVERWORLD_LAKE.y0 &&
-        y <= OVERWORLD_LAKE.y1;
-      if (border) row.push("tree");
-      else if (inLake) row.push("water");
-      else if (has(ROCKS, x, y)) row.push("rock");
-      else if (has(TREES, x, y)) row.push("tree");
-      else if (has(FLOWERS, x, y)) row.push("flower");
-      else row.push(y === 9 ? "path" : "grass");
+    for (let x = 0; x < W; x++) {
+      row.push(tile(x, y));
     }
     grid.push(row);
   }
   return grid;
+
+  function tile(x: number, y: number): TileKind {
+    // Frame: mountains north, sea south, forest east/west.
+    if (y === 0) return "mountain";
+    if (y === H - 1) return "water";
+    if (x === 0 || x === W - 1) return "tree";
+
+    // Central plaza around the castle.
+    const dx = Math.abs(x - cx);
+    const dy = Math.abs(y - cy);
+    if (dx <= 2 && dy <= 2) return dx + dy === 0 ? "path" : "grass";
+
+    const left = x < cx;
+    const top = y < cy;
+    if (top && left) return "sand"; // desert
+    if (top && !left) return x >= 15 && y <= 3 ? "mountain" : "grass"; // mountains
+    if (!top && left) return x >= 2 && x <= 5 && y >= 9 && y <= 11 ? "water" : "grass"; // lake
+    return x >= 14 && y >= 9 ? "water" : "grass"; // sea
+  }
 }
 
 /** Stone room behind the TheCode castle gate, with a carpet up the middle. */
@@ -80,6 +66,20 @@ export function buildCastle(): TileKind[][] {
       if (border) row.push("wall");
       else if (x === mid) row.push("carpet");
       else row.push("floor");
+    }
+    grid.push(row);
+  }
+  return grid;
+}
+
+/** A small dark chamber for the final boss. */
+export function buildGanonRoom(): TileKind[][] {
+  const grid: TileKind[][] = [];
+  for (let y = 0; y < GANON_H; y++) {
+    const row: TileKind[] = [];
+    for (let x = 0; x < GANON_W; x++) {
+      const border = x === 0 || y === 0 || x === GANON_W - 1 || y === GANON_H - 1;
+      row.push(border ? "wall" : "floor");
     }
     grid.push(row);
   }
