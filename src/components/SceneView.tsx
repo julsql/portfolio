@@ -56,6 +56,7 @@ export default function SceneView(props: Props) {
     (scene.enemies ?? []).map((e) => ({ ...e, dir: 1, frame: 0, maxHp: e.hp ?? 1 })),
   );
   const [attacking, setAttacking] = useState(false);
+  const [bossHurt, setBossHurt] = useState(false);
 
   const pushRock = useCallback(
     (id: string, x: number, y: number) =>
@@ -194,7 +195,13 @@ export default function SceneView(props: Props) {
     const fx = hero.x + dx;
     const fy = hero.y + dy;
     const target = enemies.find((e) => e.x === fx && e.y === fy);
-    if (target?.random && (target.hp ?? 1) <= 1) onBossDefeated();
+    if (target?.random) {
+      if ((target.hp ?? 1) <= 1) onBossDefeated();
+      else {
+        setBossHurt(true);
+        setTimeout(() => setBossHurt(false), 320);
+      }
+    }
     setEnemies((prev) =>
       prev.flatMap((e) => {
         if (e.x !== fx || e.y !== fy) return [e];
@@ -235,7 +242,7 @@ export default function SceneView(props: Props) {
         style={{ ["--cols" as string]: scene.width, ["--rows" as string]: scene.height }}
       >
         {boss && (
-          <div className="boss-bar">
+          <div className={`boss-bar${bossHurt ? " hurt" : ""}`}>
             <span className="boss-name">Ganondorf</span>
             <span className="boss-pips">
               {Array.from({ length: boss.maxHp }, (_, i) => (
@@ -287,7 +294,9 @@ export default function SceneView(props: Props) {
           e.sprites ? (
             <img
               key={e.id}
-              className={`enemy ${e.random ? "enemy-boss" : "enemy-sprite"}`}
+              className={`enemy ${e.random ? "enemy-boss" : "enemy-sprite"}${
+                e.random && bossHurt ? " hurt" : ""
+              }`}
               style={tileStyle(e.x, e.y)}
               src={e.sprites[e.frame % e.sprites.length]}
               alt=""

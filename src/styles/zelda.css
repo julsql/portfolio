@@ -403,6 +403,27 @@ img.decor {
 .boss-pip.full {
   background: linear-gradient(#ff5028, #c01000);
 }
+.boss-bar.hurt {
+  animation: bar-blink 0.32s steps(2) infinite;
+}
+.enemy-boss.hurt {
+  animation: boss-flash 0.32s ease;
+}
+@keyframes bar-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+@keyframes boss-flash {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(216, 40, 0, 0.8)) drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.6));
+  }
+  30%,
+  70% {
+    filter: brightness(2.2) sepia(1) saturate(12) hue-rotate(-25deg);
+  }
+}
 
 /* ----- Item pickups (heart, sword pedestal) ----- */
 .landmark-item {
