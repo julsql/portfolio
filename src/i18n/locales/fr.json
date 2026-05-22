@@ -18,6 +18,11 @@
     "tool": "Outils",
     "title": "Royaumes"
   },
+  "world": {
+    "enter": "ENTRER",
+    "exit": "Sortie",
+    "castle": "Château"
+  },
   "modal": {
     "live": "Voir le site",
     "demo": "Démo en ligne",

@@ -1,0 +1,109 @@
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import type { Hero as HeroType, LandmarkRef, Scene } from "../types";
+import { castleById, projectById } from "../data/projects";
+import { OVERWORLD_ID } from "../data/scenes";
+import { useMovement } from "../hooks/useMovement";
+import Hero from "./Hero";
+import TouchControls from "./TouchControls";
+import Legend from "./Legend";
+
+interface Props {
+  scene: Scene;
+  initialHero: HeroType;
+  onInteract: (landmark: LandmarkRef) => void;
+  paused: boolean;
+}
+
+function tileStyle(x: number, y: number) {
+  return { left: `calc(${x} * var(--tile))`, top: `calc(${y} * var(--tile))` };
+}
+
+export default function SceneView({ scene, initialHero, onInteract, paused }: Props) {
+  const { t } = useTranslation();
+  const { hero, move, setEnabled } = useMovement(scene, initialHero, onInteract);
+
+  useEffect(() => setEnabled(!paused), [paused, setEnabled]);
+
+  return (
+    <div className="overworld">
+      <p className="explore-hint">
+        <span className="hint-desktop">{t("hud.hint")}</span>
+        <span className="hint-touch">{t("hud.hint_touch")}</span>
+      </p>
+
+      <div
+        className={`field scene-${scene.id}`}
+        style={{ ["--cols" as string]: scene.width, ["--rows" as string]: scene.height }}
+      >
+        <div className="tilemap">
+          {scene.tiles.flatMap((row, y) =>
+            row.map((kind, x) => <div key={`${x}-${y}`} className={`tile tile-${kind}`} />),
+          )}
+        </div>
+
+        {scene.decor.map((d, i) => (
+          <span key={`d-${i}`} className="decor" style={tileStyle(d.x, d.y)} aria-hidden="true">
+            {d.icon}
+          </span>
+        ))}
+
+        {scene.landmarks.map((l) => {
+          if (l.kind === "exit") {
+            return (
+              <button
+                key={`exit-${l.x}-${l.y}`}
+                className="landmark landmark-exit"
+                style={tileStyle(l.x, l.y)}
+                onClick={() => onInteract(l)}
+                aria-label={t("world.exit")}
+              >
+                <span className="landmark-icon">🚪</span>
+                <span className="landmark-label">{t("world.exit")}</span>
+              </button>
+            );
+          }
+
+          if (l.kind === "castle") {
+            const castle = castleById(l.ref);
+            if (!castle) return null;
+            return (
+              <button
+                key={`castle-${l.ref}`}
+                className="landmark landmark-castle"
+                style={tileStyle(l.x, l.y)}
+                onClick={() => onInteract(l)}
+                aria-label={castle.name}
+              >
+                <span className="landmark-icon">{castle.icon}</span>
+                <span className="landmark-label">
+                  {castle.name} <span className="enter-tag">⤵ {t("world.enter")}</span>
+                </span>
+              </button>
+            );
+          }
+
+          const p = projectById(l.ref);
+          if (!p) return null;
+          return (
+            <button
+              key={`p-${l.ref}`}
+              className={`landmark cat-${p.category}`}
+              style={tileStyle(l.x, l.y)}
+              onClick={() => onInteract(l)}
+              aria-label={p.name}
+            >
+              <span className="landmark-icon">{p.icon}</span>
+              <span className="landmark-label">{p.name}</span>
+            </button>
+          );
+        })}
+
+        <Hero hero={hero} />
+      </div>
+
+      {scene.id === OVERWORLD_ID && <Legend />}
+      <TouchControls onMove={move} />
+    </div>
+  );
+}

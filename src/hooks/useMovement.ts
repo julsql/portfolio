@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import type { Hero, Project } from "../types";
-import { BLOCKED, HERO_START, MAP_HEIGHT, MAP_WIDTH } from "../data/map";
-import { PROJECTS } from "../data/projects";
+import type { Hero, LandmarkRef, Scene } from "../types";
+import { BLOCKED } from "../data/map";
 
 type Dir = "up" | "down" | "left" | "right";
 
@@ -25,24 +24,23 @@ const KEY_TO_DIR: Record<string, Dir> = {
   q: "left", // AZERTY
 };
 
-function projectAt(x: number, y: number): Project | undefined {
-  return PROJECTS.find((p) => p.pos.x === x && p.pos.y === y);
-}
-
 interface UseMovement {
   hero: Hero;
-  /** Try to move the hero one tile; opens a project if a landmark is bumped. */
+  /** Try to move the hero one tile; interacts with a landmark if bumped. */
   move: (dir: Dir) => void;
-  enabled: boolean;
   setEnabled: (v: boolean) => void;
 }
 
 /**
- * Owns the hero position. Walking into a project landmark does not move the
- * hero — it calls `onOpen` instead (Zelda-style "bump to interact").
+ * Owns the hero position within a scene. Walking into a landmark does not move
+ * the hero — it calls `onInteract` instead (Zelda-style "bump to interact").
  */
-export function useMovement(grid: string[][], onOpen: (p: Project) => void): UseMovement {
-  const [hero, setHero] = useState<Hero>({ ...HERO_START });
+export function useMovement(
+  scene: Scene,
+  initial: Hero,
+  onInteract: (landmark: LandmarkRef) => void,
+): UseMovement {
+  const [hero, setHero] = useState<Hero>(initial);
   const [enabled, setEnabled] = useState(true);
 
   const move = useCallback(
@@ -53,21 +51,21 @@ export function useMovement(grid: string[][], onOpen: (p: Project) => void): Use
         const nx = prev.x + dx;
         const ny = prev.y + dy;
         const facing = dir;
-        if (nx < 0 || ny < 0 || nx >= MAP_WIDTH || ny >= MAP_HEIGHT) {
+        if (nx < 0 || ny < 0 || nx >= scene.width || ny >= scene.height) {
           return { ...prev, facing };
         }
-        const target = projectAt(nx, ny);
-        if (target) {
-          onOpen(target);
+        const landmark = scene.landmarks.find((l) => l.x === nx && l.y === ny);
+        if (landmark) {
+          onInteract(landmark);
           return { ...prev, facing };
         }
-        if (BLOCKED.includes(grid[ny][nx] as never)) {
+        if (BLOCKED.includes(scene.tiles[ny][nx])) {
           return { ...prev, facing };
         }
         return { x: nx, y: ny, facing };
       });
     },
-    [enabled, grid, onOpen],
+    [enabled, scene, onInteract],
   );
 
   useEffect(() => {
@@ -81,5 +79,5 @@ export function useMovement(grid: string[][], onOpen: (p: Project) => void): Use
     return () => window.removeEventListener("keydown", handler);
   }, [move]);
 
-  return { hero, move, enabled, setEnabled };
+  return { hero, move, setEnabled };
 }

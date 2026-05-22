@@ -1,13 +1,17 @@
 import type { TileKind } from "../types";
 
-export const MAP_WIDTH = 20;
-export const MAP_HEIGHT = 14;
+// ── Overworld dimensions ───────────────────────────────────────────────────
+export const OVERWORLD_W = 20;
+export const OVERWORLD_H = 14;
 
-/** Where the hero spawns. */
-export const HERO_START = { x: 9, y: 9, facing: "up" as const };
+// ── Castle interior dimensions ─────────────────────────────────────────────
+export const CASTLE_W = 13;
+export const CASTLE_H = 10;
 
-// Fixed decoration so the layout is deterministic (and testable).
-const LAKE = { x0: 8, y0: 6, x1: 11, y1: 8 };
+/** Tiles the hero cannot walk onto. */
+export const BLOCKED: ReadonlyArray<TileKind> = ["tree", "water", "rock", "wall"];
+
+const OVERWORLD_LAKE = { x0: 8, y0: 6, x1: 11, y1: 8 };
 
 const TREES: ReadonlyArray<[number, number]> = [
   [2, 4],
@@ -41,14 +45,18 @@ const ROCKS: ReadonlyArray<[number, number]> = [
 const has = (list: ReadonlyArray<[number, number]>, x: number, y: number) =>
   list.some(([tx, ty]) => tx === x && ty === y);
 
-/** Build the static tile grid. Landmarks are drawn on top (see projects.ts). */
-export function buildMap(): TileKind[][] {
+/** Static terrain for the open-air overworld. */
+export function buildOverworld(): TileKind[][] {
   const grid: TileKind[][] = [];
-  for (let y = 0; y < MAP_HEIGHT; y++) {
+  for (let y = 0; y < OVERWORLD_H; y++) {
     const row: TileKind[] = [];
-    for (let x = 0; x < MAP_WIDTH; x++) {
-      const border = x === 0 || y === 0 || x === MAP_WIDTH - 1 || y === MAP_HEIGHT - 1;
-      const inLake = x >= LAKE.x0 && x <= LAKE.x1 && y >= LAKE.y0 && y <= LAKE.y1;
+    for (let x = 0; x < OVERWORLD_W; x++) {
+      const border = x === 0 || y === 0 || x === OVERWORLD_W - 1 || y === OVERWORLD_H - 1;
+      const inLake =
+        x >= OVERWORLD_LAKE.x0 &&
+        x <= OVERWORLD_LAKE.x1 &&
+        y >= OVERWORLD_LAKE.y0 &&
+        y <= OVERWORLD_LAKE.y1;
       if (border) row.push("tree");
       else if (inLake) row.push("water");
       else if (has(ROCKS, x, y)) row.push("rock");
@@ -61,5 +69,19 @@ export function buildMap(): TileKind[][] {
   return grid;
 }
 
-/** Tiles the hero cannot walk onto. */
-export const BLOCKED: ReadonlyArray<TileKind> = ["tree", "water", "rock"];
+/** Stone room behind the TheCode castle gate, with a carpet up the middle. */
+export function buildCastle(): TileKind[][] {
+  const grid: TileKind[][] = [];
+  const mid = Math.floor(CASTLE_W / 2);
+  for (let y = 0; y < CASTLE_H; y++) {
+    const row: TileKind[] = [];
+    for (let x = 0; x < CASTLE_W; x++) {
+      const border = x === 0 || y === 0 || x === CASTLE_W - 1 || y === CASTLE_H - 1;
+      if (border) row.push("wall");
+      else if (x === mid) row.push("carpet");
+      else row.push("floor");
+    }
+    grid.push(row);
+  }
+  return grid;
+}

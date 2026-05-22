@@ -18,6 +18,11 @@
     "tool": "Tools",
     "title": "Realms"
   },
+  "world": {
+    "enter": "ENTER",
+    "exit": "Exit",
+    "castle": "Castle"
+  },
   "modal": {
     "live": "Visit website",
     "demo": "Live demo",

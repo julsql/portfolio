@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PROJECTS } from "./projects";
+import { CASTLES, projectById, PROJECTS } from "./projects";
 import fr from "../i18n/locales/fr.json";
 import en from "../i18n/locales/en.json";
 
@@ -24,6 +24,19 @@ describe("projects data", () => {
     for (const p of PROJECTS) {
       expect(dict[p.id]?.tagline?.length).toBeGreaterThan(0);
       expect(dict[p.id]?.description?.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe("castles", () => {
+  it("only reference existing projects that are tagged with the matching group", () => {
+    for (const castle of CASTLES) {
+      expect(castle.memberIds.length).toBeGreaterThan(0);
+      for (const id of castle.memberIds) {
+        const p = projectById(id);
+        expect(p, `missing project ${id}`).toBeDefined();
+        expect(p?.group).toBe(castle.id);
+      }
     }
   });
 });
