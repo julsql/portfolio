@@ -469,6 +469,9 @@ img.decor {
   font-size: calc(var(--tile) * 0.66);
   filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.5));
   animation: bob 2s ease-in-out infinite;
+  /* Keep the icon in front of its label. */
+  position: relative;
+  z-index: 8;
 }
 /* Projects are the stars of the show — make them big and obvious. */
 .cat-web .landmark-icon,
@@ -487,7 +490,7 @@ img.landmark-icon {
 }
 .landmark-label {
   position: absolute;
-  top: calc(var(--tile) * 1);
+  top: calc(var(--tile) * 1.1);
   font-family: var(--font-pixel);
   font-size: 10px;
   white-space: nowrap;
@@ -496,7 +499,7 @@ img.landmark-icon {
   background: rgba(8, 18, 6, 0.95);
   border: 2px solid currentColor;
   pointer-events: none;
-  z-index: 7;
+  z-index: 6;
 }
 .cat-web .landmark-label {
   color: var(--cat-web);
