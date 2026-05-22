@@ -1066,7 +1066,10 @@ img.landmark-icon {
   margin-bottom: 10px;
 }
 .dialog-face {
-  font-size: 30px;
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  image-rendering: pixelated;
 }
 .dialog-name {
   font-family: var(--font-pixel);

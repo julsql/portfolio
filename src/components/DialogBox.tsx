@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { sound } from "../audio/sound";
+import { SPRITES } from "../data/sprites";
 
 interface Props {
   onClose: () => void;
@@ -31,7 +32,7 @@ export default function DialogBox({ onClose }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="dialog-head">
-          <span className="dialog-face">🧙</span>
+          <img className="dialog-face" src={SPRITES.npc} alt="" />
           <span className="dialog-name">{t("npc.name")}</span>
         </div>
         <p className="dialog-text">{t("npc.hint")}</p>

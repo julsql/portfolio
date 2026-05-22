@@ -20,6 +20,7 @@ export const SPRITES = {
   linkHeart: `${B}/link-heart.svg`,
   linkTriforce: `${B}/link-triforce.png`,
   zelda: `${B}/zelda.png`,
+  npc: `${B}/npc.png`,
   heart: {
     full: `${B}/heart-full.png`,
     half: `${B}/heart-half.png`,
