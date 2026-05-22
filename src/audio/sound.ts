@@ -71,14 +71,29 @@ class SoundEngine {
     // Unlock right away — init() is called from the START gesture.
     void this.ctx.resume();
 
-    // Browsers suspend the context on tab-switch / focus loss; resume it on
-    // any interaction or when the tab becomes visible again.
+    // Browsers throttle background timers (which makes the chiptune drag), so
+    // stop the music and suspend audio when the tab is hidden, and pick the
+    // same track back up when it returns to the foreground.
     const resume = () => void this.ctx?.resume();
     window.addEventListener("pointerdown", resume);
     window.addEventListener("keydown", resume);
     document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) resume();
+      if (document.hidden) {
+        this.pauseMusic();
+        void this.ctx?.suspend();
+      } else {
+        void this.ctx?.resume();
+        if (this.track) this.music(this.track);
+      }
     });
+  }
+
+  /** Stop the loop but remember the track, so visibility can resume it. */
+  private pauseMusic() {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = undefined;
+    }
   }
 
   setMuted(m: boolean) {
