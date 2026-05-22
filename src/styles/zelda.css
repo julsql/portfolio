@@ -513,6 +513,15 @@ img.landmark-icon {
   object-fit: contain;
   image-rendering: pixelated;
 }
+img.castle-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--tile) * 1.5);
+  height: calc(var(--tile) * 1.5);
+  margin-left: calc(var(--tile) * -0.75);
+  margin-top: calc(var(--tile) * -0.75);
+}
 .door-icon {
   animation: none;
 }

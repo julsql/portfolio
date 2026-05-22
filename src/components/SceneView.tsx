@@ -420,7 +420,7 @@ export default function SceneView(props: Props) {
           onClick={() => interact(l)}
           aria-label={castle.name}
         >
-          <span className="landmark-icon">{castle.icon}</span>
+          <img className="landmark-icon castle-icon" src={SPRITES.castle} alt="" />
           <span className="landmark-label">
             <span>{castle.name}</span> <span className="enter-tag">⤵ {t("world.enter")}</span>
           </span>
