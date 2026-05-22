@@ -19,22 +19,11 @@ export const BLOCKED: ReadonlyArray<TileKind> = ["tree", "rock", "wall", "mounta
  * Themed overworld: a desert (NW), mountains (NE), a lake (SW) and the sea (SE),
  * with TheCode castle on a grassy plaza in the centre.
  */
-// Single trees scattered across empty land — never a wall or a frame.
-const OVERWORLD_TREES = new Set([
-  "17,2",
-  "18,4",
-  "2,9",
-  "2,11",
-  "5,9",
-  "9,11",
-  "13,9",
-  "13,12",
-  "18,8",
-]);
-
 export function buildOverworld(): TileKind[][] {
   const W = OVERWORLD_W;
   const H = OVERWORLD_H;
+  const cx = 10;
+  const cy = 7;
   const grid: TileKind[][] = [];
 
   for (let y = 0; y < H; y++) {
@@ -47,25 +36,22 @@ export function buildOverworld(): TileKind[][] {
   return grid;
 
   function tile(x: number, y: number): TileKind {
-    // Desert: NW corner, reaching the top & left edges so it feels endless.
-    if (x <= 6 && y <= 5) return "sand";
+    // Frame: mountains north, sea south, forest east/west.
+    if (y === 0) return "mountain";
+    if (y === H - 1) return "water";
+    if (x === 0 || x === W - 1) return "tree";
 
-    // Mountains border the desert on its inner (south & east) edges, with one
-    // sandy pass into it — they don't run across the whole top of the map.
-    const pass = x === 7 && (y === 2 || y === 3);
-    if (pass) return "sand";
-    if ((x === 7 && y <= 6) || (y === 6 && x <= 7)) return "mountain";
+    // Central plaza around the castle.
+    const dx = Math.abs(x - cx);
+    const dy = Math.abs(y - cy);
+    if (dx <= 2 && dy <= 2) return dx + dy === 0 ? "path" : "grass";
 
-    // Sea: SE corner, reaching the edges.
-    if (x >= 14 && y >= 9) return "water";
-
-    // Castle plaza at the centre.
-    if (Math.abs(x - 10) <= 2 && Math.abs(y - 7) <= 2) {
-      return x === 10 && y === 7 ? "path" : "grass";
-    }
-
-    if (OVERWORLD_TREES.has(`${x},${y}`)) return "tree";
-    return "grass";
+    const left = x < cx;
+    const top = y < cy;
+    if (top && left) return "sand"; // desert
+    if (top && !left) return x >= 15 && y <= 3 ? "mountain" : "grass"; // mountains
+    if (!top && left) return x >= 2 && x <= 5 && y >= 9 && y <= 11 ? "water" : "grass"; // lake
+    return x >= 14 && y >= 9 ? "water" : "grass"; // sea
   }
 }
 
