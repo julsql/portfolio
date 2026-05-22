@@ -34,6 +34,11 @@
     "burned": "Tu n'as plus de cœurs...",
     "retry": "Recommencer"
   },
+  "victory": {
+    "title": "VICTOIRE !",
+    "thanks": "Merci, vaillant héros ! Tu as vaincu Ganondorf et exploré tout mon royaume de projets. JulSql te salue !",
+    "close": "Continuer"
+  },
   "modal": {
     "live": "Voir le site",
     "demo": "Démo en ligne",

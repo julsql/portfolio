@@ -12,6 +12,7 @@ import ProjectModal from "./components/ProjectModal";
 import DialogBox from "./components/DialogBox";
 import ItemGet, { type Item } from "./components/ItemGet";
 import GameOver from "./components/GameOver";
+import Victory from "./components/Victory";
 import Hud from "./components/Hud";
 
 type View = "map" | "list";
@@ -40,6 +41,7 @@ export default function App() {
   const [invuln, setInvuln] = useState(false);
   const invulnRef = useRef(false);
   const [gameOver, setGameOver] = useState(false);
+  const [victory, setVictory] = useState(false);
   const [muted, setMuted] = useState(false);
 
   // Live scene: drop the grabbed heart, the taken sword and collected rupees;
@@ -82,6 +84,12 @@ export default function App() {
   useEffect(() => {
     if (started && health <= 0) setGameOver(true);
   }, [started, health]);
+
+  const onBossDefeated = useCallback(() => {
+    sound.stopMusic();
+    sound.sfx("victory");
+    setVictory(true);
+  }, []);
 
   // Background music follows the current scene.
   useEffect(() => {
@@ -141,6 +149,7 @@ export default function App() {
 
   const retry = () => {
     setGameOver(false);
+    setVictory(false);
     setHealth(maxHealth);
     invulnRef.current = false;
     setInvuln(false);
@@ -169,7 +178,7 @@ export default function App() {
     );
   }
 
-  const paused = active !== null || gameOver || dialogue || itemGet !== null;
+  const paused = active !== null || gameOver || dialogue || itemGet !== null || victory;
 
   return (
     <div className="screen">
@@ -189,6 +198,7 @@ export default function App() {
             onInteract={onInteract}
             onPickup={onPickup}
             onHit={takeHit}
+            onBossDefeated={onBossDefeated}
             paused={paused}
             hasSword={hasSword}
             health={health}
@@ -204,6 +214,14 @@ export default function App() {
       {dialogue && <DialogBox onClose={() => setDialogue(false)} />}
       {itemGet && <ItemGet item={itemGet} onDone={() => setItemGet(null)} />}
       {gameOver && <GameOver onRetry={retry} />}
+      {victory && (
+        <Victory
+          onClose={() => {
+            setVictory(false);
+            sound.music(sceneId === GANON_ID ? "ganon" : "overworld");
+          }}
+        />
+      )}
     </div>
   );
 }

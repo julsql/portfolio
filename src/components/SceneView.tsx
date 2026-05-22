@@ -15,6 +15,7 @@ interface Props {
   onInteract: (l: LandmarkRef) => void;
   onPickup: (l: LandmarkRef) => void;
   onHit: () => void;
+  onBossDefeated: () => void;
   paused: boolean;
   hasSword: boolean;
   health: number;
@@ -46,7 +47,7 @@ const heartSrc = (health: number, i: number) => {
 };
 
 export default function SceneView(props: Props) {
-  const { scene, initialHero, onInteract, onPickup, onHit } = props;
+  const { scene, initialHero, onInteract, onPickup, onHit, onBossDefeated } = props;
   const { paused, hasSword, health, maxHearts, rupees, invulnerable } = props;
   const { t } = useTranslation();
 
@@ -192,6 +193,8 @@ export default function SceneView(props: Props) {
     const [dx, dy] = DELTA[hero.facing];
     const fx = hero.x + dx;
     const fy = hero.y + dy;
+    const target = enemies.find((e) => e.x === fx && e.y === fy);
+    if (target?.random && (target.hp ?? 1) <= 1) onBossDefeated();
     setEnemies((prev) =>
       prev.flatMap((e) => {
         if (e.x !== fx || e.y !== fy) return [e];
@@ -199,7 +202,7 @@ export default function SceneView(props: Props) {
         return hp > 0 ? [{ ...e, hp }] : [];
       }),
     );
-  }, [attacking, hero]);
+  }, [attacking, hero, enemies, onBossDefeated]);
 
   return (
     <div className="overworld">
@@ -362,7 +365,6 @@ export default function SceneView(props: Props) {
           aria-label={t("world.ganon_door")}
         >
           <img className="landmark-icon door-icon" src={SPRITES.door} alt="" />
-          <span className="landmark-label">{t("world.ganon_door")}</span>
         </button>
       );
     }

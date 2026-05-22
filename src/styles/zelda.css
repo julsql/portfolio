@@ -185,7 +185,7 @@
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
 }
 .tile-grass:nth-child(2n) {
-  background: var(--c-grass-dark);
+  background: #52a338;
 }
 .tile-path {
   background: var(--c-path);
@@ -433,6 +433,12 @@ img.decor {
   filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.5));
   animation: bob 2s ease-in-out infinite;
 }
+/* Projects are the stars of the show — make them big and obvious. */
+.cat-web .landmark-icon,
+.cat-app .landmark-icon,
+.cat-tool .landmark-icon {
+  font-size: calc(var(--tile) * 0.95);
+}
 img.landmark-icon {
   width: calc(var(--tile) * 0.82);
   height: calc(var(--tile) * 0.82);
@@ -444,15 +450,16 @@ img.landmark-icon {
 }
 .landmark-label {
   position: absolute;
-  top: calc(var(--tile) * 0.92);
+  top: calc(var(--tile) * 1);
   font-family: var(--font-pixel);
-  font-size: 8px;
+  font-size: 10px;
   white-space: nowrap;
-  padding: 2px 4px;
+  padding: 3px 6px;
   border-radius: 3px;
-  background: rgba(11, 28, 8, 0.85);
-  border: 1px solid currentColor;
+  background: rgba(8, 18, 6, 0.95);
+  border: 2px solid currentColor;
   pointer-events: none;
+  z-index: 7;
 }
 .cat-web .landmark-label {
   color: var(--cat-web);
@@ -1018,6 +1025,48 @@ img.landmark-icon {
   color: var(--c-gold);
   text-align: center;
   text-shadow: 2px 2px 0 #7c4a02;
+}
+
+/* ================================================================ VICTORY */
+.victory {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 16px;
+  text-align: center;
+  background: radial-gradient(circle at 50% 38%, #2a2456 0%, #06061a 80%);
+  animation: fade 0.3s ease-out;
+}
+.victory-zelda {
+  width: min(220px, 55vw);
+  height: auto;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 28px rgba(248, 216, 120, 0.9));
+  animation:
+    pop 0.4s ease-out,
+    float 2.6s ease-in-out infinite;
+}
+.victory-title {
+  font-family: var(--font-pixel);
+  font-size: clamp(26px, 8vw, 56px);
+  color: var(--c-gold);
+  text-shadow:
+    4px 4px 0 #7c4a02,
+    0 0 18px rgba(248, 216, 120, 0.7);
+}
+.victory-thanks {
+  font-size: clamp(19px, 3.5vw, 26px);
+  color: var(--c-cream);
+  max-width: 620px;
+  line-height: 1.4;
+}
+.victory-close {
+  font-size: 12px;
 }
 
 /* ============================================================== GAME OVER */

@@ -15,7 +15,8 @@ export type Sfx =
   | "hurt"
   | "door"
   | "burn"
-  | "gameover";
+  | "gameover"
+  | "victory";
 
 interface Pattern {
   stepMs: number;
@@ -149,6 +150,11 @@ class SoundEngine {
         break;
       case "gameover":
         [392, 330, 262, 196].forEach((f, i) => this.tone(f, 0.3, "triangle", 0.2, i * 0.24));
+        break;
+      case "victory":
+        [523, 659, 784, 1046, 880, 1046, 1318].forEach((f, i) =>
+          this.tone(f, 0.16, "square", 0.18, i * 0.13),
+        );
         break;
     }
   }

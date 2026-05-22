@@ -34,6 +34,11 @@
     "burned": "You ran out of hearts...",
     "retry": "Retry"
   },
+  "victory": {
+    "title": "VICTORY!",
+    "thanks": "Thank you, brave hero! You defeated Ganondorf and explored my whole realm of projects. JulSql salutes you!",
+    "close": "Continue"
+  },
   "modal": {
     "live": "Visit website",
     "demo": "Live demo",

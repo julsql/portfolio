@@ -23,7 +23,7 @@
   --cat-app: #58c8f8;
   --cat-tool: #f86840;
 
-  --tile: clamp(20px, min(4.4vw, 5.6vh), 46px);
+  --tile: clamp(22px, min(5vw, 6.2vh), 56px);
 
   --font-pixel: "Press Start 2P", monospace;
   --font-body: "VT323", "Courier New", monospace;
