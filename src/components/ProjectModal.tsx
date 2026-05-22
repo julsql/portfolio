@@ -111,8 +111,18 @@ export default function ProjectModal({ project, onClose }: Props) {
         </div>
 
         <div className="modal-actions">
-          <div className="modal-row">{links.filter((l) => l.kind !== "code").map(renderLink)}</div>
-          <div className="modal-row">{links.filter((l) => l.kind === "code").map(renderLink)}</div>
+          {ordered.length <= 2 ? (
+            <div className="modal-row">{ordered.map(renderLink)}</div>
+          ) : (
+            <>
+              <div className="modal-row">
+                {links.filter((l) => l.kind !== "code").map(renderLink)}
+              </div>
+              <div className="modal-row">
+                {links.filter((l) => l.kind === "code").map(renderLink)}
+              </div>
+            </>
+          )}
         </div>
 
         <p className="modal-hint">{t("modal.keys")}</p>

@@ -250,7 +250,7 @@ export default function App() {
             invulnerable={invuln}
           />
         ) : (
-          <ListView onOpen={setActive} />
+          <ListView onOpen={setActive} paused={active !== null} />
         )}
       </main>
       {active && <ProjectModal project={active} onClose={() => setActive(null)} />}

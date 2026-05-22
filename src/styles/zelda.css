@@ -930,6 +930,12 @@ img.landmark-icon {
 .p-card:hover {
   transform: translateY(-4px);
 }
+.p-card.sel {
+  transform: translateY(-4px);
+  outline: 3px solid var(--c-gold);
+  outline-offset: 3px;
+  box-shadow: 0 0 16px rgba(248, 216, 120, 0.6);
+}
 .p-card.cat-app {
   border-color: var(--cat-app);
 }
