@@ -147,10 +147,19 @@ export default function App() {
     setRupees((n) => n + RUPEE_VALUE[l.rupee ?? "green"]);
   };
 
+  // Game over wipes all progress — start a fresh run.
   const retry = () => {
     setGameOver(false);
     setVictory(false);
-    setHealth(maxHealth);
+    setActive(null);
+    setDialogue(false);
+    setItemGet(null);
+    setHasSword(false);
+    setHeartTaken(false);
+    setCollected(new Set());
+    setRupees(0);
+    setMaxHealth(START_HEALTH);
+    setHealth(START_HEALTH);
     invulnRef.current = false;
     setInvuln(false);
     setSceneId(OVERWORLD_ID);

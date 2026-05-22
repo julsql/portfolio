@@ -35,11 +35,15 @@ export default function Victory({ onClose }: Props) {
       <img className="victory-zelda" src={SPRITES.zelda} alt="Zelda" />
       <h1 className="victory-title">{t("victory.title")}</h1>
       <p className="victory-thanks">{t("victory.thanks")}</p>
-      {ready && (
-        <button className="btn btn-primary victory-close" onClick={onClose}>
-          ★ {t("victory.close")}
-        </button>
-      )}
+      {/* Always rendered (reserves its space) — just hidden until unlocked,
+          so nothing already on screen shifts when it appears. */}
+      <button
+        className={`btn btn-primary victory-close${ready ? " ready" : ""}`}
+        onClick={ready ? onClose : undefined}
+        disabled={!ready}
+      >
+        ★ {t("victory.close")}
+      </button>
     </div>
   );
 }

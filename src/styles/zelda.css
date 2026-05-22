@@ -1130,6 +1130,10 @@ img.landmark-icon {
 }
 .victory-close {
   font-size: 12px;
+  visibility: hidden;
+}
+.victory-close.ready {
+  visibility: visible;
 }
 
 /* ============================================================== GAME OVER */
