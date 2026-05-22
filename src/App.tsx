@@ -226,6 +226,7 @@ export default function App() {
   // Audio must be unlocked by a user gesture, so init + start music on START.
   const start = () => {
     sound.init();
+    sound.sfx("select");
     sound.music("overworld");
     setStarted(true);
   };
