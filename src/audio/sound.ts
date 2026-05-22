@@ -167,4 +167,11 @@ class SoundEngine {
   }
 }
 
-export const sound = new SoundEngine();
+// Cache the engine on the global scope so HMR module reloads reuse the same
+// instance (and its single <audio> element) instead of stacking a second
+// background track over the old one.
+const scope = (typeof window !== "undefined" ? window : globalThis) as unknown as {
+  __portfolioSound?: SoundEngine;
+};
+export const sound: SoundEngine =
+  scope.__portfolioSound ?? (scope.__portfolioSound = new SoundEngine());
