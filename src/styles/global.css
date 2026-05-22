@@ -36,6 +36,14 @@
   color-scheme: dark;
 }
 
+/* Portrait windows show a transposed 14x20 map. */
+@media (orientation: portrait) {
+  :root {
+    --tile: min(calc((100vw - 16px) / 14), calc((100vh - var(--chrome)) / 20), 54px);
+    --tile: min(calc((100vw - 16px) / 14), calc((100dvh - var(--chrome)) / 20), 54px);
+  }
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

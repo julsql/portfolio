@@ -4,6 +4,7 @@ import type { Hero, LandmarkRef, Project } from "./types";
 import { castleSceneId, CASTLE_ID, GANON_ID, OVERWORLD_ID, SCENES } from "./data/scenes";
 import { projectById } from "./data/projects";
 import { RUPEE_VALUE } from "./data/sprites";
+import { transposeHero, transposeScene } from "./data/transpose";
 import { sound } from "./audio/sound";
 import TitleScreen from "./components/TitleScreen";
 import SceneView from "./components/SceneView";
@@ -44,8 +45,20 @@ export default function App() {
   const [victory, setVictory] = useState(false);
   const [muted, setMuted] = useState(false);
 
+  // Portrait windows get a transposed (taller-than-wide) map.
+  const [portrait, setPortrait] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(orientation: portrait)").matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(orientation: portrait)");
+    const onChange = () => setPortrait(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
   // Live scene: drop the grabbed heart, the taken sword and collected rupees;
   // once the heart is taken, reveal the door to Ganon's lair behind the throne.
+  // In portrait, transpose the whole scene so it fits a tall window.
   const scene = useMemo(() => {
     const base = SCENES[sceneId];
     let landmarks = base.landmarks;
@@ -60,8 +73,9 @@ export default function App() {
         { x: 6, y: 1, kind: "door", ref: GANON_ID, spawn: SCENES[GANON_ID].heroStart },
       ];
     }
-    return { ...base, landmarks };
-  }, [sceneId, heartTaken, hasSword, collected]);
+    const built = { ...base, landmarks };
+    return portrait ? transposeScene(built) : built;
+  }, [sceneId, heartTaken, hasSword, collected, portrait]);
 
   const goToScene = (id: string, where: Hero) => {
     setSpawn(where);
@@ -201,9 +215,9 @@ export default function App() {
       <main className="stage">
         {view === "map" ? (
           <SceneView
-            key={`${sceneId}-${runId}`}
+            key={`${sceneId}-${runId}-${portrait ? "p" : "l"}`}
             scene={scene}
-            initialHero={spawn}
+            initialHero={portrait ? transposeHero(spawn) : spawn}
             onInteract={onInteract}
             onPickup={onPickup}
             onHit={takeHit}
