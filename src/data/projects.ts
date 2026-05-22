@@ -46,21 +46,26 @@ export const PROJECTS: Project[] = [
 
   // ── Apps realm ───────────────────────────────────────────────────────────
   {
-    id: "jimi-api",
-    name: "JIMI API",
-    category: "app",
-    icon: "🗿",
-    tech: ["Spring Boot 3", "Java", "MariaDB", "LLM"],
-    repoUrl: "https://github.com/JIMIDevLab/jimi_api",
-  },
-  {
-    id: "jimi-app",
-    name: "JIMI App",
+    id: "jimi",
+    name: "JIMI",
     category: "app",
     icon: "🤖",
-    tech: ["React Native", "Expo", "TypeScript"],
-    storeUrl: "https://play.google.com/store/apps/details?id=fr.tsp.jimithechatbot",
-    repoUrl: "https://github.com/JIMIDevLab/jimi_app",
+    tech: ["Spring Boot 3", "React Native", "Expo", "MariaDB", "LLM"],
+    repoUrl: "https://github.com/JIMIDevLab/jimi_api",
+    links: [
+      {
+        kind: "live",
+        labelKey: "api",
+        url: "https://jimi-api.julsql.fr/swagger-ui/index.html#/",
+      },
+      {
+        kind: "store",
+        labelKey: "android",
+        url: "https://play.google.com/store/apps/details?id=fr.tsp.jimithechatbot",
+      },
+      { kind: "code", labelKey: "code_api", url: "https://github.com/JIMIDevLab/jimi_api" },
+      { kind: "code", labelKey: "code_app", url: "https://github.com/JIMIDevLab/jimi_app" },
+    ],
   },
 
   // ── Tools realm ──────────────────────────────────────────────────────────
@@ -137,7 +142,6 @@ export const CASTLES: Castle[] = [
   },
 ];
 
-export const projectById = (id: string): Project | undefined =>
-  PROJECTS.find((p) => p.id === id);
+export const projectById = (id: string): Project | undefined => PROJECTS.find((p) => p.id === id);
 
 export const castleById = (id: string): Castle | undefined => CASTLES.find((c) => c.id === id);

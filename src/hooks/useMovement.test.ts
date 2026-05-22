@@ -7,18 +7,14 @@ const overworld = SCENES[OVERWORLD_ID];
 
 describe("useMovement", () => {
   it("moves the hero onto a walkable tile and updates facing", () => {
-    const { result } = renderHook(() =>
-      useMovement(overworld, overworld.heroStart, () => {}),
-    );
+    const { result } = renderHook(() => useMovement(overworld, overworld.heroStart, () => {}));
     // Hero starts at (9,9); moving left should land on (8,9).
     act(() => result.current.move("left"));
     expect(result.current.hero).toMatchObject({ x: 8, y: 9, facing: "left" });
   });
 
   it("does not leave the map but still turns to face a blocked direction", () => {
-    const { result } = renderHook(() =>
-      useMovement(overworld, overworld.heroStart, () => {}),
-    );
+    const { result } = renderHook(() => useMovement(overworld, overworld.heroStart, () => {}));
     act(() => {
       for (let i = 0; i < 30; i++) result.current.move("left");
     });
@@ -29,9 +25,7 @@ describe("useMovement", () => {
 
   it("interacts with a landmark instead of moving when bumping it", () => {
     const onInteract = vi.fn();
-    const { result } = renderHook(() =>
-      useMovement(overworld, overworld.heroStart, onInteract),
-    );
+    const { result } = renderHook(() => useMovement(overworld, overworld.heroStart, onInteract));
     // From (9,9): step left to (6,9), then up toward the castle at (9,2)?
     // exif-tools sits at (6,11). Walk left to x=6 then down onto it.
     act(() => {

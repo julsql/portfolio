@@ -12,12 +12,6 @@
     "lang": "FR",
     "sound": "Sound"
   },
-  "legend": {
-    "web": "Websites",
-    "app": "Applications",
-    "tool": "Tools",
-    "title": "Realms"
-  },
   "world": {
     "enter": "ENTER",
     "exit": "Exit",
@@ -28,6 +22,10 @@
     "demo": "Live demo",
     "store": "Get it on the store",
     "code": "Source code",
+    "api": "API (Swagger)",
+    "android": "Android app (Play Store)",
+    "code_api": "Code — API",
+    "code_app": "Code — App",
     "stack": "Tech stack",
     "close": "Close",
     "category": {
@@ -70,13 +68,9 @@
       "tagline": "Manage your Magic collections",
       "description": "A Symfony app to manage Magic: The Gathering card collections and decks. Multi-user management, automated deployment with Deployer."
     },
-    "jimi-api": {
-      "tagline": "LLM-powered calendar assistant",
-      "description": "A Spring Boot 3 backend: the user writes in natural language (\"plan a meeting tomorrow at 2pm\"), an LLM extracts the structured event and CRUDs it in a MariaDB database. Multi-turn extraction with no client-side state machine."
-    },
-    "jimi-app": {
-      "tagline": "Cross-platform calendar chatbot",
-      "description": "A single Expo / React Native client running on iOS, Android and Web. Chat in natural language to manage your calendar; a schedule page reads straight from the database, with no risk of hallucination. Published on the Play Store."
+    "jimi": {
+      "tagline": "Chat-driven calendar assistant (LLM)",
+      "description": "A chat-driven calendar assistant. The Spring Boot 3 backend extracts an event from a natural-language message (\"plan a meeting tomorrow at 2pm\") via an LLM and CRUDs it in a MariaDB database. The Expo / React Native client runs on iOS, Android and Web; a schedule page reads straight from the database, with no risk of hallucination. The Android app is published on the Play Store."
     },
     "thecode-apple": {
       "tagline": "TheCode for iOS & macOS",

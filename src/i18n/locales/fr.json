@@ -12,12 +12,6 @@
     "lang": "EN",
     "sound": "Son"
   },
-  "legend": {
-    "web": "Sites web",
-    "app": "Applications",
-    "tool": "Outils",
-    "title": "Royaumes"
-  },
   "world": {
     "enter": "ENTRER",
     "exit": "Sortie",
@@ -28,6 +22,10 @@
     "demo": "Démo en ligne",
     "store": "Télécharger sur le store",
     "code": "Code source",
+    "api": "API (Swagger)",
+    "android": "App Android (Play Store)",
+    "code_api": "Code — API",
+    "code_app": "Code — App",
     "stack": "Stack technique",
     "close": "Fermer",
     "category": {
@@ -38,7 +36,7 @@
   },
   "list": {
     "title": "Mes projets en production",
-    "intro": "12 projets déployés et maintenus. Clique sur une carte pour explorer."
+    "intro": "Mes projets déployés et maintenus. Clique sur une carte pour explorer."
   },
   "footer": {
     "made": "Conçu et codé par JulSql",
@@ -70,13 +68,9 @@
       "tagline": "Gérer ses collections Magic",
       "description": "Application Symfony pour gérer collections et decks de cartes Magic: The Gathering. Gestion multi-utilisateurs, déploiement automatisé avec Deployer."
     },
-    "jimi-api": {
-      "tagline": "Assistant d'agenda piloté par LLM",
-      "description": "Backend Spring Boot 3 : l'utilisateur écrit en langage naturel (« planifie une réunion demain à 14h »), un LLM en extrait l'événement structuré et le CRUD en base MariaDB. Extraction multi-tours sans machine à états côté client."
-    },
-    "jimi-app": {
-      "tagline": "Chatbot de calendrier multiplateforme",
-      "description": "Client Expo / React Native unique tournant sur iOS, Android et Web. On chatte en langage naturel pour gérer son agenda ; une page planning lit directement la base, sans risque d'hallucination. Publié sur le Play Store."
+    "jimi": {
+      "tagline": "Assistant d'agenda par chat (LLM)",
+      "description": "Assistant de calendrier piloté par chat. Le backend Spring Boot 3 extrait l'événement d'un message en langage naturel (« planifie une réunion demain à 14h ») via un LLM et le CRUD en base MariaDB. L'app cliente Expo / React Native tourne sur iOS, Android et Web ; une page planning lit directement la base, sans risque d'hallucination. App Android publiée sur le Play Store."
     },
     "thecode-apple": {
       "tagline": "TheCode pour iOS & macOS",

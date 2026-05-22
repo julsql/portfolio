@@ -7,6 +7,13 @@ interface Props {
   onClose: () => void;
 }
 
+const LINK_ICON: Record<string, string> = {
+  live: "▶",
+  demo: "▶",
+  store: "⬇",
+  code: "⌥",
+};
+
 export default function ProjectModal({ project, onClose }: Props) {
   const { t } = useTranslation();
 
@@ -52,19 +59,45 @@ export default function ProjectModal({ project, onClose }: Props) {
         </div>
 
         <div className="modal-actions">
-          {project.liveUrl && (
-            <a className="btn btn-primary" href={project.liveUrl} target="_blank" rel="noreferrer">
-              ▶ {t("modal.live")}
-            </a>
+          {project.links ? (
+            project.links.map((link) => (
+              <a
+                key={link.url}
+                className={`btn ${link.kind === "code" ? "btn-ghost" : "btn-primary"}`}
+                href={link.url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {LINK_ICON[link.kind]} {t(`modal.${link.labelKey}`)}
+              </a>
+            ))
+          ) : (
+            <>
+              {project.liveUrl && (
+                <a
+                  className="btn btn-primary"
+                  href={project.liveUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  ▶ {t("modal.live")}
+                </a>
+              )}
+              {project.storeUrl && (
+                <a
+                  className="btn btn-primary"
+                  href={project.storeUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  ⬇ {t("modal.store")}
+                </a>
+              )}
+              <a className="btn btn-ghost" href={project.repoUrl} target="_blank" rel="noreferrer">
+                ⌥ {t("modal.code")}
+              </a>
+            </>
           )}
-          {project.storeUrl && (
-            <a className="btn btn-primary" href={project.storeUrl} target="_blank" rel="noreferrer">
-              ⬇ {t("modal.store")}
-            </a>
-          )}
-          <a className="btn btn-ghost" href={project.repoUrl} target="_blank" rel="noreferrer">
-            ⌥ {t("modal.code")}
-          </a>
         </div>
       </div>
     </div>

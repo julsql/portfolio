@@ -4,15 +4,25 @@ import fr from "../i18n/locales/fr.json";
 import en from "../i18n/locales/en.json";
 
 describe("projects data", () => {
-  it("contains the 12 curated production projects with unique ids", () => {
-    expect(PROJECTS).toHaveLength(12);
-    expect(new Set(PROJECTS.map((p) => p.id)).size).toBe(12);
+  it("contains the curated production projects with unique ids", () => {
+    // 12 repos, but JIMI groups its API + App into a single landmark → 11.
+    expect(PROJECTS).toHaveLength(11);
+    expect(new Set(PROJECTS.map((p) => p.id)).size).toBe(11);
   });
 
   it("always has a repo url and a non-empty tech stack", () => {
     for (const p of PROJECTS) {
       expect(p.repoUrl).toMatch(/^https:\/\/github\.com\//);
       expect(p.tech.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("only declares well-formed links when present", () => {
+    for (const p of PROJECTS) {
+      for (const link of p.links ?? []) {
+        expect(link.url).toMatch(/^https?:\/\//);
+        expect(link.labelKey.length).toBeGreaterThan(0);
+      }
     }
   });
 

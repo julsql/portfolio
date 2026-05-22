@@ -20,6 +20,8 @@ export default function App() {
   // Current scene + the hero spawn to use when (re)entering it.
   const [sceneId, setSceneId] = useState(OVERWORLD_ID);
   const [spawn, setSpawn] = useState<Hero>(SCENES[OVERWORLD_ID].heroStart);
+  // Easter egg: grabbing the crown in the castle changes the avatar.
+  const [crowned, setCrowned] = useState(false);
 
   const scene = SCENES[sceneId];
 
@@ -37,6 +39,8 @@ export default function App() {
       goToScene(target, SCENES[target].heroStart);
     } else if (l.kind === "exit") {
       goToScene(l.ref, l.spawn ?? SCENES[l.ref].heroStart);
+    } else if (l.kind === "crown") {
+      setCrowned((c) => !c);
     }
   };
 
@@ -58,6 +62,7 @@ export default function App() {
             initialHero={spawn}
             onInteract={onInteract}
             paused={active !== null}
+            crowned={crowned}
           />
         ) : (
           <ListView onOpen={setActive} />

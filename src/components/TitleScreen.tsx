@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 interface Props {
@@ -7,9 +8,21 @@ interface Props {
 
 export default function TitleScreen({ onStart, onToggleLang }: Props) {
   const { t } = useTranslation();
+
+  // Enter / Space start the game from anywhere on the title screen.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onStart();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onStart]);
+
   return (
-    <div className="title-screen" onClick={onStart} role="button" tabIndex={0}
-      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onStart()}>
+    <div className="title-screen" onClick={onStart} role="button" tabIndex={0}>
       <button
         className="lang-btn title-lang"
         onClick={(e) => {

@@ -1,5 +1,13 @@
 export type Category = "web" | "app" | "tool";
 
+/** One action button in a project modal. */
+export interface ProjectLink {
+  kind: "live" | "demo" | "store" | "code";
+  /** i18n key under `modal.*` for the button label. */
+  labelKey: string;
+  url: string;
+}
+
 /** A project shown as a landmark in a scene. */
 export interface Project {
   /** Stable id, also used as the i18n key for name/description. */
@@ -19,6 +27,8 @@ export interface Project {
   repoUrl: string;
   /** App store / Play Store link, when published. */
   storeUrl?: string;
+  /** Explicit list of action buttons; overrides liveUrl/storeUrl/repoUrl when set. */
+  links?: ProjectLink[];
 }
 
 /** A castle on the overworld that, once entered, reveals its member projects. */
@@ -52,8 +62,8 @@ export interface Hero {
 export interface LandmarkRef {
   x: number;
   y: number;
-  kind: "project" | "castle" | "exit";
-  /** project id, castle id, or target scene id (for exits). */
+  kind: "project" | "castle" | "exit" | "crown";
+  /** project id, castle id, target scene id (for exits), or "crown". */
   ref: string;
   /** Where the hero should spawn after an exit transition. */
   spawn?: Hero;

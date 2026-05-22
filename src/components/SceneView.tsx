@@ -2,24 +2,23 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import type { Hero as HeroType, LandmarkRef, Scene } from "../types";
 import { castleById, projectById } from "../data/projects";
-import { OVERWORLD_ID } from "../data/scenes";
 import { useMovement } from "../hooks/useMovement";
 import Hero from "./Hero";
 import TouchControls from "./TouchControls";
-import Legend from "./Legend";
 
 interface Props {
   scene: Scene;
   initialHero: HeroType;
   onInteract: (landmark: LandmarkRef) => void;
   paused: boolean;
+  crowned: boolean;
 }
 
 function tileStyle(x: number, y: number) {
   return { left: `calc(${x} * var(--tile))`, top: `calc(${y} * var(--tile))` };
 }
 
-export default function SceneView({ scene, initialHero, onInteract, paused }: Props) {
+export default function SceneView({ scene, initialHero, onInteract, paused, crowned }: Props) {
   const { t } = useTranslation();
   const { hero, move, setEnabled } = useMovement(scene, initialHero, onInteract);
 
@@ -49,6 +48,20 @@ export default function SceneView({ scene, initialHero, onInteract, paused }: Pr
         ))}
 
         {scene.landmarks.map((l) => {
+          if (l.kind === "crown") {
+            return (
+              <button
+                key={`crown-${l.x}-${l.y}`}
+                className="landmark landmark-crown"
+                style={tileStyle(l.x, l.y)}
+                onClick={() => onInteract(l)}
+                aria-label="crown"
+              >
+                <span className="landmark-icon">👑</span>
+              </button>
+            );
+          }
+
           if (l.kind === "exit") {
             return (
               <button
@@ -99,10 +112,9 @@ export default function SceneView({ scene, initialHero, onInteract, paused }: Pr
           );
         })}
 
-        <Hero hero={hero} />
+        <Hero hero={hero} crowned={crowned} />
       </div>
 
-      {scene.id === OVERWORLD_ID && <Legend />}
       <TouchControls onMove={move} />
     </div>
   );
