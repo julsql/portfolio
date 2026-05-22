@@ -48,10 +48,10 @@ const castle: Scene = {
     { x: 6, y: 1, kind: "crown", ref: "crown" },
   ],
   decor: [
-    { x: 1, y: 1, icon: "🔥" },
-    { x: 11, y: 1, icon: "🔥" },
-    { x: 1, y: 8, icon: "🔥" },
-    { x: 11, y: 8, icon: "🔥" },
+    { x: 1, y: 1, icon: "🔥", hazard: true },
+    { x: 11, y: 1, icon: "🔥", hazard: true },
+    { x: 1, y: 8, icon: "🔥", hazard: true },
+    { x: 11, y: 8, icon: "🔥", hazard: true },
   ],
 };
 

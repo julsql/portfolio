@@ -15,7 +15,13 @@
   "world": {
     "enter": "ENTER",
     "exit": "Exit",
-    "castle": "Castle"
+    "castle": "Castle",
+    "hot": "🔥 Too hot! Step away from the fire!"
+  },
+  "gameover": {
+    "title": "GAME OVER",
+    "burned": "You caught fire...",
+    "retry": "Retry"
   },
   "modal": {
     "live": "Visit website",

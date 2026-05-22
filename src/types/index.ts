@@ -69,11 +69,13 @@ export interface LandmarkRef {
   spawn?: Hero;
 }
 
-/** Purely decorative, non-interactive sprite placed on a tile. */
+/** Decorative sprite placed on a tile. When `hazard`, standing on it burns. */
 export interface Decor {
   x: number;
   y: number;
   icon: string;
+  /** Standing on this tile too long triggers a game over (e.g. fire). */
+  hazard?: boolean;
 }
 
 export interface Scene {

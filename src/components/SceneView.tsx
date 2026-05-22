@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Hero as HeroType, LandmarkRef, Scene } from "../types";
 import { castleById, projectById } from "../data/projects";
@@ -10,31 +10,70 @@ interface Props {
   scene: Scene;
   initialHero: HeroType;
   onInteract: (landmark: LandmarkRef) => void;
+  onGameOver: () => void;
   paused: boolean;
   crowned: boolean;
 }
+
+/** Heat ticks (every BURN_MS) on a fire tile before the hero burns up. */
+const BURN_LIMIT = 6;
+const BURN_MS = 350;
 
 function tileStyle(x: number, y: number) {
   return { left: `calc(${x} * var(--tile))`, top: `calc(${y} * var(--tile))` };
 }
 
-export default function SceneView({ scene, initialHero, onInteract, paused, crowned }: Props) {
+export default function SceneView({
+  scene,
+  initialHero,
+  onInteract,
+  onGameOver,
+  paused,
+  crowned,
+}: Props) {
   const { t } = useTranslation();
   const { hero, move, setEnabled } = useMovement(scene, initialHero, onInteract);
+  const [heat, setHeat] = useState(0);
 
   useEffect(() => setEnabled(!paused), [paused, setEnabled]);
 
+  // Heat builds up while standing on a fire tile, and cools instantly off it.
+  const onFire = scene.decor.some((d) => d.hazard && d.x === hero.x && d.y === hero.y);
+  useEffect(() => {
+    if (paused || !onFire) {
+      setHeat(0);
+      return;
+    }
+    const id = setInterval(() => setHeat((h) => h + 1), BURN_MS);
+    return () => clearInterval(id);
+  }, [onFire, paused]);
+
+  useEffect(() => {
+    if (heat >= BURN_LIMIT) onGameOver();
+  }, [heat, onGameOver]);
+
+  const heatRatio = Math.min(heat / BURN_LIMIT, 1);
+
   return (
     <div className="overworld">
-      <p className="explore-hint">
-        <span className="hint-desktop">{t("hud.hint")}</span>
-        <span className="hint-touch">{t("hud.hint_touch")}</span>
+      <p className={`explore-hint${onFire ? " danger" : ""}`}>
+        {onFire ? (
+          t("world.hot")
+        ) : (
+          <>
+            <span className="hint-desktop">{t("hud.hint")}</span>
+            <span className="hint-touch">{t("hud.hint_touch")}</span>
+          </>
+        )}
       </p>
 
       <div
         className={`field scene-${scene.id}`}
         style={{ ["--cols" as string]: scene.width, ["--rows" as string]: scene.height }}
       >
+        {heat > 0 && (
+          <div className="heat-overlay" style={{ opacity: heatRatio }} aria-hidden="true" />
+        )}
         <div className="tilemap">
           {scene.tiles.flatMap((row, y) =>
             row.map((kind, x) => <div key={`${x}-${y}`} className={`tile tile-${kind}`} />),
@@ -112,7 +151,7 @@ export default function SceneView({ scene, initialHero, onInteract, paused, crow
           );
         })}
 
-        <Hero hero={hero} crowned={crowned} />
+        <Hero hero={hero} crowned={crowned} burning={onFire} />
       </div>
 
       <TouchControls onMove={move} />

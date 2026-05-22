@@ -77,4 +77,15 @@ describe("castle wiring", () => {
     expect(exit.ref).toBe(OVERWORLD_ID);
     expect(exit.spawn).toBeDefined();
   });
+
+  it("places fire hazards on tiles the hero can actually stand on", () => {
+    const scene = SCENES[CASTLE_ID];
+    const hazards = scene.decor.filter((d) => d.hazard);
+    expect(hazards.length).toBeGreaterThan(0);
+    for (const h of hazards) {
+      // Walkable tile (so you can step into it) and not a landmark.
+      expect(isBlocked(scene.tiles[h.y][h.x])).toBe(false);
+      expect(scene.landmarks.some((l) => l.x === h.x && l.y === h.y)).toBe(false);
+    }
+  });
 });

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Hero, LandmarkRef, Project } from "./types";
 import { castleSceneId, OVERWORLD_ID, SCENES } from "./data/scenes";
@@ -7,6 +7,7 @@ import TitleScreen from "./components/TitleScreen";
 import SceneView from "./components/SceneView";
 import ListView from "./components/ListView";
 import ProjectModal from "./components/ProjectModal";
+import GameOver from "./components/GameOver";
 import Hud from "./components/Hud";
 
 type View = "map" | "list";
@@ -22,6 +23,10 @@ export default function App() {
   const [spawn, setSpawn] = useState<Hero>(SCENES[OVERWORLD_ID].heroStart);
   // Easter egg: grabbing the crown in the castle changes the avatar.
   const [crowned, setCrowned] = useState(false);
+  // Hazard system: burning on a fire tile ends the run.
+  const [gameOver, setGameOver] = useState(false);
+  // Bumping this forces SceneView to remount so the hero respawns.
+  const [runId, setRunId] = useState(0);
 
   // Once grabbed, the crown vanishes from the room (and stays gone).
   const scene = useMemo(() => {
@@ -49,6 +54,15 @@ export default function App() {
     }
   };
 
+  const onGameOver = useCallback(() => setGameOver(true), []);
+
+  const retry = () => {
+    setGameOver(false);
+    setSceneId(OVERWORLD_ID);
+    setSpawn(SCENES[OVERWORLD_ID].heroStart);
+    setRunId((r) => r + 1);
+  };
+
   const toggleLang = () => i18n.changeLanguage(i18n.language.startsWith("fr") ? "en" : "fr");
 
   if (!started) {
@@ -61,12 +75,13 @@ export default function App() {
       <main className="stage">
         {view === "map" ? (
           <SceneView
-            // Re-mount on scene change so the hero respawns at the right spot.
-            key={sceneId}
+            // Re-mount on scene change (or retry) so the hero respawns.
+            key={`${sceneId}-${runId}`}
             scene={scene}
             initialHero={spawn}
             onInteract={onInteract}
-            paused={active !== null}
+            onGameOver={onGameOver}
+            paused={active !== null || gameOver}
             crowned={crowned}
           />
         ) : (
@@ -74,6 +89,7 @@ export default function App() {
         )}
       </main>
       {active && <ProjectModal project={active} onClose={() => setActive(null)} />}
+      {gameOver && <GameOver onRetry={retry} />}
     </div>
   );
 }

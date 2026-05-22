@@ -15,7 +15,13 @@
   "world": {
     "enter": "ENTRER",
     "exit": "Sortie",
-    "castle": "Château"
+    "castle": "Château",
+    "hot": "🔥 Trop chaud ! Éloigne-toi du feu !"
+  },
+  "gameover": {
+    "title": "GAME OVER",
+    "burned": "Tu as pris feu...",
+    "retry": "Recommencer"
   },
   "modal": {
     "live": "Voir le site",
