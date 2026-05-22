@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Hero, LandmarkRef, Rock, Scene } from "../types";
 import { BLOCKED } from "../data/map";
 
@@ -36,7 +36,7 @@ export interface MoveHandlers {
 
 interface UseMovement {
   hero: Hero;
-  /** Increments on every successful step — drives the walk-frame animation. */
+  /** Increments on every successful step. */
   steps: number;
   move: (dir: Dir) => void;
   setEnabled: (v: boolean) => void;
@@ -45,9 +45,14 @@ interface UseMovement {
 /**
  * Owns the hero position within a scene. Handles bump-to-interact landmarks,
  * walk-over pickups (rupees), pushable rocks (which sink in water) and drowning.
+ *
+ * Side effects (pickups, damage, rock moves) run directly in `move` — never
+ * inside a setState updater — so React 18 StrictMode's double-invoked updaters
+ * can't fire them twice (which doubled rupee counts).
  */
 export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMovement {
   const [hero, setHero] = useState<Hero>(initial);
+  const heroRef = useRef<Hero>(initial);
   const [steps, setSteps] = useState(0);
   const [enabled, setEnabled] = useState(true);
   const { onInteract, onPickup, onDrown, rocks, enemies, pushRock, removeRock } = h;
@@ -55,59 +60,65 @@ export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMo
   const move = useCallback(
     (dir: Dir) => {
       if (!enabled) return;
-      setHero((prev) => {
-        const { dx, dy } = DELTAS[dir];
-        const nx = prev.x + dx;
-        const ny = prev.y + dy;
-        const facing = dir;
-        const stay = { ...prev, facing };
-        const stepTo = (x: number, y: number) => {
-          setSteps((s) => s + 1);
-          return { x, y, facing };
-        };
+      const prev = heroRef.current;
+      const { dx, dy } = DELTAS[dir];
+      const nx = prev.x + dx;
+      const ny = prev.y + dy;
+      const facing = dir;
 
-        if (nx < 0 || ny < 0 || nx >= scene.width || ny >= scene.height) return stay;
+      const face = () => {
+        const next = { ...prev, facing };
+        heroRef.current = next;
+        setHero(next);
+      };
+      const stepTo = (x: number, y: number) => {
+        const next = { x, y, facing };
+        heroRef.current = next;
+        setHero(next);
+        setSteps((s) => s + 1);
+      };
 
-        const landmark = scene.landmarks.find((l) => l.x === nx && l.y === ny);
-        if (landmark) {
-          if (landmark.pickup) {
-            onPickup(landmark);
-            return stepTo(nx, ny);
-          }
-          onInteract(landmark);
-          return stay;
-        }
+      if (nx < 0 || ny < 0 || nx >= scene.width || ny >= scene.height) return face();
 
-        const rock = rocks.find((r) => r.x === nx && r.y === ny);
-        if (rock) {
-          const bx = nx + dx;
-          const by = ny + dy;
-          const inBounds = bx >= 0 && by >= 0 && bx < scene.width && by < scene.height;
-          if (!inBounds) return stay;
-          const beyond = scene.tiles[by][bx];
-          if (beyond === "water") {
-            // Heave the boulder into the water — it sinks and vanishes.
-            removeRock(rock.id);
-            return stepTo(nx, ny);
-          }
-          const obstructed =
-            BLOCKED.includes(beyond) ||
-            rocks.some((r) => r.x === bx && r.y === by) ||
-            scene.landmarks.some((l) => l.x === bx && l.y === by) ||
-            enemies.some((e) => e.x === bx && e.y === by);
-          if (obstructed) return stay;
-          pushRock(rock.id, bx, by);
+      const landmark = scene.landmarks.find((l) => l.x === nx && l.y === ny);
+      if (landmark) {
+        if (landmark.pickup) {
+          onPickup(landmark);
           return stepTo(nx, ny);
         }
+        onInteract(landmark);
+        return face();
+      }
 
-        const tile = scene.tiles[ny][nx];
-        if (tile === "water") {
-          onDrown();
-          return stay;
+      const rock = rocks.find((r) => r.x === nx && r.y === ny);
+      if (rock) {
+        const bx = nx + dx;
+        const by = ny + dy;
+        const inBounds = bx >= 0 && by >= 0 && bx < scene.width && by < scene.height;
+        if (!inBounds) return face();
+        const beyond = scene.tiles[by][bx];
+        if (beyond === "water") {
+          // Heave the boulder into the water — it sinks and vanishes.
+          removeRock(rock.id);
+          return stepTo(nx, ny);
         }
-        if (BLOCKED.includes(tile)) return stay;
+        const obstructed =
+          BLOCKED.includes(beyond) ||
+          rocks.some((r) => r.x === bx && r.y === by) ||
+          scene.landmarks.some((l) => l.x === bx && l.y === by) ||
+          enemies.some((e) => e.x === bx && e.y === by);
+        if (obstructed) return face();
+        pushRock(rock.id, bx, by);
         return stepTo(nx, ny);
-      });
+      }
+
+      const tile = scene.tiles[ny][nx];
+      if (tile === "water") {
+        onDrown();
+        return face();
+      }
+      if (BLOCKED.includes(tile)) return face();
+      return stepTo(nx, ny);
     },
     [enabled, scene, rocks, enemies, onInteract, onPickup, onDrown, pushRock, removeRock],
   );
