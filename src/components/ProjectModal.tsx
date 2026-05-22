@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { Project } from "../types";
+import type { Project, ProjectLink } from "../types";
 
 interface Props {
   project: Project;
@@ -14,16 +14,63 @@ const LINK_ICON: Record<string, string> = {
   code: "⌥",
 };
 
+function projectLinks(project: Project): ProjectLink[] {
+  if (project.links) return project.links;
+  const links: ProjectLink[] = [];
+  if (project.liveUrl) links.push({ kind: "live", labelKey: "live", url: project.liveUrl });
+  if (project.storeUrl) links.push({ kind: "store", labelKey: "store", url: project.storeUrl });
+  links.push({ kind: "code", labelKey: "code", url: project.repoUrl });
+  return links;
+}
+
 export default function ProjectModal({ project, onClose }: Props) {
   const { t } = useTranslation();
 
+  // Ordered links: primary (live/demo/store) first, then code — this is the
+  // order arrow-key selection walks through.
+  const links = useMemo(() => projectLinks(project), [project]);
+  const ordered = useMemo(
+    () => [...links.filter((l) => l.kind !== "code"), ...links.filter((l) => l.kind === "code")],
+    [links],
+  );
+  const [sel, setSel] = useState(0);
+
   useEffect(() => {
+    const n = ordered.length;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" || e.key === "Enter" || e.key === " ") onClose();
+      if (e.key === "Escape") {
+        onClose();
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        setSel((s) => (s + 1) % n);
+      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        setSel((s) => (s - 1 + n) % n);
+      } else if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        window.open(ordered[sel].url, "_blank", "noopener,noreferrer");
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [ordered, sel, onClose]);
+
+  const renderLink = (link: ProjectLink) => {
+    const i = ordered.indexOf(link);
+    const base = link.kind === "code" ? "btn btn-ghost" : "btn btn-primary";
+    return (
+      <a
+        key={link.url}
+        className={`${base}${i === sel ? " sel" : ""}`}
+        href={link.url}
+        target="_blank"
+        rel="noreferrer"
+        onMouseEnter={() => setSel(i)}
+      >
+        {LINK_ICON[link.kind]} {t(`modal.${link.labelKey}`)}
+      </a>
+    );
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -61,67 +108,11 @@ export default function ProjectModal({ project, onClose }: Props) {
         </div>
 
         <div className="modal-actions">
-          {project.links ? (
-            <>
-              <div className="modal-row">
-                {project.links
-                  .filter((l) => l.kind !== "code")
-                  .map((link) => (
-                    <a
-                      key={link.url}
-                      className="btn btn-primary"
-                      href={link.url}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {LINK_ICON[link.kind]} {t(`modal.${link.labelKey}`)}
-                    </a>
-                  ))}
-              </div>
-              <div className="modal-row">
-                {project.links
-                  .filter((l) => l.kind === "code")
-                  .map((link) => (
-                    <a
-                      key={link.url}
-                      className="btn btn-ghost"
-                      href={link.url}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {LINK_ICON[link.kind]} {t(`modal.${link.labelKey}`)}
-                    </a>
-                  ))}
-              </div>
-            </>
-          ) : (
-            <div className="modal-row">
-              {project.liveUrl && (
-                <a
-                  className="btn btn-primary"
-                  href={project.liveUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  ▶ {t("modal.live")}
-                </a>
-              )}
-              {project.storeUrl && (
-                <a
-                  className="btn btn-primary"
-                  href={project.storeUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  ⬇ {t("modal.store")}
-                </a>
-              )}
-              <a className="btn btn-ghost" href={project.repoUrl} target="_blank" rel="noreferrer">
-                ⌥ {t("modal.code")}
-              </a>
-            </div>
-          )}
+          <div className="modal-row">{links.filter((l) => l.kind !== "code").map(renderLink)}</div>
+          <div className="modal-row">{links.filter((l) => l.kind === "code").map(renderLink)}</div>
         </div>
+
+        <p className="modal-hint">{t("modal.keys")}</p>
       </div>
     </div>
   );

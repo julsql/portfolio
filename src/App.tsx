@@ -115,6 +115,24 @@ export default function App() {
 
   useEffect(() => sound.setMuted(muted), [muted]);
 
+  // Global keyboard shortcuts: Tab = Map/List, s = sound, l = language.
+  useEffect(() => {
+    if (!started) return;
+    const overlayOpen = active !== null || dialogue || itemGet !== null || gameOver || victory;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Tab") {
+        e.preventDefault();
+        if (!overlayOpen) setView((v) => (v === "map" ? "list" : "map"));
+      } else if (e.key === "m" || e.key === "M") {
+        setMuted((m) => !m);
+      } else if (e.key === "l" || e.key === "L") {
+        i18n.changeLanguage(i18n.language.startsWith("fr") ? "en" : "fr");
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [started, active, dialogue, itemGet, gameOver, victory, i18n]);
+
   useEffect(() => {
     if (gameOver) {
       sound.stopMusic();

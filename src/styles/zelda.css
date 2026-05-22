@@ -872,6 +872,19 @@ img.landmark-icon {
   color: var(--c-cream);
   border-color: var(--c-cream);
 }
+/* Keyboard-selected link in the project card. */
+.btn.sel {
+  outline: 3px solid var(--c-gold);
+  outline-offset: 2px;
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(248, 216, 120, 0.7);
+}
+.modal-hint {
+  margin-top: 14px;
+  font-size: 16px;
+  color: #9a8a6a;
+  text-align: center;
+}
 
 /* ============================================================== LIST VIEW */
 .list-view {

@@ -51,6 +51,7 @@
     "code_app": "Code — App",
     "stack": "Stack technique",
     "close": "Fermer",
+    "keys": "← → choisir un lien · Entrée pour ouvrir · Échap pour fermer",
     "category": {
       "web": "Site web",
       "app": "Application",
