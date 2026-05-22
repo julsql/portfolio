@@ -78,6 +78,8 @@ export default function SceneView(props: Props) {
       else if (l.kind === "sword") sound.sfx("item");
       else if (l.kind === "door") sound.sfx("enterLair");
       else if (l.kind === "exit") sound.sfx("door");
+      else if (l.kind === "project" || l.kind === "castle" || l.kind === "npc")
+        sound.sfx("select");
       onInteract(l);
     },
     [onInteract],

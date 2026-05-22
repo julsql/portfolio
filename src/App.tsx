@@ -119,8 +119,10 @@ export default function App() {
   // except the movement D-pad / attack button.
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
+      // Menu/UI actions only — game places (.landmark) and movement buttons
+      // already have their own sounds.
       const el = (e.target as HTMLElement | null)?.closest(
-        "button:not(.dpad-btn):not(.attack-btn), a.btn, .p-card, .landmark",
+        "button:not(.dpad-btn):not(.attack-btn):not(.landmark), a.btn, .p-card",
       );
       if (el) sound.sfx("select");
     };

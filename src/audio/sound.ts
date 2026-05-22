@@ -145,8 +145,7 @@ class SoundEngine {
         this.tone(880, 0.04, "square", 0.12);
         break;
       case "select":
-        this.tone(660, 0.04, "square", 0.14);
-        this.tone(990, 0.06, "square", 0.12, 0.04);
+        this.tone(988, 0.045, "square", 0.13);
         break;
     }
   }
