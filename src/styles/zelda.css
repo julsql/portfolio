@@ -367,6 +367,43 @@ img.decor {
   image-rendering: pixelated;
 }
 
+/* ----- Boss health bar (Ganondorf) ----- */
+.boss-bar {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  background: rgba(8, 4, 16, 0.85);
+  border: 2px solid var(--c-red);
+  border-radius: 4px;
+  pointer-events: none;
+}
+.boss-name {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: var(--c-red);
+  letter-spacing: 1px;
+}
+.boss-pips {
+  display: flex;
+  gap: 3px;
+}
+.boss-pip {
+  width: 16px;
+  height: 10px;
+  background: #3a1010;
+  border: 1px solid #000;
+}
+.boss-pip.full {
+  background: linear-gradient(#ff5028, #c01000);
+}
+
 /* ----- Item pickups (heart, sword pedestal) ----- */
 .landmark-item {
   z-index: 5;

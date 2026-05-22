@@ -24,7 +24,7 @@ interface Props {
   invulnerable: boolean;
 }
 
-type Enemy = EnemySpec & { dir: number; frame: number };
+type Enemy = EnemySpec & { dir: number; frame: number; maxHp: number };
 type Dir = HeroType["facing"];
 
 const BURN_MS = 300;
@@ -53,7 +53,7 @@ export default function SceneView(props: Props) {
 
   const [rocks, setRocks] = useState(scene.rocks ?? []);
   const [enemies, setEnemies] = useState<Enemy[]>(
-    (scene.enemies ?? []).map((e) => ({ ...e, dir: 1, frame: 0 })),
+    (scene.enemies ?? []).map((e) => ({ ...e, dir: 1, frame: 0, maxHp: e.hp ?? 1 })),
   );
   const [attacking, setAttacking] = useState(false);
 
@@ -204,6 +204,8 @@ export default function SceneView(props: Props) {
     );
   }, [attacking, hero, enemies, onBossDefeated]);
 
+  const boss = enemies.find((e) => e.random);
+
   return (
     <div className="overworld">
       <div className="status">
@@ -232,6 +234,16 @@ export default function SceneView(props: Props) {
         className={`field scene-${scene.id}`}
         style={{ ["--cols" as string]: scene.width, ["--rows" as string]: scene.height }}
       >
+        {boss && (
+          <div className="boss-bar">
+            <span className="boss-name">Ganondorf</span>
+            <span className="boss-pips">
+              {Array.from({ length: boss.maxHp }, (_, i) => (
+                <span key={i} className={`boss-pip${i < (boss.hp ?? 0) ? " full" : ""}`} />
+              ))}
+            </span>
+          </div>
+        )}
         <div className="tilemap">
           {scene.tiles.flatMap((row, y) =>
             row.map((kind, x) => <div key={`${x}-${y}`} className={`tile tile-${kind}`} />),
@@ -351,7 +363,6 @@ export default function SceneView(props: Props) {
           aria-label={t("npc.name")}
         >
           <span className="landmark-icon">🧙</span>
-          <span className="landmark-label">{t("npc.name")}</span>
         </button>
       );
     }
