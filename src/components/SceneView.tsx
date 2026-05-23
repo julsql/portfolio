@@ -104,7 +104,7 @@ export default function SceneView(props: Props) {
     [],
   );
   const drown = useCallback(() => {
-    sound.sfx("hurt");
+    sound.sfx("drown");
     onHit();
   }, [onHit]);
 
@@ -235,19 +235,23 @@ export default function SceneView(props: Props) {
 
   // ── Damage resolution shared by sword / arrows / bombs ───────────────────
   const damageAt = useCallback(
-    (fx: number, fy: number, source: "sword" | "arrow" | "bomb") => {
+    (fx: number, fy: number, _source: "sword" | "arrow" | "bomb") => {
       const target = enemies.find((e) => e.x === fx && e.y === fy);
-      if (target?.random) {
+      if (target) {
         const willDie = (target.hp ?? 1) <= 1;
-        if (willDie && target.id === "ganondorf") onBossDefeated();
-        else if (willDie && target.id === "monster") onMonsterDefeated();
-        else {
-          sound.sfx("bossHit");
-          setBossHurt(true);
-          setTimeout(() => setBossHurt(false), 320);
+        if (target.random) {
+          if (willDie && target.id === "ganondorf") onBossDefeated();
+          else if (willDie && target.id === "monster") onMonsterDefeated();
+          else {
+            sound.sfx("bossHit");
+            setBossHurt(true);
+            setTimeout(() => setBossHurt(false), 320);
+          }
+        } else {
+          // Regular foe: roar on hit, NES-style death squawk on kill.
+          sound.sfx(willDie ? "enemyDie" : "enemyHit");
         }
       }
-      if (target && source !== "sword") sound.sfx("arrowHit");
       setEnemies((prev) =>
         prev.flatMap((e) => {
           if (e.x !== fx || e.y !== fy) return [e];
@@ -319,7 +323,11 @@ export default function SceneView(props: Props) {
           const nx = a.x + dx;
           const ny = a.y + dy;
           if (nx < 0 || ny < 0 || nx >= scene.width || ny >= scene.height) return [];
-          if (BLOCKED.includes(scene.tiles[ny][nx])) return [];
+          if (BLOCKED.includes(scene.tiles[ny][nx])) {
+            // Arrow snaps off a wall — tiny "tink".
+            sound.sfx("arrowHit");
+            return [];
+          }
           return [{ ...a, x: nx, y: ny }];
         }),
       );

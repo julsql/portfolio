@@ -1,7 +1,9 @@
 /**
- * Audio engine. Plays the project's own sound files (public/sound/) for music
- * and most effects, and falls back to a tiny Web Audio synth for the few
- * events that have no file (footsteps, sword swing, generic door, game over).
+ * Audio engine. Every short SFX is mapped to a Zelda sample shipped under
+ * public/sound/ (LOZ / LTTP rips from noproblo.dayjo.org/zeldasounds). When a
+ * mapping is an array we pick a random sample each call — that lets the
+ * sword swing and the footsteps cycle through small variants for a far more
+ * authentic feel. Background music streams a single looping <audio> tag.
  */
 
 type Track = "overworld" | "dungeon" | "ganon" | "fairy";
@@ -34,7 +36,9 @@ export type Sfx =
   | "unlock"
   | "buy"
   | "fairyRevive"
-  | "triforceGet";
+  | "triforceGet"
+  | "enemyHit"
+  | "enemyDie";
 
 const S = "/sound";
 const MUSIC: Record<Track, string> = {
@@ -43,25 +47,58 @@ const MUSIC: Record<Track, string> = {
   ganon: `${S}/music-ganon.wav`,
   fairy: `${S}/fairy-fountain.wav`,
 };
-const FILES: Partial<Record<Sfx, string>> = {
-  step: `${S}/step.wav`,
-  attack: `${S}/sword-swing.wav`,
-  select: `${S}/touch.wav`,
-  close: `${S}/dialog-close.wav`,
-  pickup: `${S}/rupee.wav`,
-  item: `${S}/sword.wav`,
-  heart: `${S}/heart.wav`,
-  hurt: `${S}/hurt.wav`,
-  hurtBoss: `${S}/hurt-boss.wav`,
-  bossHit: `${S}/boss-hit.wav`,
-  drown: `${S}/drown.wav`,
-  enterLair: `${S}/enter-lair.wav`,
-  victory: `${S}/victory.wav`,
-  lowHealth: `${S}/low-health.wav`,
-  gameover: `${S}/gameover.wav`,
-  chest: `${S}/chest-open.wav`,
-  unlock: `${S}/puzzle-solved.wav`,
+
+/** A Zelda sample (or a list of variants picked at random on each call). */
+const FILES: Partial<Record<Sfx, string | string[]>> = {
+  // Movement — alternate two LTTP samples so successive steps don't feel
+  // identical (grass-walk = soft brush, link-land = harder thump).
+  step: [`${S}/lttp-grass-walk.wav`, `${S}/lttp-link-land.wav`],
+
+  // Sword — three LTTP swing variants for randomized attacks.
+  attack: [`${S}/lttp-sword-1.wav`, `${S}/lttp-sword-2.wav`, `${S}/lttp-sword-3.wav`],
+
+  // Pickups & UI fanfares.
+  pickup: `${S}/loz-get-rupee.wav`,
+  heart: `${S}/loz-get-heart.wav`,
+  item: `${S}/loz-fanfare.wav`,
+  chest: `${S}/lttp-chest.wav`,
+  buy: `${S}/lttp-chest.wav`,
+  triforceGet: `${S}/loz-fanfare.wav`,
+  fairyRevive: `${S}/lttp-get-fairy.wav`,
+
+  // Combat — Link.
+  hurt: `${S}/loz-link-hurt.wav`,
+  hurtBoss: `${S}/lttp-link-hurt.wav`,
+  drown: `${S}/lttp-link-fall.wav`,
+  burn: `${S}/lttp-fire-rod.wav`,
+  gameover: `${S}/loz-link-die.wav`,
+  lowHealth: `${S}/loz-low-health.wav`,
+  victory: `${S}/lttp-item-fanfare.wav`,
+
+  // Combat — enemies / bosses.
+  enemyHit: `${S}/loz-enemy-hit.wav`,
+  enemyDie: `${S}/loz-enemy-die.wav`,
+  bossHit: `${S}/lttp-boss-hit.wav`,
+  potBreak: `${S}/lttp-shatter.wav`,
+
+  // Bow & bombs.
+  bowShoot: `${S}/loz-arrow.wav`,
+  arrowHit: `${S}/lttp-arrow-hit.wav`,
+  bombDrop: `${S}/loz-bomb-drop.wav`,
+  explosion: `${S}/loz-bomb-blow.wav`,
+
+  // Doors & secrets.
+  door: `${S}/loz-stairs.wav`,
+  enterLair: `${S}/loz-boss-scream.wav`,
+  unlock: `${S}/loz-secret.wav`,
+  lockedNo: `${S}/lttp-error.wav`,
+
+  // Menus / dialogs.
+  cursor: `${S}/lttp-menu-cursor.wav`,
+  select: `${S}/lttp-menu-select.wav`,
+  close: `${S}/lttp-text-done.wav`,
 };
+
 const MUSIC_VOL = 0.4;
 const SFX_VOL = 0.7;
 
@@ -69,9 +106,9 @@ class SoundEngine {
   private muted = false;
   private music_el?: HTMLAudioElement;
   private track?: Track;
-  /** Per-name audio element for SFX that need to keep playing (e.g. low-health). */
+  /** Per-name audio element for SFX that need to keep playing (low-health). */
   private loops = new Map<Sfx, HTMLAudioElement>();
-  // Web Audio is only used for the synthesized fallback blips.
+  // Web Audio is only used to unlock playback on the first gesture.
   private ctx?: AudioContext;
   private master?: GainNode;
 
@@ -86,12 +123,8 @@ class SoundEngine {
         this.master = this.ctx.createGain();
         this.master.gain.value = this.muted ? 0 : 0.85;
         this.master.connect(this.ctx.destination);
-        // init() runs from the START gesture — unlock the context now so the
-        // synthesized SFX (select/cursor/attack…) actually produce sound.
         void this.ctx.resume();
       }
-      // Pause music when the tab is hidden (background timers/throttling) and
-      // resume the same track when it comes back.
       document.addEventListener("visibilitychange", () => {
         if (document.hidden) this.music_el?.pause();
         else if (this.track && this.music_el && !this.muted)
@@ -110,10 +143,9 @@ class SoundEngine {
     if (this.master) this.master.gain.value = m ? 0 : 0.85;
   }
 
-  /** Start (on=true) or stop a looping SFX on top of the music. No-op if
-   *  the sfx has no file (synth-only) or is already in the requested state. */
+  /** Start (on=true) or stop a looping SFX on top of the music. */
   loopSfx(name: Sfx, on: boolean) {
-    const url = FILES[name];
+    const url = pickFile(FILES[name]);
     if (!url) return;
     let el = this.loops.get(name);
     if (on) {
@@ -134,14 +166,11 @@ class SoundEngine {
   sfx(name: Sfx) {
     if (this.muted) return;
     void this.ctx?.resume();
-    const url = FILES[name];
-    if (url) {
-      const a = new Audio(url);
-      a.volume = SFX_VOL;
-      void a.play().catch(() => {});
-      return;
-    }
-    this.synth(name);
+    const url = pickFile(FILES[name]);
+    if (!url) return;
+    const a = new Audio(url);
+    a.volume = SFX_VOL;
+    void a.play().catch(() => {});
   }
 
   music(track: Track) {
@@ -152,7 +181,6 @@ class SoundEngine {
       const el = new Audio();
       el.loop = true;
       el.volume = MUSIC_VOL;
-      // Fallback if `loop` isn't honored: restart from the top when it ends.
       el.addEventListener("ended", () => {
         el.currentTime = 0;
         void el.play().catch(() => {});
@@ -169,111 +197,13 @@ class SoundEngine {
     this.music_el?.pause();
     this.track = undefined;
   }
+}
 
-  // ── Synth fallback (step / attack / door / burn / gameover) ───────────────
-  private synth(name: Sfx) {
-    this.init();
-    void this.ctx?.resume();
-    switch (name) {
-      case "step":
-        this.tone(130, 0.05, "square", 0.04);
-        break;
-      case "attack":
-        this.tone(680, 0.07, "square", 0.16);
-        this.tone(430, 0.07, "square", 0.1, 0.04);
-        break;
-      case "door":
-        this.tone(180, 0.16, "square", 0.16);
-        break;
-      case "burn":
-        this.noise(0.28, 0.12);
-        break;
-      case "cursor":
-        this.tone(880, 0.04, "square", 0.12);
-        break;
-      case "select":
-        this.tone(988, 0.045, "square", 0.13);
-        break;
-      case "bowShoot":
-        this.tone(1200, 0.05, "triangle", 0.14);
-        this.tone(700, 0.07, "triangle", 0.1, 0.04);
-        break;
-      case "arrowHit":
-        this.tone(500, 0.06, "square", 0.15);
-        this.noise(0.07, 0.08);
-        break;
-      case "bombDrop":
-        this.tone(200, 0.1, "square", 0.12);
-        break;
-      case "explosion":
-        this.noise(0.45, 0.28);
-        this.tone(80, 0.32, "sawtooth", 0.18);
-        break;
-      case "chest":
-        this.tone(660, 0.08, "square", 0.14);
-        this.tone(880, 0.08, "square", 0.14, 0.07);
-        this.tone(1320, 0.12, "square", 0.16, 0.14);
-        break;
-      case "potBreak":
-        this.noise(0.18, 0.16);
-        this.tone(420, 0.05, "square", 0.12);
-        break;
-      case "lockedNo":
-        this.tone(280, 0.07, "square", 0.14);
-        this.tone(220, 0.07, "square", 0.14, 0.06);
-        break;
-      case "unlock":
-        this.tone(660, 0.07, "square", 0.14);
-        this.tone(990, 0.07, "square", 0.14, 0.06);
-        this.tone(1320, 0.1, "square", 0.16, 0.13);
-        break;
-      case "buy":
-        this.tone(880, 0.05, "square", 0.14);
-        this.tone(1100, 0.07, "square", 0.14, 0.05);
-        break;
-      case "fairyRevive":
-        this.tone(880, 0.1, "triangle", 0.16);
-        this.tone(1100, 0.1, "triangle", 0.16, 0.08);
-        this.tone(1320, 0.18, "triangle", 0.18, 0.18);
-        break;
-      case "triforceGet":
-        this.tone(660, 0.12, "square", 0.16);
-        this.tone(880, 0.12, "square", 0.16, 0.12);
-        this.tone(1320, 0.32, "square", 0.18, 0.24);
-        break;
-    }
-  }
-
-  private tone(freq: number, dur: number, type: OscillatorType, vol: number, at = 0) {
-    if (!this.ctx || !this.master || freq <= 0) return;
-    const t = this.ctx.currentTime + at;
-    const osc = this.ctx.createOscillator();
-    const g = this.ctx.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, t);
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(vol, t + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    osc.connect(g).connect(this.master);
-    osc.start(t);
-    osc.stop(t + dur + 0.03);
-  }
-
-  private noise(dur: number, vol: number) {
-    if (!this.ctx || !this.master) return;
-    const t = this.ctx.currentTime;
-    const n = Math.floor(this.ctx.sampleRate * dur);
-    const buf = this.ctx.createBuffer(1, n, this.ctx.sampleRate);
-    const d = buf.getChannelData(0);
-    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
-    const src = this.ctx.createBufferSource();
-    src.buffer = buf;
-    const g = this.ctx.createGain();
-    g.gain.setValueAtTime(vol, t);
-    src.connect(g).connect(this.master);
-    src.start(t);
-    src.stop(t + dur);
-  }
+/** Resolve a FILES entry (string or string[]) to one URL, picking at random. */
+function pickFile(entry: string | string[] | undefined): string | undefined {
+  if (!entry) return undefined;
+  if (typeof entry === "string") return entry;
+  return entry[Math.floor(Math.random() * entry.length)];
 }
 
 // Cache the engine on the global scope so HMR module reloads reuse the same
