@@ -63,6 +63,7 @@ export default function ProjectModal({ project, onClose }: Props) {
     const n = ordered.length;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        sound.sfx("close");
         onClose();
         return;
       }
@@ -107,7 +108,13 @@ export default function ProjectModal({ project, onClose }: Props) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div
+      className="modal-overlay"
+      onClick={() => {
+        sound.sfx("close");
+        onClose();
+      }}
+    >
       <div
         className={`modal cat-${project.category}`}
         role="dialog"
@@ -115,7 +122,14 @@ export default function ProjectModal({ project, onClose }: Props) {
         aria-label={project.name}
         onClick={(e) => e.stopPropagation()}
       >
-        <button className="modal-close" onClick={onClose} aria-label={t("modal.close")}>
+        <button
+          className="modal-close"
+          onClick={() => {
+            sound.sfx("close");
+            onClose();
+          }}
+          aria-label={t("modal.close")}
+        >
           ✕
         </button>
 

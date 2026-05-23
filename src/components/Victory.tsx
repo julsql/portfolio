@@ -28,7 +28,7 @@ export default function Victory({ onClose, triforce = false }: Props) {
     if (!ready) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " " || e.key === "Escape") {
-        sound.sfx("select");
+        sound.sfx("close");
         onClose();
       }
     };

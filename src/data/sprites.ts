@@ -43,6 +43,7 @@ export const SPRITES = {
   // ── New items, props and scene assets ───────────────────────────────────
   arrow: `${B}/arrow.svg`,
   bow: [`${B}/bow-1.svg`, `${B}/bow-2.svg`, `${B}/bow-3.svg`, `${B}/bow-4.svg`],
+  bowIcon: `${B}/bow.png`,
   bomb: `${B}/bomb.png`,
   explosion: `${B}/explosion.svg`,
   bottleEmpty: `${B}/bottle-empty.png`,

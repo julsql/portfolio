@@ -43,7 +43,7 @@ export default function ItemGet({ item, onDone }: Props) {
     const timer = setTimeout(onDone, 1600);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " " || e.key === "Escape") {
-        sound.sfx("select");
+        sound.sfx("close");
         onDone();
       }
     };
@@ -55,7 +55,13 @@ export default function ItemGet({ item, onDone }: Props) {
   }, [onDone]);
 
   return (
-    <div className="itemget" onClick={onDone}>
+    <div
+      className="itemget"
+      onClick={() => {
+        sound.sfx("close");
+        onDone();
+      }}
+    >
       <img className="itemget-img" src={IMG[item]} alt="" />
       <p className="itemget-text">{t(`item.${item}`)}</p>
     </div>

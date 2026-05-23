@@ -38,7 +38,7 @@ export default function DialogBox({ kind, onClose }: Props) {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " " || e.key === "Escape") {
         e.preventDefault();
-        sound.sfx("select");
+        sound.sfx("close");
         onClose();
       }
     };
@@ -51,7 +51,13 @@ export default function DialogBox({ kind, onClose }: Props) {
   const key = `dialog.${kind}`;
 
   return (
-    <div className="dialog-overlay" onClick={onClose}>
+    <div
+      className="dialog-overlay"
+      onClick={() => {
+        sound.sfx("close");
+        onClose();
+      }}
+    >
       <div
         className="dialog-box"
         role="dialog"
@@ -63,7 +69,13 @@ export default function DialogBox({ kind, onClose }: Props) {
           <span className="dialog-name">{t(`${key}.name`)}</span>
         </div>
         <p className="dialog-text">{t(`${key}.text`)}</p>
-        <button className="btn btn-primary dialog-ok" onClick={onClose}>
+        <button
+          className="btn btn-primary dialog-ok"
+          onClick={() => {
+            sound.sfx("close");
+            onClose();
+          }}
+        >
           ▶ {t(`${key}.ok`, { defaultValue: t("npc.ok") })}
         </button>
       </div>

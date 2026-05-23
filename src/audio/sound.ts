@@ -23,6 +23,7 @@ export type Sfx =
   | "lowHealth"
   | "cursor"
   | "select"
+  | "close"
   | "bowShoot"
   | "arrowHit"
   | "bombDrop"
@@ -43,6 +44,10 @@ const MUSIC: Record<Track, string> = {
   fairy: `${S}/fairy-fountain.wav`,
 };
 const FILES: Partial<Record<Sfx, string>> = {
+  step: `${S}/step.wav`,
+  attack: `${S}/sword-swing.wav`,
+  select: `${S}/touch.wav`,
+  close: `${S}/dialog-close.wav`,
   pickup: `${S}/rupee.wav`,
   item: `${S}/sword.wav`,
   heart: `${S}/heart.wav`,
@@ -64,6 +69,8 @@ class SoundEngine {
   private muted = false;
   private music_el?: HTMLAudioElement;
   private track?: Track;
+  /** Per-name audio element for SFX that need to keep playing (e.g. low-health). */
+  private loops = new Map<Sfx, HTMLAudioElement>();
   // Web Audio is only used for the synthesized fallback blips.
   private ctx?: AudioContext;
   private master?: GainNode;
@@ -99,7 +106,29 @@ class SoundEngine {
   setMuted(m: boolean) {
     this.muted = m;
     if (this.music_el) this.music_el.muted = m;
+    this.loops.forEach((el) => (el.muted = m));
     if (this.master) this.master.gain.value = m ? 0 : 0.85;
+  }
+
+  /** Start (on=true) or stop a looping SFX on top of the music. No-op if
+   *  the sfx has no file (synth-only) or is already in the requested state. */
+  loopSfx(name: Sfx, on: boolean) {
+    const url = FILES[name];
+    if (!url) return;
+    let el = this.loops.get(name);
+    if (on) {
+      if (!el) {
+        el = new Audio(url);
+        el.loop = true;
+        el.volume = SFX_VOL;
+        el.muted = this.muted;
+        this.loops.set(name, el);
+      }
+      if (el.paused) void el.play().catch(() => {});
+    } else if (el) {
+      el.pause();
+      el.currentTime = 0;
+    }
   }
 
   sfx(name: Sfx) {

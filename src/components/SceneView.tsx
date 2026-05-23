@@ -141,6 +141,15 @@ export default function SceneView(props: Props) {
   });
   useEffect(() => setEnabled(!paused), [paused, setEnabled]);
 
+  // The bomb fuse fires from a setTimeout closure → it must read the hero
+  // position at the moment of the explosion, not at placement, otherwise the
+  // hero is "always" within range of his own bomb. Mirror the live hero into
+  // a ref so the fuse callback can sample the up-to-date position.
+  const heroRef = useRef(hero);
+  useEffect(() => {
+    heroRef.current = hero;
+  }, [hero]);
+
   const [frame, setFrame] = useState<1 | 2>(1);
   useEffect(() => {
     if (paused) return;
@@ -336,8 +345,12 @@ export default function SceneView(props: Props) {
       damageAt(bx - 1, by, "bomb");
       damageAt(bx, by + 1, "bomb");
       damageAt(bx, by - 1, "bomb");
-      // Bomb hurts the hero too if he's adjacent.
-      if (Math.abs(hero.x - bx) + Math.abs(hero.y - by) <= 1) onHit();
+      // Hurts the hero only if he hasn't walked off the explosion in time —
+      // enemy-style contact: he must be on a blast tile when it goes off.
+      // Sample the live position from a ref (the closure captured at
+      // placement still sees the hero on the bomb tile).
+      const h = heroRef.current;
+      if (Math.abs(h.x - bx) + Math.abs(h.y - by) <= 1) onHit();
       setTimeout(() => setPlacedBombs((bs) => bs.filter((b) => b.id !== id)), BOMB_FLASH_MS);
     }, BOMB_FUSE_MS);
   }, [bombs, paused, hero, consumeBomb, damageAt, onHit]);
@@ -374,7 +387,7 @@ export default function SceneView(props: Props) {
         <span className="inventory" aria-label={t("hud.inventory")}>
           {hasBow && (
             <span className="inv-slot" title={t("item.bow")}>
-              <img src={SPRITES.arrow} alt="" /> {arrows}
+              <img src={SPRITES.bowIcon} alt="" /> {arrows}
             </span>
           )}
           {bombs > 0 && (

@@ -182,10 +182,16 @@ export default function App() {
         return;
       }
       setGameOver(true);
-    } else if (health === 2) {
-      sound.sfx("lowHealth");
     }
   }, [started, health, bottles, maxHealth]);
+
+  // Loop the low-health beep on top of the music while the hero is on his
+  // last full heart, regardless of which scene he is in.
+  useEffect(() => {
+    const low = started && !gameOver && !victory && health > 0 && health <= 2;
+    sound.loopSfx("lowHealth", low);
+    return () => sound.loopSfx("lowHealth", false);
+  }, [started, gameOver, victory, health]);
 
   const onBossDefeated = useCallback(() => {
     sound.stopMusic();

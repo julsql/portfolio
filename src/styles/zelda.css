@@ -664,15 +664,6 @@ img.npc-icon {
 .cat-tool .landmark-label {
   color: var(--cat-tool);
 }
-.landmark::before {
-  content: "";
-  position: absolute;
-  bottom: 2px;
-  width: 60%;
-  height: 14%;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.28);
-}
 
 /* The big TheCode castle — larger, glowing, with an ENTER tag. */
 .landmark-castle .landmark-icon {
@@ -756,9 +747,6 @@ img.cave-mouth {
   height: calc(var(--tile) * 0.95);
   object-fit: contain;
   image-rendering: pixelated;
-}
-.landmark-cave::before {
-  content: none;
 }
 .landmark-boss-door {
   background: radial-gradient(circle at 50% 50%, rgba(216, 40, 0, 0.55), rgba(216, 40, 0, 0));
