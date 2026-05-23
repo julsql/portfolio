@@ -253,8 +253,10 @@ export default function App() {
 
   useEffect(() => {
     if (gameOver) {
-      sound.stopMusic();
+      // Link's death cry first, then the iconic Game Over dirge takes over
+      // the background as a looped music track on the Game Over screen.
       sound.sfx("gameover");
+      sound.music("gameOver");
     }
   }, [gameOver]);
 

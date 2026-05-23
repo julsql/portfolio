@@ -167,7 +167,10 @@
   "footer": {
     "made": "Conçu et codé par JulSql",
     "tech": "React · TypeScript · Vite",
-    "github": "github.com/julsql"
+    "github": "github.com/julsql",
+    "sounds_prefix": "Sons fournis par",
+    "sounds_supplier": "HelpTheWretched",
+    "sounds_from": "depuis The Legend of Zelda: Ocarina of Time"
   },
   "about": {
     "title": "À propos de l'aventurier",

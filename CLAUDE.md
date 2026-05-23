@@ -40,6 +40,26 @@ Toujours faire passer `npm run test` **et** `npm run build` avant de commiter.
 - **`src/styles/`** — `global.css` (variables, `--tile`) + `zelda.css`. Taille des cases via
   `--tile` calculée pour que l'overworld 20×14 tienne dans la fenêtre (`dvh`).
 
+## Sons (`public/sound/`)
+
+À **chaque** ajout, suppression ou remplacement d'un fichier sous `public/sound/`
+(ou modification du mapping `événement → fichier` dans `src/audio/sound.ts`), tu
+dois **mettre à jour `SOUNDS.md`** dans la même opération :
+
+- ajouter / retirer la ligne correspondante dans la bonne section (Footsteps,
+  Combat, Link, Pickups & containers, Doors & secrets, UI, Music)
+- renseigner le nom local (`public/sound/...`), la description courte et le
+  lien direct vers la source (par défaut HelpTheWretched
+  `https://noproblo.dayjo.org/zeldasounds/<GAME>/<File>.wav`)
+- mettre à jour les **compteurs** en fin de fichier
+  (« 54 SFX + N music tracks », etc.)
+
+Les crédits restent groupés dans le footer (`src/components/Footer.tsx` +
+clés `footer.sounds_*` des locales), dans la section "🎵 Crédits sons" du
+README et dans l'en-tête du fichier `src/audio/sound.ts`. Si tu ajoutes un
+sample qui vient d'une autre source que HTW, ajoute aussi un second crédit
+à ces trois endroits.
+
 ## Conventions importantes
 
 - **Sprites** : déposer dans `public/sprites/` (noms en kebab-case, sans accents/espaces) et

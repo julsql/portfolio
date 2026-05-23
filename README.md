@@ -99,6 +99,13 @@ docker-compose up -d --build
 Puis pointe ton reverse proxy (nginx / Traefik) vers le port **8011**, par ex.
 `portfolio.julsql.fr` → `http://127.0.0.1:8011`.
 
+## 🎵 Crédits sons
+
+Tous les effets sonores (`public/sound/*.wav`) sont fournis par
+**HelpTheWretched** — [noproblo.dayjo.org/zeldasounds](https://noproblo.dayjo.org/zeldasounds/) —
+issus de **The Legend of Zelda: Ocarina of Time**. Voir `src/audio/sound.ts` pour
+le mapping complet `événement → fichier`.
+
 ## 👤 Auteur
 
 **JulSql** — développeur web fullstack · [github.com/julsql](https://github.com/julsql)

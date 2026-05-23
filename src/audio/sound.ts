@@ -1,44 +1,62 @@
 /**
- * Audio engine. Every short SFX is mapped to a Zelda sample shipped under
- * public/sound/ (LOZ / LTTP rips from noproblo.dayjo.org/zeldasounds). When a
- * mapping is an array we pick a random sample each call — that lets the
- * sword swing and the footsteps cycle through small variants for a far more
- * authentic feel. Background music streams a single looping <audio> tag.
+ * Audio engine. Every short SFX is mapped to an Ocarina of Time sample
+ * shipped under public/sound/. When a mapping is an array we pick a random
+ * sample each call — that lets footsteps (4 variants per surface), the
+ * sword swing (4 attack shouts) and Link's hurts (3 variants) cycle through
+ * small variants for a far more authentic Zelda feel. Music streams a
+ * single looping <audio> tag.
+ *
+ * Sound credits: every sample in public/sound/ comes from HelpTheWretched
+ * https://noproblo.dayjo.org/zeldasounds/ — sourced from
+ * The Legend of Zelda: Ocarina of Time.
  */
 
-type Track = "overworld" | "dungeon" | "ganon" | "fairy";
+type Track = "overworld" | "dungeon" | "ganon" | "fairy" | "gameOver";
 export type Sfx =
-  | "step"
+  // Per-surface footsteps — the caller picks the right one based on the
+  // tile under Link's feet.
+  | "stepGrass"
+  | "stepDirt"
+  | "stepSand"
+  | "stepWood"
+  | "stepStone"
+  | "stepCarpet"
+  // Combat
   | "attack"
-  | "pickup"
-  | "item"
-  | "heart"
-  | "hurt"
-  | "hurtBoss"
+  | "attackShout"
+  | "enemyHit"
+  | "enemyDie"
   | "bossHit"
-  | "drown"
-  | "enterLair"
-  | "door"
-  | "burn"
-  | "gameover"
-  | "victory"
-  | "lowHealth"
-  | "cursor"
-  | "select"
-  | "close"
   | "bowShoot"
   | "arrowHit"
   | "bombDrop"
   | "explosion"
-  | "chest"
   | "potBreak"
-  | "lockedNo"
-  | "unlock"
+  // Link state
+  | "hurt"
+  | "hurtBoss"
+  | "drown"
+  | "burn"
+  | "gameover"
+  | "lowHealth"
+  | "victory"
+  // Pickups & containers
+  | "pickup"
+  | "heart"
+  | "item"
+  | "chest"
   | "buy"
-  | "fairyRevive"
   | "triforceGet"
-  | "enemyHit"
-  | "enemyDie";
+  | "fairyRevive"
+  // Doors & secrets
+  | "unlock"
+  | "door"
+  | "enterLair"
+  | "lockedNo"
+  // UI
+  | "cursor"
+  | "select"
+  | "close";
 
 const S = "/sound";
 const MUSIC: Record<Track, string> = {
@@ -46,57 +64,76 @@ const MUSIC: Record<Track, string> = {
   dungeon: `${S}/music-castle.mp3`,
   ganon: `${S}/music-ganon.wav`,
   fairy: `${S}/fairy-fountain.wav`,
+  gameOver: `${S}/gameover.wav`,
 };
 
-/** A Zelda sample (or a list of variants picked at random on each call). */
+/** A single sample, or a list of variants picked at random on each call. */
 const FILES: Partial<Record<Sfx, string | string[]>> = {
-  // Movement — alternate two LTTP samples so successive steps don't feel
-  // identical (grass-walk = soft brush, link-land = harder thump).
-  step: [`${S}/lttp-grass-walk.wav`, `${S}/lttp-link-land.wav`],
+  // Footsteps — randomized within each surface (so consecutive steps don't
+  // sound identical) and selected per tile by the caller.
+  stepGrass: [
+    `${S}/step-grass-1.wav`,
+    `${S}/step-grass-2.wav`,
+    `${S}/step-grass-3.wav`,
+    `${S}/step-grass-4.wav`,
+  ],
+  stepDirt: [
+    `${S}/step-dirt-1.wav`,
+    `${S}/step-dirt-2.wav`,
+    `${S}/step-dirt-3.wav`,
+    `${S}/step-dirt-4.wav`,
+  ],
+  stepSand: [`${S}/step-sand-1.wav`, `${S}/step-sand-2.wav`, `${S}/step-sand-3.wav`],
+  stepWood: [`${S}/step-wood-1.wav`, `${S}/step-wood-2.wav`, `${S}/step-wood-3.wav`],
+  stepStone: [`${S}/step-stone-1.wav`, `${S}/step-stone-2.wav`, `${S}/step-stone-3.wav`],
+  stepCarpet: [`${S}/step-carpet-1.wav`, `${S}/step-carpet-2.wav`, `${S}/step-carpet-3.wav`],
 
-  // Sword — three LTTP swing variants for randomized attacks.
-  attack: [`${S}/lttp-sword-1.wav`, `${S}/lttp-sword-2.wav`, `${S}/lttp-sword-3.wav`],
+  // Sword swing — swoosh + one of Young Link's 4 attack shouts (the shout
+  // is fired alongside the swoosh by the caller).
+  attack: `${S}/sword-swing.wav`,
+  attackShout: [
+    `${S}/attack-shout-1.wav`,
+    `${S}/attack-shout-2.wav`,
+    `${S}/attack-shout-3.wav`,
+    `${S}/attack-shout-4.wav`,
+  ],
+  enemyHit: `${S}/enemy-hit.wav`,
+  enemyDie: `${S}/enemy-die.wav`,
+  bossHit: `${S}/boss-hit.wav`,
+  bowShoot: `${S}/arrow-shoot.wav`,
+  arrowHit: `${S}/arrow-hit.wav`,
+  bombDrop: `${S}/bomb-drop.wav`,
+  explosion: `${S}/bomb-blow.wav`,
+  potBreak: `${S}/pot-shatter.wav`,
 
-  // Pickups & UI fanfares.
-  pickup: `${S}/loz-get-rupee.wav`,
-  heart: `${S}/loz-get-heart.wav`,
-  item: `${S}/loz-fanfare.wav`,
-  chest: `${S}/lttp-chest.wav`,
-  buy: `${S}/lttp-chest.wav`,
-  triforceGet: `${S}/loz-fanfare.wav`,
-  fairyRevive: `${S}/lttp-get-fairy.wav`,
+  // Link state — 3 variants for each so successive hits don't repeat.
+  hurt: [`${S}/link-hurt-1.wav`, `${S}/link-hurt-2.wav`, `${S}/link-hurt-3.wav`],
+  hurtBoss: [`${S}/link-fall-1.wav`, `${S}/link-fall-2.wav`, `${S}/link-fall-3.wav`],
+  drown: `${S}/link-splash.wav`,
+  burn: [`${S}/link-hurt-1.wav`, `${S}/link-hurt-2.wav`, `${S}/link-hurt-3.wav`],
+  gameover: `${S}/link-die.wav`,
+  lowHealth: `${S}/low-health.wav`,
+  victory: `${S}/fanfare-item.wav`,
 
-  // Combat — Link.
-  hurt: `${S}/loz-link-hurt.wav`,
-  hurtBoss: `${S}/lttp-link-hurt.wav`,
-  drown: `${S}/lttp-link-fall.wav`,
-  burn: `${S}/lttp-fire-rod.wav`,
-  gameover: `${S}/loz-link-die.wav`,
-  lowHealth: `${S}/loz-low-health.wav`,
-  victory: `${S}/lttp-item-fanfare.wav`,
-
-  // Combat — enemies / bosses.
-  enemyHit: `${S}/loz-enemy-hit.wav`,
-  enemyDie: `${S}/loz-enemy-die.wav`,
-  bossHit: `${S}/lttp-boss-hit.wav`,
-  potBreak: `${S}/lttp-shatter.wav`,
-
-  // Bow & bombs.
-  bowShoot: `${S}/loz-arrow.wav`,
-  arrowHit: `${S}/lttp-arrow-hit.wav`,
-  bombDrop: `${S}/loz-bomb-drop.wav`,
-  explosion: `${S}/loz-bomb-blow.wav`,
+  // Pickups & containers.
+  pickup: `${S}/rupee.wav`,
+  heart: `${S}/fanfare-heart.wav`,
+  item: `${S}/fanfare-item.wav`,
+  chest: `${S}/chest-open.wav`,
+  buy: `${S}/chest-open.wav`,
+  triforceGet: `${S}/fanfare-item.wav`,
+  fairyRevive: `${S}/fairy.wav`,
 
   // Doors & secrets.
-  door: `${S}/loz-stairs.wav`,
-  enterLair: `${S}/loz-boss-scream.wav`,
-  unlock: `${S}/loz-secret.wav`,
-  lockedNo: `${S}/lttp-error.wav`,
+  unlock: `${S}/door-unlock.wav`,
+  door: `${S}/door-open.wav`,
+  enterLair: `${S}/door-boss.wav`,
+  lockedNo: `${S}/error.wav`,
 
-  // Menus / dialogs.
-  cursor: `${S}/lttp-menu-cursor.wav`,
-  select: `${S}/lttp-menu-select.wav`,
-  close: `${S}/lttp-text-done.wav`,
+  // UI.
+  cursor: `${S}/menu-cursor.wav`,
+  select: `${S}/menu-select.wav`,
+  close: `${S}/dialog-done.wav`,
 };
 
 const MUSIC_VOL = 0.4;

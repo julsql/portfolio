@@ -1219,6 +1219,20 @@ img.cave-mouth {
   font-size: 17px;
   color: #9a8a6a;
 }
+.footer-credits {
+  flex-basis: 100%;
+  text-align: center;
+  font-size: 15px;
+  color: #9a8a6a;
+  margin-top: 4px;
+}
+.footer-credits-link {
+  color: var(--c-gold);
+  text-decoration: underline;
+}
+.footer-credits-link:hover {
+  color: var(--c-cream);
+}
 
 /* ============================================================ FIRE HAZARD */
 .explore-hint.danger {

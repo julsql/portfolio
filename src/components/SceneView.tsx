@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { EnemySpec, Hero as HeroType, LandmarkRef, Pot, Scene, TileKind } from "../types";
+import type { Sfx } from "../audio/sound";
 import { castleById, projectById } from "../data/projects";
 import { BLOCKED } from "../data/map";
 import { OVERWORLD_ID } from "../data/scenes";
@@ -47,6 +48,18 @@ type Drop = { id: number; x: number; y: number; color: RupeeColor };
 
 const RUPEE_COLORS: RupeeColor[] = ["green", "green", "green", "blue", "blue", "red"];
 const randomRupee = (): RupeeColor => RUPEE_COLORS[Math.floor(Math.random() * RUPEE_COLORS.length)];
+
+/** Each tile kind picks its own OOT footstep bank (so Link sounds different
+ *  on grass than on sand or wood). Falls back to `stepDirt` for everything
+ *  else (any other walkable tile). */
+const STEP_SFX: Partial<Record<TileKind, Sfx>> = {
+  grass: "stepGrass",
+  path: "stepDirt",
+  sand: "stepSand",
+  dock: "stepWood",
+  floor: "stepStone",
+  carpet: "stepCarpet",
+};
 
 const BURN_MS = 300;
 const ENEMY_MS = 600;
@@ -137,7 +150,7 @@ export default function SceneView(props: Props) {
     enemies,
     pushRock,
     removeRock,
-    onStep: () => sound.sfx("step"),
+    onStep: (tile) => sound.sfx(STEP_SFX[tile] ?? "stepDirt"),
   });
   useEffect(() => setEnabled(!paused), [paused, setEnabled]);
 
@@ -161,10 +174,18 @@ export default function SceneView(props: Props) {
   const onFire = scene.decor.some((d) => d.hazard && d.x === hero.x && d.y === hero.y);
   useEffect(() => {
     if (paused || !onFire) return;
-    sound.sfx("burn");
     const id = setInterval(() => onHit(), BURN_MS);
     return () => clearInterval(id);
   }, [onFire, paused, onHit]);
+  // Re-play the "burn" cry every time Link actually loses a heart while on
+  // fire (i.e. when his `health` prop drops). Using a health-watcher instead
+  // of firing the SFX from the interval avoids spamming the cry during the
+  // invulnerability window between successful hits.
+  const lastHealthRef = useRef(health);
+  useEffect(() => {
+    if (health < lastHealthRef.current && onFire) sound.sfx("burn");
+    lastHealthRef.current = health;
+  }, [health, onFire]);
 
   // ── Enemies: patrol or random walk, blocked by rocks / pots / walls ──────
   const canEnter = useCallback(
@@ -288,7 +309,9 @@ export default function SceneView(props: Props) {
 
   const strike = useCallback(() => {
     if (attacking) return;
+    // Sword swoosh + a random Young-Link "Haa!" shout, played together.
     sound.sfx("attack");
+    sound.sfx("attackShout");
     setAttacking(true);
     setTimeout(() => setAttacking(false), ATTACK_MS);
     const [dx, dy] = DELTA[hero.facing];

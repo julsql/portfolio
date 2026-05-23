@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Hero, LandmarkRef, Pot, Rock, Scene } from "../types";
+import type { Hero, LandmarkRef, Pot, Rock, Scene, TileKind } from "../types";
 import { BLOCKED } from "../data/map";
 
 type Dir = "up" | "down" | "left" | "right";
@@ -33,7 +33,8 @@ export interface MoveHandlers {
   enemies: { x: number; y: number }[];
   pushRock: (id: string, x: number, y: number) => void;
   removeRock: (id: string) => void;
-  onStep?: () => void;
+  /** Fires on every successful step with the tile Link just walked onto. */
+  onStep?: (tile: TileKind) => void;
 }
 
 interface UseMovement {
@@ -81,7 +82,7 @@ export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMo
         heroRef.current = next;
         setHero(next);
         setSteps((s) => s + 1);
-        onStep?.();
+        onStep?.(scene.tiles[y][x]);
       };
 
       if (nx < 0 || ny < 0 || nx >= scene.width || ny >= scene.height) return face();
