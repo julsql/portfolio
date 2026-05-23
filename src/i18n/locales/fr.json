@@ -11,23 +11,100 @@
     "view_list": "Liste",
     "lang": "EN",
     "sound": "Son",
-    "hint_sword": "Flèches / ZQSD pour bouger · Espace pour frapper à l'épée"
+    "hint_sword": "Flèches / ZQSD pour bouger · Espace pour frapper à l'épée",
+    "hint_bow": "Espace : épée · X : arc · B : bombe · U/I : flacons",
+    "inventory": "Inventaire"
   },
   "world": {
     "enter": "ENTRER",
     "exit": "Sortie",
     "castle": "Château",
     "hot": "🔥 Trop chaud ! Éloigne-toi du feu !",
-    "ganon_door": "Antre de Ganon"
+    "ganon_door": "Antre de Ganon",
+    "cave": "Caverne",
+    "fountain": "Fontaine des fées",
+    "bossDoor": "Porte du boss"
   },
   "npc": {
     "name": "???",
     "hint": "Vaillant héros ! Le terrible Ganondorf s'est emparé du royaume et retient la Princesse Zelda. Toi seul peux la délivrer... pars la libérer !",
     "ok": "J'y vais"
   },
+  "boss": {
+    "monster": "Gardien des secrets",
+    "ganondorf": "Ganondorf"
+  },
+  "shop": {
+    "bombs": "Bombes (×4)",
+    "arrows": "Flèches (×10)",
+    "potion": "Potion rouge",
+    "bottle": "Flacon vide",
+    "bossKey": "Clef du boss",
+    "smallKey": "Petite clef",
+    "item": "Objet"
+  },
+  "bottle": {
+    "empty": "Flacon vide",
+    "potion": "Potion rouge",
+    "fairy": "Fée en flacon"
+  },
   "item": {
     "heart": "Cœur de vie gagné !",
-    "sword": "Tu as obtenu l'Épée de Légende !"
+    "sword": "Tu as obtenu l'Épée de Légende !",
+    "bow": "Tu as obtenu l'Arc & des Flèches !",
+    "arrow": "Carquois rempli de flèches !",
+    "bomb": "Tu as obtenu des Bombes !",
+    "potion": "Flacon rempli de potion rouge !",
+    "smallKey": "Petite clef !",
+    "bossKey": "Clef du Boss !",
+    "bottle": "Flacon vide récupéré !",
+    "fairy": "Tu as attrapé une fée !",
+    "triforce": "Fragment de Triforce !",
+    "chest": "Coffre",
+    "chestLocked": "Coffre verrouillé",
+    "chestOpen": "Coffre ouvert"
+  },
+  "dialog": {
+    "sage": {
+      "name": "???",
+      "text": "Vaillant héros ! Le terrible Ganondorf s'est emparé du royaume et retient la Princesse Zelda. Toi seul peux la délivrer... mais avant cela, traverse la caverne secrète au nord-est pour trouver l'arc et un fragment de Triforce.",
+      "ok": "J'y vais"
+    },
+    "merchant": {
+      "name": "Marchand",
+      "text": "Bienvenue dans ma boutique ! Approche un article pour l'acheter avec tes rubis. La clef du Boss ouvre la porte que tu cherches au nord de la caverne.",
+      "ok": "Merci"
+    },
+    "fountain": {
+      "name": "Fontaine des fées",
+      "text": "Les fées dansent au-dessus de l'eau. Approche-les avec un flacon vide pour en attraper une — elle te ramènera à la vie si tu tombes au combat.",
+      "ok": "Bien"
+    },
+    "bossLocked": {
+      "name": "Porte verrouillée",
+      "text": "Une serrure massive scelle cette porte. Il te faut la clef du Boss pour l'ouvrir.",
+      "ok": "Comprends"
+    },
+    "ganonLocked": {
+      "name": "Antre de Ganondorf",
+      "text": "Une aura maléfique scelle cette porte. Seule la lumière d'un fragment de Triforce peut la dissiper — trouve-le dans la caverne secrète au nord-est.",
+      "ok": "Compris"
+    },
+    "needsKey": {
+      "name": "Coffre verrouillé",
+      "text": "Ce coffre est entravé par une chaîne. Trouve une petite clef pour la briser.",
+      "ok": "OK"
+    },
+    "needsBottle": {
+      "name": "Fée farouche",
+      "text": "Tu ne peux pas attraper la fée à mains nues — il te faut un flacon vide pour la capturer.",
+      "ok": "Compris"
+    },
+    "notEnoughRupees": {
+      "name": "Pas assez de rubis",
+      "text": "Reviens lorsque tu auras réuni davantage de rubis !",
+      "ok": "Bien"
+    }
   },
   "gameover": {
     "title": "GAME OVER",
@@ -37,7 +114,10 @@
   "victory": {
     "title": "VICTOIRE !",
     "thanks": "Merci, vaillant héros ! Tu as vaincu Ganondorf et exploré tout mon royaume de projets. JulSql te salue !",
-    "close": "Continuer"
+    "close": "Continuer",
+    "triforce_title": "FRAGMENT TROUVÉ !",
+    "triforce_thanks": "Tu tiens le fragment de Triforce ! Sa lumière dorée guide désormais tes pas — file maintenant affronter Ganondorf dans son antre.",
+    "triforce_close": "En route"
   },
   "modal": {
     "live": "Voir le site",

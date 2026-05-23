@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { EnemySpec, Hero as HeroType, LandmarkRef, Scene, TileKind } from "../types";
+import type { EnemySpec, Hero as HeroType, LandmarkRef, Pot, Scene, TileKind } from "../types";
 import { castleById, projectById } from "../data/projects";
 import { BLOCKED } from "../data/map";
-import { SPRITES } from "../data/sprites";
+import { OVERWORLD_ID } from "../data/scenes";
+import { SPRITES, type RupeeColor } from "../data/sprites";
 import { sound } from "../audio/sound";
 import { useMovement } from "../hooks/useMovement";
 import Hero from "./Hero";
@@ -16,8 +17,22 @@ interface Props {
   onPickup: (l: LandmarkRef) => void;
   onHit: () => void;
   onBossDefeated: () => void;
+  onMonsterDefeated: () => void;
+  onRupee: (color: RupeeColor) => void;
+  useBottle: (slot: number) => void;
   paused: boolean;
   hasSword: boolean;
+  hasBow: boolean;
+  arrows: number;
+  bombs: number;
+  smallKeys: number;
+  hasBossKey: boolean;
+  hasTriforce: boolean;
+  bottles: ("empty" | "potion" | "fairy")[];
+  opened: Set<string>;
+  unlockedDoors: Set<string>;
+  consumeArrow: () => void;
+  consumeBomb: () => void;
   health: number;
   maxHearts: number;
   rupees: number;
@@ -26,10 +41,19 @@ interface Props {
 
 type Enemy = EnemySpec & { dir: number; frame: number; maxHp: number };
 type Dir = HeroType["facing"];
+type Arrow = { id: number; x: number; y: number; dir: Dir };
+type Bomb = { id: number; x: number; y: number; exploding: boolean };
+type Drop = { id: number; x: number; y: number; color: RupeeColor };
+
+const RUPEE_COLORS: RupeeColor[] = ["green", "green", "green", "blue", "blue", "red"];
+const randomRupee = (): RupeeColor => RUPEE_COLORS[Math.floor(Math.random() * RUPEE_COLORS.length)];
 
 const BURN_MS = 300;
 const ENEMY_MS = 600;
 const ATTACK_MS = 260;
+const ARROW_MS = 80;
+const BOMB_FUSE_MS = 1500;
+const BOMB_FLASH_MS = 380;
 const DELTA: Record<Dir, [number, number]> = {
   up: [0, -1],
   down: [0, 1],
@@ -46,17 +70,29 @@ const heartSrc = (health: number, i: number) => {
   return units >= 2 ? SPRITES.heart.full : units === 1 ? SPRITES.heart.half : SPRITES.heart.empty;
 };
 
+const bottleSrc = (b: "empty" | "potion" | "fairy") =>
+  b === "fairy" ? SPRITES.bottleFairy : b === "potion" ? SPRITES.potion : SPRITES.bottleEmpty;
+
 export default function SceneView(props: Props) {
-  const { scene, initialHero, onInteract, onPickup, onHit, onBossDefeated } = props;
-  const { paused, hasSword, health, maxHearts, rupees, invulnerable } = props;
+  const { scene, initialHero, onInteract, onPickup, onHit } = props;
+  const { onBossDefeated, onMonsterDefeated, onRupee } = props;
+  const { paused, hasSword, hasBow, arrows, bombs, bottles, opened, unlockedDoors } = props;
+  const { health, maxHearts, rupees, invulnerable } = props;
+  const { hasBossKey, hasTriforce, smallKeys, consumeArrow, consumeBomb, useBottle } = props;
   const { t } = useTranslation();
 
   const [rocks, setRocks] = useState(scene.rocks ?? []);
+  const [pots, setPots] = useState<Pot[]>(scene.pots ?? []);
   const [enemies, setEnemies] = useState<Enemy[]>(
     (scene.enemies ?? []).map((e) => ({ ...e, dir: 1, frame: 0, maxHp: e.hp ?? 1 })),
   );
   const [attacking, setAttacking] = useState(false);
   const [bossHurt, setBossHurt] = useState(false);
+  const [arrowsInFlight, setArrowsInFlight] = useState<Arrow[]>([]);
+  const [placedBombs, setPlacedBombs] = useState<Bomb[]>([]);
+  /** Rupees dropped by broken pots, waiting for the hero to walk over them. */
+  const [drops, setDrops] = useState<Drop[]>([]);
+  const nextId = useRef(0);
 
   const pushRock = useCallback(
     (id: string, x: number, y: number) =>
@@ -68,7 +104,7 @@ export default function SceneView(props: Props) {
     [],
   );
   const drown = useCallback(() => {
-    sound.sfx("hurt"); // same feedback as taking a hit from an enemy
+    sound.sfx("hurt");
     onHit();
   }, [onHit]);
 
@@ -77,9 +113,8 @@ export default function SceneView(props: Props) {
       if (l.kind === "heart") sound.sfx("heart");
       else if (l.kind === "sword") sound.sfx("item");
       else if (l.kind === "door") sound.sfx("enterLair");
-      else if (l.kind === "exit") sound.sfx("door");
-      else if (l.kind === "project" || l.kind === "castle" || l.kind === "npc")
-        sound.sfx("select");
+      else if (l.kind === "exit" || l.kind === "cave") sound.sfx("door");
+      else if (l.kind === "project" || l.kind === "castle" || l.kind === "npc") sound.sfx("select");
       onInteract(l);
     },
     [onInteract],
@@ -87,7 +122,7 @@ export default function SceneView(props: Props) {
 
   const pickup = useCallback(
     (l: LandmarkRef) => {
-      sound.sfx("pickup");
+      if (l.kind === "rupee") sound.sfx("pickup");
       onPickup(l);
     },
     [onPickup],
@@ -98,6 +133,7 @@ export default function SceneView(props: Props) {
     onPickup: pickup,
     onDrown: drown,
     rocks,
+    pots,
     enemies,
     pushRock,
     removeRock,
@@ -105,7 +141,6 @@ export default function SceneView(props: Props) {
   });
   useEffect(() => setEnabled(!paused), [paused, setEnabled]);
 
-  // Idle "breathing": continuously alternate the walk frames so Link feels alive.
   const [frame, setFrame] = useState<1 | 2>(1);
   useEffect(() => {
     if (paused) return;
@@ -122,16 +157,17 @@ export default function SceneView(props: Props) {
     return () => clearInterval(id);
   }, [onFire, paused, onHit]);
 
-  // ── Enemies: patrol or random walk, blocked by rocks / walls / landmarks ──
+  // ── Enemies: patrol or random walk, blocked by rocks / pots / walls ──────
   const canEnter = useCallback(
     (x: number, y: number, tiles: TileKind[][]) => {
       if (x < 0 || y < 0 || x >= scene.width || y >= scene.height) return false;
       if (tiles[y][x] === "water" || BLOCKED.includes(tiles[y][x])) return false;
       if (rocks.some((r) => r.x === x && r.y === y)) return false;
+      if (pots.some((p) => p.x === x && p.y === y)) return false;
       if (scene.landmarks.some((l) => l.x === x && l.y === y)) return false;
       return true;
     },
-    [scene, rocks],
+    [scene, rocks, pots],
   );
 
   useEffect(() => {
@@ -148,7 +184,6 @@ export default function SceneView(props: Props) {
             const len = e.sprites?.length ?? 1;
             return { ...e, x: e.x + dx, y: e.y + dy, frame: (e.frame + 1) % len };
           }
-          // Patrol along its axis, bouncing at bounds or obstacles.
           let dir = e.dir;
           const tryStep = (d: number) => {
             const x = e.axis === "h" ? e.x + d : e.x;
@@ -170,7 +205,6 @@ export default function SceneView(props: Props) {
     return () => clearInterval(id);
   }, [paused, canEnter, scene]);
 
-  // Contact with an enemy hurts (Ganondorf has his own hit sound).
   useEffect(() => {
     if (paused) return;
     const touching = enemies.find((e) => e.x === hero.x && e.y === hero.y);
@@ -179,6 +213,53 @@ export default function SceneView(props: Props) {
       onHit();
     }
   }, [enemies, hero, paused, onHit]);
+
+  // Pick up any rupee dropped on the tile the hero just walked onto.
+  useEffect(() => {
+    if (paused) return;
+    const drop = drops.find((d) => d.x === hero.x && d.y === hero.y);
+    if (!drop) return;
+    sound.sfx("pickup");
+    setDrops((ds) => ds.filter((d) => d.id !== drop.id));
+    onRupee(drop.color);
+  }, [hero, drops, paused, onRupee]);
+
+  // ── Damage resolution shared by sword / arrows / bombs ───────────────────
+  const damageAt = useCallback(
+    (fx: number, fy: number, source: "sword" | "arrow" | "bomb") => {
+      const target = enemies.find((e) => e.x === fx && e.y === fy);
+      if (target?.random) {
+        const willDie = (target.hp ?? 1) <= 1;
+        if (willDie && target.id === "ganondorf") onBossDefeated();
+        else if (willDie && target.id === "monster") onMonsterDefeated();
+        else {
+          sound.sfx("bossHit");
+          setBossHurt(true);
+          setTimeout(() => setBossHurt(false), 320);
+        }
+      }
+      if (target && source !== "sword") sound.sfx("arrowHit");
+      setEnemies((prev) =>
+        prev.flatMap((e) => {
+          if (e.x !== fx || e.y !== fy) return [e];
+          const hp = (e.hp ?? 1) - 1;
+          return hp > 0 ? [{ ...e, hp }] : [];
+        }),
+      );
+      const pot = pots.find((p) => p.x === fx && p.y === fy);
+      if (pot) {
+        sound.sfx("potBreak");
+        setPots((ps) => ps.filter((p) => p.id !== pot.id));
+        // Drop a freshly-coloured rupee on the broken tile — the hero picks
+        // it up by walking onto it (see the drops useEffect below).
+        setDrops((ds) => [
+          ...ds,
+          { id: nextId.current++, x: pot.x, y: pot.y, color: randomRupee() },
+        ]);
+      }
+    },
+    [enemies, pots, onBossDefeated, onMonsterDefeated],
+  );
 
   // ── Sword: Space strikes the tile in front; kills enemies / wounds boss ──
   useEffect(() => {
@@ -198,25 +279,84 @@ export default function SceneView(props: Props) {
     setAttacking(true);
     setTimeout(() => setAttacking(false), ATTACK_MS);
     const [dx, dy] = DELTA[hero.facing];
-    const fx = hero.x + dx;
-    const fy = hero.y + dy;
-    const target = enemies.find((e) => e.x === fx && e.y === fy);
-    if (target?.random) {
-      if ((target.hp ?? 1) <= 1) onBossDefeated();
-      else {
-        sound.sfx("bossHit");
-        setBossHurt(true);
-        setTimeout(() => setBossHurt(false), 320);
+    damageAt(hero.x + dx, hero.y + dy, "sword");
+  }, [attacking, hero, damageAt]);
+
+  // ── Bow: X fires an arrow in the direction the hero is currently facing ──
+  const shoot = useCallback(() => {
+    if (!hasBow || arrows <= 0 || paused) return;
+    sound.sfx("bowShoot");
+    consumeArrow();
+    const dir = hero.facing;
+    const [dx, dy] = DELTA[dir];
+    const id = nextId.current++;
+    setArrowsInFlight((as) => [...as, { id, x: hero.x + dx, y: hero.y + dy, dir }]);
+  }, [hasBow, arrows, paused, hero, consumeArrow]);
+
+  // Step arrows along their direction; despawn on walls / out of bounds.
+  useEffect(() => {
+    if (paused || arrowsInFlight.length === 0) return;
+    const id = setInterval(() => {
+      setArrowsInFlight((prev) =>
+        prev.flatMap((a) => {
+          // Resolve impact on the current tile before advancing.
+          const enemyHere = enemies.some((e) => e.x === a.x && e.y === a.y);
+          const potHere = pots.some((p) => p.x === a.x && p.y === a.y);
+          if (enemyHere || potHere) {
+            damageAt(a.x, a.y, "arrow");
+            return [];
+          }
+          const [dx, dy] = DELTA[a.dir];
+          const nx = a.x + dx;
+          const ny = a.y + dy;
+          if (nx < 0 || ny < 0 || nx >= scene.width || ny >= scene.height) return [];
+          if (BLOCKED.includes(scene.tiles[ny][nx])) return [];
+          return [{ ...a, x: nx, y: ny }];
+        }),
+      );
+    }, ARROW_MS);
+    return () => clearInterval(id);
+  }, [paused, arrowsInFlight.length, enemies, pots, scene, damageAt]);
+
+  // ── Bombs: B drops a bomb that ticks down then explodes ──────────────────
+  const dropBomb = useCallback(() => {
+    if (bombs <= 0 || paused) return;
+    sound.sfx("bombDrop");
+    consumeBomb();
+    const id = nextId.current++;
+    const bx = hero.x;
+    const by = hero.y;
+    setPlacedBombs((bs) => [...bs, { id, x: bx, y: by, exploding: false }]);
+    setTimeout(() => {
+      sound.sfx("explosion");
+      setPlacedBombs((bs) => bs.map((b) => (b.id === id ? { ...b, exploding: true } : b)));
+      // Damage at the bomb tile and the four cardinal neighbours.
+      damageAt(bx, by, "bomb");
+      damageAt(bx + 1, by, "bomb");
+      damageAt(bx - 1, by, "bomb");
+      damageAt(bx, by + 1, "bomb");
+      damageAt(bx, by - 1, "bomb");
+      // Bomb hurts the hero too if he's adjacent.
+      if (Math.abs(hero.x - bx) + Math.abs(hero.y - by) <= 1) onHit();
+      setTimeout(() => setPlacedBombs((bs) => bs.filter((b) => b.id !== id)), BOMB_FLASH_MS);
+    }, BOMB_FUSE_MS);
+  }, [bombs, paused, hero, consumeBomb, damageAt, onHit]);
+
+  // Combat / inventory keys: X shoots, B drops a bomb.
+  useEffect(() => {
+    if (paused) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "x" || e.key === "X") {
+        e.preventDefault();
+        shoot();
+      } else if (e.key === "b" || e.key === "B") {
+        e.preventDefault();
+        dropBomb();
       }
-    }
-    setEnemies((prev) =>
-      prev.flatMap((e) => {
-        if (e.x !== fx || e.y !== fy) return [e];
-        const hp = (e.hp ?? 1) - 1;
-        return hp > 0 ? [{ ...e, hp }] : [];
-      }),
-    );
-  }, [attacking, hero, enemies, onBossDefeated]);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [paused, shoot, dropBomb]);
 
   const boss = enemies.find((e) => e.random);
 
@@ -231,6 +371,44 @@ export default function SceneView(props: Props) {
         <span className="rupees">
           <img className="rupee-icon" src={SPRITES.rupee.green} alt="" /> {rupees}
         </span>
+        <span className="inventory" aria-label={t("hud.inventory")}>
+          {hasBow && (
+            <span className="inv-slot" title={t("item.bow")}>
+              <img src={SPRITES.arrow} alt="" /> {arrows}
+            </span>
+          )}
+          {bombs > 0 && (
+            <span className="inv-slot" title={t("item.bomb")}>
+              <img src={SPRITES.bomb} alt="" /> {bombs}
+            </span>
+          )}
+          {smallKeys > 0 && (
+            <span className="inv-slot" title={t("item.smallKey")}>
+              <img src={SPRITES.keySmall} alt="" /> {smallKeys}
+            </span>
+          )}
+          {hasBossKey && (
+            <span className="inv-slot" title={t("item.bossKey")}>
+              <img src={SPRITES.keyBoss} alt="" />
+            </span>
+          )}
+          {hasTriforce && (
+            <span className="inv-slot" title={t("item.triforce")}>
+              <img src={SPRITES.triforcePiece} alt="" />
+            </span>
+          )}
+          {bottles.map((b, i) => (
+            <button
+              key={i}
+              className="inv-slot inv-bottle"
+              onClick={() => useBottle(i)}
+              title={t(`bottle.${b}`)}
+              aria-label={t(`bottle.${b}`)}
+            >
+              <img src={bottleSrc(b)} alt="" />
+            </button>
+          ))}
+        </span>
       </div>
 
       <p className={`explore-hint${onFire ? " danger" : ""}`}>
@@ -238,7 +416,9 @@ export default function SceneView(props: Props) {
           t("world.hot")
         ) : (
           <>
-            <span className="hint-desktop">{hasSword ? t("hud.hint_sword") : t("hud.hint")}</span>
+            <span className="hint-desktop">
+              {hasBow ? t("hud.hint_bow") : hasSword ? t("hud.hint_sword") : t("hud.hint")}
+            </span>
             <span className="hint-touch">{t("hud.hint_touch")}</span>
           </>
         )}
@@ -250,7 +430,7 @@ export default function SceneView(props: Props) {
       >
         {boss && (
           <div className={`boss-bar${bossHurt ? " hurt" : ""}`}>
-            <span className="boss-name">Ganondorf</span>
+            <span className="boss-name">{t(`boss.${boss.id}`, { defaultValue: boss.id })}</span>
             <span className="boss-pips">
               {Array.from({ length: boss.maxHp }, (_, i) => (
                 <span key={i} className={`boss-pip${i < (boss.hp ?? 0) ? " full" : ""}`} />
@@ -295,7 +475,47 @@ export default function SceneView(props: Props) {
           />
         ))}
 
+        {pots.map((p) => (
+          <img
+            key={p.id}
+            className="pot-obj"
+            style={tileStyle(p.x, p.y)}
+            src={SPRITES.pot}
+            alt=""
+          />
+        ))}
+
         {scene.landmarks.map((l) => renderLandmark(l))}
+
+        {arrowsInFlight.map((a) => (
+          <img
+            key={`arr-${a.id}`}
+            className={`arrow-fx arrow-${a.dir}`}
+            style={tileStyle(a.x, a.y)}
+            src={SPRITES.arrow}
+            alt=""
+          />
+        ))}
+
+        {drops.map((d) => (
+          <img
+            key={`drop-${d.id}`}
+            className="drop-rupee"
+            style={tileStyle(d.x, d.y)}
+            src={SPRITES.rupee[d.color]}
+            alt=""
+          />
+        ))}
+
+        {placedBombs.map((b) => (
+          <img
+            key={`bomb-${b.id}`}
+            className={`bomb-fx${b.exploding ? " exploding" : ""}`}
+            style={tileStyle(b.x, b.y)}
+            src={b.exploding ? SPRITES.explosion : SPRITES.bomb}
+            alt=""
+          />
+        ))}
 
         {enemies.map((e) =>
           e.sprites ? (
@@ -325,7 +545,12 @@ export default function SceneView(props: Props) {
         />
       </div>
 
-      <TouchControls onMove={move} onAttack={hasSword ? strike : undefined} />
+      <TouchControls
+        onMove={move}
+        onAttack={hasSword ? strike : undefined}
+        onShoot={hasBow && arrows > 0 ? shoot : undefined}
+        onBomb={bombs > 0 ? dropBomb : undefined}
+      />
     </div>
   );
 
@@ -369,16 +594,153 @@ export default function SceneView(props: Props) {
         </button>
       );
     }
-    if (l.kind === "npc") {
+    if (l.kind === "chest") {
+      const isOpen = opened.has(l.ref);
       return (
         <button
           key={key}
-          className="landmark landmark-npc"
+          className="landmark landmark-chest"
           style={tileStyle(l.x, l.y)}
           onClick={() => interact(l)}
-          aria-label={t("npc.name")}
+          aria-label={t(isOpen ? "item.chestOpen" : "item.chest")}
         >
-          <img className="landmark-icon npc-icon" src={SPRITES.npc} alt="" />
+          <img className="item-sprite" src={isOpen ? SPRITES.chestOpen : SPRITES.chest} alt="" />
+        </button>
+      );
+    }
+    if (l.kind === "lockedChest") {
+      const isOpen = opened.has(l.ref);
+      return (
+        <button
+          key={key}
+          className="landmark landmark-chest"
+          style={tileStyle(l.x, l.y)}
+          onClick={() => interact(l)}
+          aria-label={t(isOpen ? "item.chestOpen" : "item.chestLocked")}
+        >
+          <img
+            className="item-sprite"
+            src={isOpen ? SPRITES.chestOpen : SPRITES.chestLocked}
+            alt=""
+          />
+        </button>
+      );
+    }
+    if (l.kind === "bossDoor") {
+      const ganon = l.ref.startsWith("ganon");
+      const opened = unlockedDoors.has(l.ref);
+      const sprite = opened ? SPRITES.doorDungeonOpen : SPRITES.doorBossLocked;
+      const cls = `landmark landmark-boss-door${opened ? " unlocked" : ""}${
+        ganon ? " for-ganon" : ""
+      }`;
+      return (
+        <button
+          key={key}
+          className={cls}
+          style={tileStyle(l.x, l.y)}
+          onClick={() => interact(l)}
+          aria-label={t("world.bossDoor")}
+        >
+          <img className="landmark-icon door-icon" src={sprite} alt="" />
+        </button>
+      );
+    }
+    if (l.kind === "cave") {
+      return (
+        <button
+          key={key}
+          className="landmark landmark-cave"
+          style={tileStyle(l.x, l.y)}
+          onClick={() => interact(l)}
+          aria-label={t("world.cave")}
+        >
+          <img className="cave-mouth" src={SPRITES.hole} alt="" />
+        </button>
+      );
+    }
+    if (l.kind === "fountain") {
+      return (
+        <button
+          key={key}
+          className="landmark landmark-fountain"
+          style={tileStyle(l.x, l.y)}
+          onClick={() => interact(l)}
+          aria-label={t("world.fountain")}
+        >
+          <img className="fountain-icon" src={SPRITES.fountain} alt="" />
+        </button>
+      );
+    }
+    if (l.kind === "fairy") {
+      return (
+        <button
+          key={key}
+          className="landmark landmark-fairy"
+          style={tileStyle(l.x, l.y)}
+          onClick={() => interact(l)}
+          aria-label={t("item.fairy")}
+        >
+          <img className="item-sprite fairy-sprite" src={SPRITES.fairy} alt="" />
+        </button>
+      );
+    }
+    if (l.kind === "triforce") {
+      return (
+        <button
+          key={key}
+          className="landmark landmark-triforce"
+          style={tileStyle(l.x, l.y)}
+          onClick={() => interact(l)}
+          aria-label={t("item.triforce")}
+        >
+          <img className="item-sprite" src={SPRITES.triforcePiece} alt="" />
+        </button>
+      );
+    }
+    if (l.kind === "shopItem") {
+      const sold = opened.has(l.ref);
+      const drop = l.drop;
+      const icon = !drop
+        ? SPRITES.rupee.green
+        : drop.kind === "bombs"
+          ? SPRITES.bomb
+          : drop.kind === "arrows"
+            ? SPRITES.arrow
+            : drop.kind === "potion"
+              ? SPRITES.potion
+              : drop.kind === "bottle"
+                ? SPRITES.bottleEmpty
+                : drop.kind === "bossKey"
+                  ? SPRITES.keyBoss
+                  : SPRITES.keySmall;
+      return (
+        <button
+          key={key}
+          className={`landmark landmark-shop${sold ? " sold" : ""}`}
+          style={tileStyle(l.x, l.y)}
+          onClick={() => interact(l)}
+          aria-label={t(`shop.${drop?.kind ?? "item"}`)}
+        >
+          {!sold && <img className="item-sprite shop-icon" src={icon} alt="" />}
+          {!sold && <span className="landmark-label">{l.price ?? 0}r</span>}
+        </button>
+      );
+    }
+    if (l.kind === "npc") {
+      const merchant = l.ref === "merchant";
+      return (
+        <button
+          key={key}
+          className={`landmark landmark-npc${merchant ? " landmark-merchant" : ""}`}
+          style={tileStyle(l.x, l.y)}
+          onClick={() => interact(l)}
+          aria-label={t(merchant ? "dialog.merchant.name" : "npc.name")}
+        >
+          <img
+            className="landmark-icon npc-icon"
+            src={merchant ? SPRITES.merchant : SPRITES.npc}
+            alt=""
+          />
         </button>
       );
     }
@@ -396,16 +758,23 @@ export default function SceneView(props: Props) {
       );
     }
     if (l.kind === "exit") {
+      // Only flag the doorway as "Sortie" when it leaves to the open world;
+      // internal doors (cave ↔ shop / fountain / back-rooms) are just doors.
+      const labelled = l.ref === OVERWORLD_ID;
       return (
         <button
           key={key}
-          className="landmark landmark-exit"
+          className={`landmark landmark-exit${labelled ? "" : " landmark-door-silent"}`}
           style={tileStyle(l.x, l.y)}
           onClick={() => interact(l)}
           aria-label={t("world.exit")}
         >
-          <img className="landmark-icon door-icon" src={SPRITES.door} alt="" />
-          <span className="landmark-label">{t("world.exit")}</span>
+          <img
+            className="landmark-icon door-icon"
+            src={labelled ? SPRITES.door : SPRITES.doorOpen}
+            alt=""
+          />
+          {labelled && <span className="landmark-label">{t("world.exit")}</span>}
         </button>
       );
     }

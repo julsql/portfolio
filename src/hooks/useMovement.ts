@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Hero, LandmarkRef, Rock, Scene } from "../types";
+import type { Hero, LandmarkRef, Pot, Rock, Scene } from "../types";
 import { BLOCKED } from "../data/map";
 
 type Dir = "up" | "down" | "left" | "right";
@@ -29,6 +29,7 @@ export interface MoveHandlers {
   onPickup: (l: LandmarkRef) => void;
   onDrown: () => void;
   rocks: Rock[];
+  pots?: Pot[];
   enemies: { x: number; y: number }[];
   pushRock: (id: string, x: number, y: number) => void;
   removeRock: (id: string) => void;
@@ -40,6 +41,8 @@ interface UseMovement {
   /** Increments on every successful step. */
   steps: number;
   move: (dir: Dir) => void;
+  /** Turn the hero without stepping (e.g. to face right before shooting). */
+  face: (dir: Dir) => void;
   setEnabled: (v: boolean) => void;
 }
 
@@ -56,7 +59,8 @@ export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMo
   const heroRef = useRef<Hero>(initial);
   const [steps, setSteps] = useState(0);
   const [enabled, setEnabled] = useState(true);
-  const { onInteract, onPickup, onDrown, rocks, enemies, pushRock, removeRock, onStep } = h;
+  const { onInteract, onPickup, onDrown, rocks, pots, enemies, pushRock, removeRock, onStep } = h;
+  const potsList = pots ?? [];
 
   const move = useCallback(
     (dir: Dir) => {
@@ -92,6 +96,9 @@ export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMo
         return face();
       }
 
+      // Clay pots block movement until smashed (sword / arrow / bomb).
+      if (potsList.some((p) => p.x === nx && p.y === ny)) return face();
+
       const rock = rocks.find((r) => r.x === nx && r.y === ny);
       if (rock) {
         const bx = nx + dx;
@@ -122,7 +129,19 @@ export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMo
       if (BLOCKED.includes(tile)) return face();
       return stepTo(nx, ny);
     },
-    [enabled, scene, rocks, enemies, onInteract, onPickup, onDrown, pushRock, removeRock, onStep],
+    [
+      enabled,
+      scene,
+      rocks,
+      potsList,
+      enemies,
+      onInteract,
+      onPickup,
+      onDrown,
+      pushRock,
+      removeRock,
+      onStep,
+    ],
   );
 
   useEffect(() => {
@@ -136,5 +155,13 @@ export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMo
     return () => window.removeEventListener("keydown", handler);
   }, [move]);
 
-  return { hero, steps, move, setEnabled };
+  const face = useCallback((dir: Dir) => {
+    const prev = heroRef.current;
+    if (prev.facing === dir) return;
+    const next = { ...prev, facing: dir };
+    heroRef.current = next;
+    setHero(next);
+  }, []);
+
+  return { hero, steps, move, face, setEnabled };
 }

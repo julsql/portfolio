@@ -102,4 +102,25 @@ describe("useMovement", () => {
     );
     expect(result.current.hero).toMatchObject({ x: 10, y: 8 });
   });
+
+  it("treats pots as solid obstacles (no step, no interact)", () => {
+    const onInteract = vi.fn();
+    const pots = [{ id: "p", x: 9, y: 9 }];
+    const { result } = renderHook(() =>
+      useMovement(overworld, { x: 10, y: 9, facing: "left" }, handlers({ pots, onInteract })),
+    );
+    act(() => result.current.move("left"));
+    expect(onInteract).not.toHaveBeenCalled();
+    expect(result.current.hero).toMatchObject({ x: 10, y: 9, facing: "left" });
+  });
+
+  it("face() turns the hero without stepping", () => {
+    const { result } = renderHook(() => useMovement(overworld, overworld.heroStart, handlers()));
+    act(() => result.current.face("right"));
+    expect(result.current.hero).toMatchObject({
+      x: overworld.heroStart.x,
+      y: overworld.heroStart.y,
+      facing: "right",
+    });
+  });
 });

@@ -11,23 +11,100 @@
     "view_list": "List",
     "lang": "FR",
     "sound": "Sound",
-    "hint_sword": "Arrows / WASD to move · Space to swing the sword"
+    "hint_sword": "Arrows / WASD to move · Space to swing the sword",
+    "hint_bow": "Space: sword · X: bow · B: bomb · U/I: bottles",
+    "inventory": "Inventory"
   },
   "world": {
     "enter": "ENTER",
     "exit": "Exit",
     "castle": "Castle",
     "hot": "🔥 Too hot! Step away from the fire!",
-    "ganon_door": "Ganon's lair"
+    "ganon_door": "Ganon's lair",
+    "cave": "Cave",
+    "fountain": "Fairy fountain",
+    "bossDoor": "Boss door"
   },
   "npc": {
     "name": "???",
     "hint": "Brave hero! The dreaded Ganondorf has seized the realm and holds Princess Zelda captive. Only you can set her free... go and rescue her!",
     "ok": "I'm on it"
   },
+  "boss": {
+    "monster": "Guardian of Secrets",
+    "ganondorf": "Ganondorf"
+  },
+  "shop": {
+    "bombs": "Bombs (×4)",
+    "arrows": "Arrows (×10)",
+    "potion": "Red potion",
+    "bottle": "Empty bottle",
+    "bossKey": "Boss key",
+    "smallKey": "Small key",
+    "item": "Item"
+  },
+  "bottle": {
+    "empty": "Empty bottle",
+    "potion": "Red potion",
+    "fairy": "Bottled fairy"
+  },
   "item": {
     "heart": "Heart container!",
-    "sword": "You got the Legendary Sword!"
+    "sword": "You got the Legendary Sword!",
+    "bow": "You got the Bow & Arrows!",
+    "arrow": "Quiver refilled with arrows!",
+    "bomb": "You got some Bombs!",
+    "potion": "Bottled red potion!",
+    "smallKey": "Small key!",
+    "bossKey": "Boss key!",
+    "bottle": "Empty bottle!",
+    "fairy": "You caught a fairy!",
+    "triforce": "Triforce fragment!",
+    "chest": "Chest",
+    "chestLocked": "Locked chest",
+    "chestOpen": "Open chest"
+  },
+  "dialog": {
+    "sage": {
+      "name": "???",
+      "text": "Brave hero! The dreaded Ganondorf has seized the realm and holds Princess Zelda captive. Before you confront him, find the bow and a Triforce fragment hidden in the secret cave to the north-east.",
+      "ok": "I'm on it"
+    },
+    "merchant": {
+      "name": "Merchant",
+      "text": "Welcome, traveller! Walk up to an item to buy it with your rupees. The Boss Key opens the door you seek at the north of the cave.",
+      "ok": "Thanks"
+    },
+    "fountain": {
+      "name": "Fairy fountain",
+      "text": "Fairies flutter above the water. Approach one with an empty bottle to catch it — she will revive you if you fall in battle.",
+      "ok": "I see"
+    },
+    "bossLocked": {
+      "name": "Locked door",
+      "text": "A heavy lock seals this door. You need the Boss Key to open it.",
+      "ok": "Got it"
+    },
+    "ganonLocked": {
+      "name": "Ganondorf's lair",
+      "text": "A dark aura seals this door. Only the light of a Triforce fragment can dispel it — find it deep in the secret cave to the north-east.",
+      "ok": "Understood"
+    },
+    "needsKey": {
+      "name": "Chained chest",
+      "text": "Heavy chains bind this chest. Find a small key to break them.",
+      "ok": "OK"
+    },
+    "needsBottle": {
+      "name": "Wild fairy",
+      "text": "You can't catch the fairy with bare hands — bring an empty bottle to capture her.",
+      "ok": "Understood"
+    },
+    "notEnoughRupees": {
+      "name": "Not enough rupees",
+      "text": "Come back when you have gathered more rupees!",
+      "ok": "OK"
+    }
   },
   "gameover": {
     "title": "GAME OVER",
@@ -37,7 +114,10 @@
   "victory": {
     "title": "VICTORY!",
     "thanks": "Thank you, brave hero! You defeated Ganondorf and explored my whole realm of projects. JulSql salutes you!",
-    "close": "Continue"
+    "close": "Continue",
+    "triforce_title": "FRAGMENT FOUND!",
+    "triforce_thanks": "You hold a Triforce fragment! Its golden light guides your steps — now go face Ganondorf in his lair.",
+    "triforce_close": "Onward"
   },
   "modal": {
     "live": "Visit website",

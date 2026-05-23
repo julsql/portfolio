@@ -5,6 +5,8 @@ import { sound } from "../audio/sound";
 
 interface Props {
   onClose: () => void;
+  /** When true, celebrate the Triforce piece instead of defeating Ganon. */
+  triforce?: boolean;
 }
 
 /** How long the victory screen stays locked (so spammed key presses from
@@ -12,7 +14,7 @@ interface Props {
 const LOCK_MS = 3000;
 
 /** Shown when Ganondorf is defeated: Zelda appears and thanks the player. */
-export default function Victory({ onClose }: Props) {
+export default function Victory({ onClose, triforce = false }: Props) {
   const { t } = useTranslation();
   const [ready, setReady] = useState(false);
 
@@ -34,11 +36,16 @@ export default function Victory({ onClose }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [ready, onClose]);
 
+  const titleKey = triforce ? "victory.triforce_title" : "victory.title";
+  const thanksKey = triforce ? "victory.triforce_thanks" : "victory.thanks";
+  const closeKey = triforce ? "victory.triforce_close" : "victory.close";
+  const img = triforce ? SPRITES.linkTriforce : SPRITES.zelda;
+
   return (
     <div className="victory" onClick={ready ? onClose : undefined}>
-      <img className="victory-zelda" src={SPRITES.zelda} alt="Zelda" />
-      <h1 className="victory-title">{t("victory.title")}</h1>
-      <p className="victory-thanks">{t("victory.thanks")}</p>
+      <img className="victory-zelda" src={img} alt="" />
+      <h1 className="victory-title">{t(titleKey)}</h1>
+      <p className="victory-thanks">{t(thanksKey)}</p>
       {/* Always rendered (reserves its space) — just hidden until unlocked,
           so nothing already on screen shifts when it appears. */}
       <button
@@ -46,7 +53,7 @@ export default function Victory({ onClose }: Props) {
         onClick={ready ? onClose : undefined}
         disabled={!ready}
       >
-        ★ {t("victory.close")}
+        ★ {t(closeKey)}
       </button>
     </div>
   );

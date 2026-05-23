@@ -38,6 +38,13 @@ export function transposeScene(scene: Scene): Scene {
     })),
     decor: scene.decor.map((d) => ({ ...d, x: d.y, y: d.x })),
     rocks: scene.rocks?.map((r) => ({ ...r, x: r.y, y: r.x })),
+    pots: scene.pots?.map((p) => ({ ...p, x: p.y, y: p.x })),
+    breakables: scene.breakables?.map((b) => ({
+      ...b,
+      x: b.y,
+      y: b.x,
+      spawn: b.spawn ? transposeHero(b.spawn) : undefined,
+    })),
     enemies: scene.enemies?.map((e) => ({
       ...e,
       x: e.y,

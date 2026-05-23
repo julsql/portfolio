@@ -4,7 +4,7 @@
  * events that have no file (footsteps, sword swing, generic door, game over).
  */
 
-type Track = "overworld" | "dungeon" | "ganon";
+type Track = "overworld" | "dungeon" | "ganon" | "fairy";
 export type Sfx =
   | "step"
   | "attack"
@@ -22,13 +22,25 @@ export type Sfx =
   | "victory"
   | "lowHealth"
   | "cursor"
-  | "select";
+  | "select"
+  | "bowShoot"
+  | "arrowHit"
+  | "bombDrop"
+  | "explosion"
+  | "chest"
+  | "potBreak"
+  | "lockedNo"
+  | "unlock"
+  | "buy"
+  | "fairyRevive"
+  | "triforceGet";
 
 const S = "/sound";
 const MUSIC: Record<Track, string> = {
   overworld: `${S}/music-overworld.mp3`,
   dungeon: `${S}/music-castle.mp3`,
   ganon: `${S}/music-ganon.wav`,
+  fairy: `${S}/fairy-fountain.wav`,
 };
 const FILES: Partial<Record<Sfx, string>> = {
   pickup: `${S}/rupee.wav`,
@@ -42,6 +54,8 @@ const FILES: Partial<Record<Sfx, string>> = {
   victory: `${S}/victory.wav`,
   lowHealth: `${S}/low-health.wav`,
   gameover: `${S}/gameover.wav`,
+  chest: `${S}/chest-open.wav`,
+  unlock: `${S}/puzzle-solved.wav`,
 };
 const MUSIC_VOL = 0.4;
 const SFX_VOL = 0.7;
@@ -150,6 +164,53 @@ class SoundEngine {
         break;
       case "select":
         this.tone(988, 0.045, "square", 0.13);
+        break;
+      case "bowShoot":
+        this.tone(1200, 0.05, "triangle", 0.14);
+        this.tone(700, 0.07, "triangle", 0.1, 0.04);
+        break;
+      case "arrowHit":
+        this.tone(500, 0.06, "square", 0.15);
+        this.noise(0.07, 0.08);
+        break;
+      case "bombDrop":
+        this.tone(200, 0.1, "square", 0.12);
+        break;
+      case "explosion":
+        this.noise(0.45, 0.28);
+        this.tone(80, 0.32, "sawtooth", 0.18);
+        break;
+      case "chest":
+        this.tone(660, 0.08, "square", 0.14);
+        this.tone(880, 0.08, "square", 0.14, 0.07);
+        this.tone(1320, 0.12, "square", 0.16, 0.14);
+        break;
+      case "potBreak":
+        this.noise(0.18, 0.16);
+        this.tone(420, 0.05, "square", 0.12);
+        break;
+      case "lockedNo":
+        this.tone(280, 0.07, "square", 0.14);
+        this.tone(220, 0.07, "square", 0.14, 0.06);
+        break;
+      case "unlock":
+        this.tone(660, 0.07, "square", 0.14);
+        this.tone(990, 0.07, "square", 0.14, 0.06);
+        this.tone(1320, 0.1, "square", 0.16, 0.13);
+        break;
+      case "buy":
+        this.tone(880, 0.05, "square", 0.14);
+        this.tone(1100, 0.07, "square", 0.14, 0.05);
+        break;
+      case "fairyRevive":
+        this.tone(880, 0.1, "triangle", 0.16);
+        this.tone(1100, 0.1, "triangle", 0.16, 0.08);
+        this.tone(1320, 0.18, "triangle", 0.18, 0.18);
+        break;
+      case "triforceGet":
+        this.tone(660, 0.12, "square", 0.16);
+        this.tone(880, 0.12, "square", 0.16, 0.12);
+        this.tone(1320, 0.32, "square", 0.18, 0.24);
         break;
     }
   }

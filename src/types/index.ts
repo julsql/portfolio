@@ -62,19 +62,58 @@ export interface Hero {
 
 import type { RupeeColor } from "../data/sprites";
 
+/** What a chest, a pot or a shop slot can hand out. */
+export type DropKind =
+  | "smallKey"
+  | "bossKey"
+  | "bow"
+  | "bombs"
+  | "arrows"
+  | "bottle"
+  | "potion"
+  | "triforce"
+  | "rupee";
+
+export interface Drop {
+  kind: DropKind;
+  /** For "bombs": how many; for "rupee": the colour. */
+  amount?: number;
+  rupee?: RupeeColor;
+}
+
 /** Something the hero can bump into (or walk over) within a scene. */
 export interface LandmarkRef {
   x: number;
   y: number;
-  kind: "project" | "castle" | "exit" | "npc" | "door" | "heart" | "sword" | "rupee";
-  /** project id, castle id, target scene id, rupee id, or marker. */
+  kind:
+    | "project"
+    | "castle"
+    | "exit"
+    | "npc"
+    | "door"
+    | "heart"
+    | "sword"
+    | "rupee"
+    | "cave"
+    | "chest"
+    | "lockedChest"
+    | "bossDoor"
+    | "fairy"
+    | "fountain"
+    | "shopItem"
+    | "triforce";
+  /** project id, castle id, target scene id, rupee id, shop slot, or marker. */
   ref: string;
-  /** Where the hero should spawn after an exit/door transition. */
+  /** Where the hero should spawn after an exit/door/cave transition. */
   spawn?: Hero;
-  /** Walk onto it (and collect) instead of bumping it — e.g. rupees. */
+  /** Walk onto it (and collect) instead of bumping it — e.g. rupees, fairies. */
   pickup?: boolean;
   /** For rupees: which colour (sets the value). */
   rupee?: RupeeColor;
+  /** For chests/shopItem: what's inside. */
+  drop?: Drop;
+  /** For shopItem: price in rupees. */
+  price?: number;
 }
 
 /** A pushable boulder. */
@@ -82,6 +121,25 @@ export interface Rock {
   id: string;
   x: number;
   y: number;
+}
+
+/** A breakable clay pot, optionally hiding a drop. */
+export interface Pot {
+  id: string;
+  x: number;
+  y: number;
+  drop?: Drop;
+}
+
+/** A cracked wall destroyed by a nearby bomb, optionally revealing a path. */
+export interface Breakable {
+  id: string;
+  x: number;
+  y: number;
+  /** Scene id to enter once destroyed (acts as a hidden cave). */
+  reveals?: string;
+  /** Hero spawn after entering the revealed scene. */
+  spawn?: Hero;
 }
 
 /**
@@ -120,5 +178,9 @@ export interface Scene {
   landmarks: LandmarkRef[];
   decor: Decor[];
   rocks?: Rock[];
+  pots?: Pot[];
+  breakables?: Breakable[];
   enemies?: EnemySpec[];
+  /** Background music identifier override (else: dungeon for caves). */
+  music?: "overworld" | "dungeon" | "ganon" | "fairy";
 }

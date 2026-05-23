@@ -50,7 +50,20 @@ describe.each(scenes)("scene $id", (scene) => {
     for (const l of scene.landmarks) {
       if (l.kind === "project") expect(projectById(l.ref)).toBeDefined();
       if (l.kind === "castle") expect(castleById(l.ref)).toBeDefined();
-      if (l.kind === "exit") expect(SCENES[l.ref]).toBeDefined();
+      if (l.kind === "exit" || l.kind === "cave" || l.kind === "bossDoor")
+        expect(SCENES[l.ref]).toBeDefined();
+    }
+  });
+
+  it("never reuses an id between two pots, breakables or rocks", () => {
+    const seen = new Set<string>();
+    for (const r of scene.rocks ?? []) {
+      expect(seen.has(r.id)).toBe(false);
+      seen.add(r.id);
+    }
+    for (const p of scene.pots ?? []) {
+      expect(seen.has(p.id)).toBe(false);
+      seen.add(p.id);
     }
   });
 });
@@ -95,11 +108,24 @@ const walkable = (scene: Scene, x: number, y: number) =>
 
 describe("game objects", () => {
   it.each(scenes)("$id: standable landmarks sit on walkable tiles", (scene) => {
-    const standable = ["project", "castle", "rupee", "npc", "heart", "sword"];
+    // Walk-onto landmarks: rupees, fairies (pickup with bottle), the triforce
+    // piece. NPCs / hearts / swords are bump-only but still need to sit on
+    // walkable tiles (the hero must be able to be on top to bump from any side).
+    const standable = ["project", "castle", "rupee", "npc", "heart", "sword", "fairy", "triforce"];
     for (const l of scene.landmarks) {
       if (standable.includes(l.kind)) {
         expect(walkable(scene, l.x, l.y), `${l.kind} ${l.ref}`).toBe(true);
       }
+    }
+  });
+
+  it.each(scenes)("$id: pots block movement and sit on walkable tiles", (scene) => {
+    const ids = new Set<string>();
+    for (const p of scene.pots ?? []) {
+      expect(walkable(scene, p.x, p.y), `pot ${p.id}`).toBe(true);
+      expect(scene.landmarks.some((l) => l.x === p.x && l.y === p.y)).toBe(false);
+      expect(ids.has(p.id), `duplicate pot id ${p.id}`).toBe(false);
+      ids.add(p.id);
     }
   });
 
