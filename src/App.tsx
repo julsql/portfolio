@@ -62,6 +62,7 @@ export default function App() {
   // Side-quest inventory.
   const [hasBow, setHasBow] = useState(false);
   const [arrows, setArrows] = useState(0);
+  const [hasBombs, setHasBombs] = useState(false);
   const [bombs, setBombs] = useState(0);
   const [smallKeys, setSmallKeys] = useState(0);
   const [hasBossKey, setHasBossKey] = useState(false);
@@ -268,6 +269,7 @@ export default function App() {
         setArrows((n) => n + (drop.amount ?? 5));
         return "arrow";
       case "bombs":
+        setHasBombs(true);
         setBombs((n) => n + (drop.amount ?? 1));
         return "bomb";
       case "smallKey":
@@ -356,6 +358,17 @@ export default function App() {
         break;
       case "shopItem": {
         if (opened.has(l.ref) || !l.drop) break;
+        // Refuse to sell ammo for gear the hero hasn't unlocked yet.
+        if (l.drop.kind === "arrows" && !hasBow) {
+          sound.sfx("lockedNo");
+          setDialog("needsBow");
+          break;
+        }
+        if (l.drop.kind === "bombs" && !hasBombs) {
+          sound.sfx("lockedNo");
+          setDialog("needsBombs");
+          break;
+        }
         const price = l.price ?? 0;
         if (rupees < price) {
           sound.sfx("lockedNo");
@@ -365,7 +378,7 @@ export default function App() {
         // Pouring a potion needs an empty bottle to hold it.
         if (l.drop.kind === "potion" && !bottles.some((b) => b === "empty")) {
           sound.sfx("lockedNo");
-          setDialog("needsBottle");
+          setDialog("needsBottlePotion");
           break;
         }
         sound.sfx("chest");
@@ -479,6 +492,7 @@ export default function App() {
     setHealth(START_HEALTH);
     setHasBow(false);
     setArrows(0);
+    setHasBombs(false);
     setBombs(0);
     setSmallKeys(0);
     setHasBossKey(false);

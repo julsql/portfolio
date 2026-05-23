@@ -12,6 +12,9 @@ export type DialogKind =
   | "ganonLocked"
   | "needsKey"
   | "needsBottle"
+  | "needsBottlePotion"
+  | "needsBow"
+  | "needsBombs"
   | "notEnoughRupees";
 
 interface Props {
@@ -27,6 +30,9 @@ const FACE: Record<NonNullable<DialogKind>, string> = {
   ganonLocked: SPRITES.triforcePiece,
   needsKey: SPRITES.keySmall,
   needsBottle: SPRITES.bottleEmpty,
+  needsBottlePotion: SPRITES.potion,
+  needsBow: SPRITES.bowIcon,
+  needsBombs: SPRITES.bomb,
   notEnoughRupees: SPRITES.rupee.red,
 };
 

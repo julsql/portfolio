@@ -100,6 +100,21 @@
       "text": "You can't catch the fairy with bare hands — bring an empty bottle to capture her.",
       "ok": "Understood"
     },
+    "needsBottlePotion": {
+      "name": "Merchant",
+      "text": "I pour the potion, I don't sell the bottle! Come back with an empty bottle to take it home.",
+      "ok": "Understood"
+    },
+    "needsBow": {
+      "name": "Merchant",
+      "text": "Arrows without a bow? Find yourself a bow first, then come back for a quiver.",
+      "ok": "Understood"
+    },
+    "needsBombs": {
+      "name": "Merchant",
+      "text": "Bombs are dangerous for novices. Find your first bomb bag, then I'll be happy to restock you.",
+      "ok": "Understood"
+    },
     "notEnoughRupees": {
       "name": "Not enough rupees",
       "text": "Come back when you have gathered more rupees!",

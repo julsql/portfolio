@@ -14,7 +14,6 @@ export const SPRITES = {
   rock: `${B}/pierre.png`,
   fire: `${B}/fire.svg`,
   tree: `${B}/tree.svg`,
-  door: `${B}/door.svg`,
   bat: `${B}/bat.png`,
   scorpion: `${B}/scorpion.png`,
   linkHeart: `${B}/link-heart.svg`,

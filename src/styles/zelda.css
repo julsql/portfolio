@@ -776,6 +776,16 @@ img.cave-mouth {
   color: var(--c-gold);
   top: calc(var(--tile) * 0.9);
 }
+.landmark-shop .shop-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.landmark-shop .shop-price-rupee {
+  width: calc(var(--tile) * 0.35);
+  height: auto;
+  image-rendering: pixelated;
+}
 
 /* The grabbable crown shimmers to invite interaction. */
 .landmark-crown .landmark-icon {

@@ -100,6 +100,21 @@
       "text": "Tu ne peux pas attraper la fée à mains nues — il te faut un flacon vide pour la capturer.",
       "ok": "Compris"
     },
+    "needsBottlePotion": {
+      "name": "Marchand",
+      "text": "Je verse la potion, je ne vends pas le flacon ! Reviens avec un flacon vide pour l'emporter.",
+      "ok": "Compris"
+    },
+    "needsBow": {
+      "name": "Marchand",
+      "text": "Des flèches sans arc ? Trouve d'abord un arc, puis reviens m'en acheter une botte.",
+      "ok": "Compris"
+    },
+    "needsBombs": {
+      "name": "Marchand",
+      "text": "Les bombes, c'est dangereux pour les novices. Déniche d'abord ton premier sac de bombes, ensuite je te réapprovisionnerai.",
+      "ok": "Compris"
+    },
     "notEnoughRupees": {
       "name": "Pas assez de rubis",
       "text": "Reviens lorsque tu auras réuni davantage de rubis !",

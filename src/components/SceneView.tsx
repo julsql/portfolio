@@ -642,7 +642,13 @@ export default function SceneView(props: Props) {
     if (l.kind === "bossDoor") {
       const ganon = l.ref.startsWith("ganon");
       const opened = unlockedDoors.has(l.ref);
-      const sprite = opened ? SPRITES.doorDungeonOpen : SPRITES.doorBossLocked;
+      const sprite = ganon
+        ? opened
+          ? SPRITES.doorOpen
+          : SPRITES.doorBossLocked
+        : opened
+          ? SPRITES.doorDungeonOpen
+          : SPRITES.doorDungeon;
       const cls = `landmark landmark-boss-door${opened ? " unlocked" : ""}${
         ganon ? " for-ganon" : ""
       }`;
@@ -735,7 +741,12 @@ export default function SceneView(props: Props) {
           aria-label={t(`shop.${drop?.kind ?? "item"}`)}
         >
           {!sold && <img className="item-sprite shop-icon" src={icon} alt="" />}
-          {!sold && <span className="landmark-label">{l.price ?? 0}r</span>}
+          {!sold && (
+            <span className="landmark-label shop-price">
+              {l.price ?? 0}
+              <img className="shop-price-rupee" src={SPRITES.rupee.green} alt="" />
+            </span>
+          )}
         </button>
       );
     }
@@ -766,7 +777,7 @@ export default function SceneView(props: Props) {
           onClick={() => interact(l)}
           aria-label={t("world.ganon_door")}
         >
-          <img className="landmark-icon door-icon" src={SPRITES.door} alt="" />
+          <img className="landmark-icon door-icon" src={SPRITES.doorOpen} alt="" />
         </button>
       );
     }
@@ -782,11 +793,7 @@ export default function SceneView(props: Props) {
           onClick={() => interact(l)}
           aria-label={t("world.exit")}
         >
-          <img
-            className="landmark-icon door-icon"
-            src={labelled ? SPRITES.door : SPRITES.doorOpen}
-            alt=""
-          />
+          <img className="landmark-icon door-icon" src={SPRITES.doorOpen} alt="" />
           {labelled && <span className="landmark-label">{t("world.exit")}</span>}
         </button>
       );
