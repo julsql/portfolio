@@ -506,16 +506,18 @@ export default function SceneView(props: Props) {
 
   const boss = enemies.find((e) => e.random);
 
-  // Before grabbing the sword, the explore hint just nudges the player to
-  // walk around. Once Link is armed, every button-driven item the player
-  // owns adds its segment so the HUD lists what they can actually do.
+  // Each button-driven item the player owns appends its own segment to the
+  // hint as soon as it is picked up — regardless of whether the sword was
+  // grabbed first. If the player has nothing actionable yet, fall back to
+  // the base "walk onto a place" nudge.
   const buildDesktopHint = (): string => {
-    if (!hasSword) return t("hud.hint");
-    const segments = [t("hud.hint_move"), t("hud.hint_seg_sword")];
+    const segments: string[] = [];
+    if (hasSword) segments.push(t("hud.hint_seg_sword"));
     if (hasBow) segments.push(t("hud.hint_seg_bow"));
     if (hasBombs) segments.push(t("hud.hint_seg_bomb"));
     if (bottles.length > 0) segments.push(t("hud.hint_seg_bottle"));
-    return segments.join(" · ");
+    if (segments.length === 0) return t("hud.hint");
+    return [t("hud.hint_move"), ...segments].join(" · ");
   };
 
   return (
