@@ -26,6 +26,7 @@ interface Props {
   paused: boolean;
   hasSword: boolean;
   hasBow: boolean;
+  hasBombs: boolean;
   arrows: number;
   bombs: number;
   smallKeys: number;
@@ -97,7 +98,7 @@ const bottleSrc = (b: "empty" | "potion" | "fairy") =>
 export default function SceneView(props: Props) {
   const { scene, initialHero, onInteract, onPickup, onHit } = props;
   const { onBossDefeated, onMonsterDefeated, onRupee, onHeal } = props;
-  const { paused, hasSword, hasBow, arrows, bombs, bottles, opened, unlockedDoors } = props;
+  const { paused, hasSword, hasBow, hasBombs, arrows, bombs, bottles, opened, unlockedDoors } = props;
   const { health, maxHearts, rupees, invulnerable } = props;
   const { hasBossKey, hasTriforce, smallKeys, consumeArrow, consumeBomb, useBottle } = props;
   const { t } = useTranslation();
@@ -505,6 +506,18 @@ export default function SceneView(props: Props) {
 
   const boss = enemies.find((e) => e.random);
 
+  // Before grabbing the sword, the explore hint just nudges the player to
+  // walk around. Once Link is armed, every button-driven item the player
+  // owns adds its segment so the HUD lists what they can actually do.
+  const buildDesktopHint = (): string => {
+    if (!hasSword) return t("hud.hint");
+    const segments = [t("hud.hint_move"), t("hud.hint_seg_sword")];
+    if (hasBow) segments.push(t("hud.hint_seg_bow"));
+    if (hasBombs) segments.push(t("hud.hint_seg_bomb"));
+    if (bottles.length > 0) segments.push(t("hud.hint_seg_bottle"));
+    return segments.join(" · ");
+  };
+
   return (
     <div className="overworld">
       <div className="status">
@@ -561,9 +574,7 @@ export default function SceneView(props: Props) {
           t("world.hot")
         ) : (
           <>
-            <span className="hint-desktop">
-              {hasBow ? t("hud.hint_bow") : hasSword ? t("hud.hint_sword") : t("hud.hint")}
-            </span>
+            <span className="hint-desktop">{buildDesktopHint()}</span>
             <span className="hint-touch">{t("hud.hint_touch")}</span>
           </>
         )}

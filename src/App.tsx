@@ -611,6 +611,7 @@ export default function App() {
             paused={paused}
             hasSword={hasSword}
             hasBow={hasBow}
+            hasBombs={hasBombs}
             arrows={arrows}
             bombs={bombs}
             smallKeys={smallKeys}

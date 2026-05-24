@@ -13,6 +13,11 @@
     "sound": "Sound",
     "hint_sword": "Arrows / WASD to move · Space to swing the sword",
     "hint_bow": "Space: sword · X: bow · B: bomb · U/I: bottles",
+    "hint_move": "Arrows / WASD to move",
+    "hint_seg_sword": "Space: sword",
+    "hint_seg_bow": "X: bow",
+    "hint_seg_bomb": "B: bomb",
+    "hint_seg_bottle": "U / I: bottles",
     "inventory": "Inventory"
   },
   "world": {
