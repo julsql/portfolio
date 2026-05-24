@@ -124,10 +124,11 @@ export default function SceneView(props: Props) {
       setRocks((rs) => rs.map((r) => (r.id === id ? { ...r, x, y } : r))),
     [],
   );
-  const removeRock = useCallback(
-    (id: string) => setRocks((rs) => rs.filter((r) => r.id !== id)),
-    [],
-  );
+  const removeRock = useCallback((id: string) => {
+    // The only path that drops a rock is heaving it into water — splash!
+    sound.sfx("splash");
+    setRocks((rs) => rs.filter((r) => r.id !== id));
+  }, []);
   const drown = useCallback(() => {
     // Splash + a hurt cry on top — Link doesn't go under in silence.
     sound.sfx("drown");
