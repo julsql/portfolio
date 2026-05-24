@@ -6,6 +6,7 @@ import {
   CASTLE_ID,
   CONSUMABLE_SHOP_REFS,
   GANON_ID,
+  GANON_RECOVERY_HEART_REFS,
   OVERWORLD_ID,
   SCENES,
   SHOP_ID,
@@ -32,6 +33,8 @@ const START_HEALTH = 6; // 3 hearts × 2 half-units
 const INVULN_MS = 800;
 const MAX_BOTTLES = 2;
 const FAIRY_REVIVE_HEALTH = 6;
+/** Quiver / bomb bag cap. */
+const MAX_AMMO = 30;
 
 export default function App() {
   const { i18n } = useTranslation();
@@ -97,7 +100,10 @@ export default function App() {
     if (heartTaken) landmarks = landmarks.filter((l) => l.kind !== "heart");
     if (hasSword) landmarks = landmarks.filter((l) => l.kind !== "sword");
     if (collected.size) {
-      landmarks = landmarks.filter((l) => !(l.kind === "rupee" && collected.has(l.ref)));
+      landmarks = landmarks.filter(
+        (l) =>
+          !((l.kind === "rupee" || l.kind === "recoveryHeart") && collected.has(l.ref)),
+      );
     }
     if (opened.size) {
       // Picked-up items vanish; opened chests/locked chests stay but render
@@ -141,6 +147,20 @@ export default function App() {
       let changed = false;
       const next = new Set(s);
       for (const ref of CONSUMABLE_SHOP_REFS) {
+        if (next.delete(ref)) changed = true;
+      }
+      return changed ? next : s;
+    });
+  }, [sceneId]);
+
+  // Recovery hearts in Ganon's room re-spawn each visit (Ganon now needs 6
+  // hits and tosses fireballs, so the room has to stay survivable on retries).
+  useEffect(() => {
+    if (sceneId !== GANON_ID) return;
+    setCollected((s) => {
+      let changed = false;
+      const next = new Set(s);
+      for (const ref of GANON_RECOVERY_HEART_REFS) {
         if (next.delete(ref)) changed = true;
       }
       return changed ? next : s;
@@ -265,14 +285,14 @@ export default function App() {
     switch (drop.kind) {
       case "bow":
         setHasBow(true);
-        setArrows((n) => n + 10);
+        setArrows((n) => Math.min(MAX_AMMO, n + 10));
         return "bow";
       case "arrows":
-        setArrows((n) => n + (drop.amount ?? 5));
+        setArrows((n) => Math.min(MAX_AMMO, n + (drop.amount ?? 5)));
         return "arrow";
       case "bombs":
         setHasBombs(true);
-        setBombs((n) => n + (drop.amount ?? 1));
+        setBombs((n) => Math.min(MAX_AMMO, n + (drop.amount ?? 1)));
         return "bomb";
       case "smallKey":
         setSmallKeys((n) => n + 1);
@@ -328,7 +348,7 @@ export default function App() {
           sound.sfx("door");
           goToScene(l.ref, l.spawn ?? SCENES[l.ref].heroStart);
         } else if (hasKey) {
-          sound.sfx("unlock");
+          sound.sfx("puzzleSolved");
           setUnlockedDoors((s) => new Set(s).add(l.ref));
           goToScene(l.ref, l.spawn ?? SCENES[l.ref].heroStart);
         } else {
@@ -418,6 +438,13 @@ export default function App() {
       setRupees((n) => n + RUPEE_VALUE[l.rupee ?? "green"]);
       return;
     }
+    if (l.kind === "recoveryHeart") {
+      if (collected.has(l.ref)) return;
+      // SFX is fired from SceneView so the pickup feels instant.
+      setCollected((c) => new Set(c).add(l.ref));
+      setHealth((h) => Math.min(maxHealth, h + 2));
+      return;
+    }
     if (l.kind === "fairy") {
       if (opened.has(l.ref)) return;
       const slot = bottles.findIndex((b) => b === "empty");
@@ -434,7 +461,7 @@ export default function App() {
     }
     if (l.kind === "triforce") {
       if (opened.has(l.ref)) return;
-      sound.sfx("chest");
+      sound.sfx("item");
       setOpened((s) => new Set(s).add(l.ref));
       setHasTriforce(true);
       setItemGet("triforce");
@@ -446,6 +473,12 @@ export default function App() {
   /** Walk-onto rupee pickup, dropped by a broken pot (random colour). */
   const onRupee = useCallback((color: RupeeColor) => setRupees((n) => n + RUPEE_VALUE[color]), []);
 
+  /** Heal Link by N half-heart units (clamped to maxHealth). */
+  const onHeal = useCallback(
+    (units: number) => setHealth((h) => Math.min(maxHealth, h + units)),
+    [maxHealth],
+  );
+
   /** Mini-boss took its last hit — unblock the Triforce fragment. */
   const onMonsterDefeated = useCallback(() => setMiniBossDefeated(true), []);
 
@@ -455,7 +488,8 @@ export default function App() {
       const content = bottles[slot];
       if (!content || content === "empty") return;
       if (content === "potion" || content === "fairy") {
-        sound.sfx(content === "fairy" ? "fairyRevive" : "heart");
+        if (content === "fairy") sound.sfx("fairyRevive");
+        else sound.drinkPotion();
         setHealth(maxHealth);
         setBottles((bs) => bs.map((b, i) => (i === slot ? "empty" : b)));
       }
@@ -551,6 +585,7 @@ export default function App() {
             onBossDefeated={onBossDefeated}
             onMonsterDefeated={onMonsterDefeated}
             onRupee={onRupee}
+            onHeal={onHeal}
             useBottle={useBottle}
             paused={paused}
             hasSword={hasSword}

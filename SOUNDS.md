@@ -53,6 +53,8 @@ picks the matching bank and `sound.sfx()` plays one variant at random.
 | `bomb-drop.wav` | A bomb hitting the ground | [`OOT_Bomb_Drop.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Bomb_Drop.wav) |
 | `bomb-blow.wav` | A bomb exploding | [`OOT_Bomb_Blow.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Bomb_Blow.wav) |
 | `pot-shatter.wav` | A pot shattering | [`OOT_Pot_Shatter.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Pot_Shatter.wav) |
+| `fireball-shoot.wav` | Ganondorf throwing a fireball in his lair | [`OOT_Anubis_Fire_Shoot.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Anubis_Fire_Shoot.wav) |
+| `fireball-burn.wav` | A fireball hitting a wall / Link | [`OOT_Anubis_Fire_Burn.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Anubis_Fire_Burn.wav) |
 
 ## 💔 Link
 
@@ -74,15 +76,19 @@ picks the matching bank and `sound.sfx()` plays one variant at random.
 | --- | --- | --- |
 | `rupee.wav` | Picking up a rupee | [`OOT_Get_Rupee.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Get_Rupee.wav) |
 | `fanfare-heart.wav` | "Get Heart Container" fanfare | [`OOT_Fanfare_HeartContainer.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Fanfare_HeartContainer.wav) |
+| `heart-refill.wav` | A heart refilling — played in cascade after drinking a red potion | [`OOT_Get_Heart.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Get_Heart.wav) |
 | `fanfare-item.wav` | "Get Item" fanfare — sword pedestal, Triforce piece, Ganon victory | [`OOT_Fanfare_Item.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Fanfare_Item.wav) |
-| `chest-open.wav` | Opening a small chest — also shop purchases | [`OOT_Chest_Small.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Chest_Small.wav) |
+| `chest-open.wav` | Opening a small chest (no longer wired — kept for fallback) | [`OOT_Chest_Small.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Chest_Small.wav) |
+| `get-small-item.wav` | "Get small item" jingle — shop purchases & chest opens | [`OOT_Get_SmallItem1.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Get_SmallItem1.wav) |
+| `link-drink.wav` | Link gulping a drink — played when emptying a red potion bottle | [`OOT_YoungLink_Gulp.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_YoungLink_Gulp.wav) |
 | `fairy.wav` | Catching a fairy / fairy auto-revive | [`OOT_Fairy.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Fairy.wav) |
 
 ## 🚪 Doors & secrets
 
 | File in `public/sound/` | Description | OOT source |
 | --- | --- | --- |
-| `door-unlock.wav` | Unlocking a door (chained chest, first open of a boss door) | [`OOT_Door_Unlock.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Door_Unlock.wav) |
+| `door-unlock.wav` | Unlocking a chained chest | [`OOT_Door_Unlock.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Door_Unlock.wav) |
+| `puzzle-solved.wav` | "Riddle solved" jingle — first open of a boss / mini-boss door | [`OOT_Secret.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Secret.wav) |
 | `door-open.wav` | Opening a regular door (scene transitions) | [`OOT_Door_Regular_Open.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Door_Regular_Open.wav) |
 | `door-boss.wav` | Unlocking a boss-room door (Ganon's lair entry) | [`OOT_Door_Boss_Unlock.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Door_Boss_Unlock.wav) |
 | `error.wav` | Error sound — no key, not enough rupees, no empty bottle… | [`OOT_MainMenu_Error.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_MainMenu_Error.wav) |
@@ -110,6 +116,6 @@ overhaul and are kept as the ambient background.
 
 ---
 
-**Counts** — 54 SFX samples (OOT) + 5 music tracks.
+**Counts** — 60 SFX samples (OOT) + 5 music tracks.
 **Multi-variant banks** — 6 footstep banks (3-4 variants each) + `attackShout`
 (4) + `hurt` / `hurtBoss` / `burn` (3 each).

@@ -32,6 +32,8 @@ export type Sfx =
   | "bombDrop"
   | "explosion"
   | "potBreak"
+  | "fireballShoot"
+  | "fireballBurn"
   // Link state
   | "hurt"
   | "hurtBoss"
@@ -43,13 +45,16 @@ export type Sfx =
   // Pickups & containers
   | "pickup"
   | "heart"
+  | "heartRefill"
   | "item"
   | "chest"
   | "buy"
+  | "drink"
   | "triforceGet"
   | "fairyRevive"
   // Doors & secrets
   | "unlock"
+  | "puzzleSolved"
   | "door"
   | "enterLair"
   | "lockedNo"
@@ -105,6 +110,8 @@ const FILES: Partial<Record<Sfx, string | string[]>> = {
   bombDrop: `${S}/bomb-drop.wav`,
   explosion: `${S}/bomb-blow.wav`,
   potBreak: `${S}/pot-shatter.wav`,
+  fireballShoot: `${S}/fireball-shoot.wav`,
+  fireballBurn: `${S}/fireball-burn.wav`,
 
   // Link state — 3 variants for each so successive hits don't repeat.
   hurt: [`${S}/link-hurt-1.wav`, `${S}/link-hurt-2.wav`, `${S}/link-hurt-3.wav`],
@@ -118,14 +125,17 @@ const FILES: Partial<Record<Sfx, string | string[]>> = {
   // Pickups & containers.
   pickup: `${S}/rupee.wav`,
   heart: `${S}/fanfare-heart.wav`,
+  heartRefill: `${S}/heart-refill.wav`,
   item: `${S}/fanfare-item.wav`,
-  chest: `${S}/chest-open.wav`,
-  buy: `${S}/chest-open.wav`,
+  chest: `${S}/get-small-item.wav`,
+  buy: `${S}/get-small-item.wav`,
+  drink: `${S}/link-drink.wav`,
   triforceGet: `${S}/fanfare-item.wav`,
   fairyRevive: `${S}/fairy.wav`,
 
   // Doors & secrets.
   unlock: `${S}/door-unlock.wav`,
+  puzzleSolved: `${S}/puzzle-solved.wav`,
   door: `${S}/door-open.wav`,
   enterLair: `${S}/door-boss.wav`,
   lockedNo: `${S}/error.wav`,
@@ -208,6 +218,22 @@ class SoundEngine {
     const a = new Audio(url);
     a.volume = SFX_VOL;
     void a.play().catch(() => {});
+  }
+
+  /**
+   * Drinking a red potion in OOT: Link gulps, then hearts refill one by one
+   * with a rapid cascade of "ting" sounds. We approximate it by playing the
+   * gulp, then scheduling N heart-refill tings spaced ~140ms apart.
+   */
+  drinkPotion() {
+    if (this.muted) return;
+    this.sfx("drink");
+    const TINGS = 4;
+    const START = 450;
+    const GAP = 140;
+    for (let i = 0; i < TINGS; i++) {
+      setTimeout(() => this.sfx("heartRefill"), START + i * GAP);
+    }
   }
 
   music(track: Track) {

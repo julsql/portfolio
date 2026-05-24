@@ -92,6 +92,7 @@ export interface LandmarkRef {
     | "npc"
     | "door"
     | "heart"
+    | "recoveryHeart"
     | "sword"
     | "rupee"
     | "cave"

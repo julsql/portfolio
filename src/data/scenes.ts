@@ -90,7 +90,11 @@ const castle: Scene = {
   ],
 };
 
-/** The secret boss chamber behind the heart. Ganondorf needs 3 sword hits. */
+/**
+ * The secret boss chamber behind the heart. Ganondorf needs 6 sword hits
+ * and throws fireballs (see SceneView). Recovery hearts on the side floor
+ * re-spawn every visit so the fight stays survivable.
+ */
 const ganonRoom: Scene = {
   id: GANON_ID,
   width: 11,
@@ -99,14 +103,14 @@ const ganonRoom: Scene = {
   heroStart: { x: 5, y: 6, facing: "up" },
   landmarks: [
     { x: 5, y: 7, kind: "exit", ref: CASTLE_ID, spawn: { x: 6, y: 3, facing: "down" } },
-    { x: 1, y: 6, kind: "rupee", ref: "rupee-gn-1", pickup: true, rupee: "blue" },
-    { x: 9, y: 6, kind: "rupee", ref: "rupee-gn-2", pickup: true, rupee: "red" },
+    { x: 1, y: 6, kind: "recoveryHeart", ref: "heart-gn-1", pickup: true },
+    { x: 9, y: 6, kind: "recoveryHeart", ref: "heart-gn-2", pickup: true },
   ],
   decor: [
     { x: 1, y: 1, icon: SPRITES.fire, hazard: true },
     { x: 9, y: 1, icon: SPRITES.fire, hazard: true },
   ],
-  enemies: [{ id: "ganondorf", x: 5, y: 3, random: true, hp: 3, sprites: SPRITES.ganondorf }],
+  enemies: [{ id: "ganondorf", x: 5, y: 3, random: true, hp: 6, sprites: SPRITES.ganondorf }],
 };
 
 /**
@@ -178,7 +182,7 @@ const bossRoom: Scene = {
   height: 8,
   tiles: buildBossRoom(),
   heroStart: { x: 5, y: 6, facing: "up" },
-  music: "ganon",
+  music: "dungeon",
   landmarks: [
     { x: 5, y: 7, kind: "exit", ref: CAVE_ID, spawn: { x: 6, y: 2, facing: "down" } },
     { x: 5, y: 1, kind: "triforce", ref: "triforce-piece", pickup: true },
@@ -262,6 +266,9 @@ export const CONSUMABLE_SHOP_REFS: ReadonlyArray<string> = [
   "shop-arrows",
   "shop-potion",
 ];
+
+/** Recovery hearts that re-spawn each time the hero enters Ganon's room. */
+export const GANON_RECOVERY_HEART_REFS: ReadonlyArray<string> = ["heart-gn-1", "heart-gn-2"];
 
 export const SCENES: Record<string, Scene> = {
   [OVERWORLD_ID]: overworld,

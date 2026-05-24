@@ -50,16 +50,17 @@ describe("useMovement", () => {
     expect(result.current.hero).toMatchObject({ x: 9, y: 9 });
   });
 
-  it("collects a rupee by walking over it", () => {
+  it("collects a pickup landmark by walking over it", () => {
     const onPickup = vi.fn();
-    // Ganon's lair always holds rupees (the overworld ones are optional).
-    const rupee = ganon.landmarks.find((l) => l.kind === "rupee")!; // (1,6)
+    // Ganon's lair now holds recovery hearts (was rupees before fireballs +
+    // 6 HP made the fight harsh enough that the room needs healing).
+    const pickup = ganon.landmarks.find((l) => l.pickup)!; // (1,6)
     const { result } = renderHook(() =>
-      useMovement(ganon, { x: rupee.x + 1, y: rupee.y, facing: "left" }, handlers({ onPickup })),
+      useMovement(ganon, { x: pickup.x + 1, y: pickup.y, facing: "left" }, handlers({ onPickup })),
     );
     act(() => result.current.move("left"));
-    expect(onPickup).toHaveBeenCalledWith(rupee);
-    expect(result.current.hero).toMatchObject({ x: rupee.x, y: rupee.y });
+    expect(onPickup).toHaveBeenCalledWith(pickup);
+    expect(result.current.hero).toMatchObject({ x: pickup.x, y: pickup.y });
   });
 
   it("throws a rock into water, removing it", () => {

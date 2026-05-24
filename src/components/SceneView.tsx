@@ -20,6 +20,8 @@ interface Props {
   onBossDefeated: () => void;
   onMonsterDefeated: () => void;
   onRupee: (color: RupeeColor) => void;
+  /** Heal Link by a number of half-heart units (pot drops at low HP). */
+  onHeal: (units: number) => void;
   useBottle: (slot: number) => void;
   paused: boolean;
   hasSword: boolean;
@@ -45,6 +47,8 @@ type Dir = HeroType["facing"];
 type Arrow = { id: number; x: number; y: number; dir: Dir };
 type Bomb = { id: number; x: number; y: number; exploding: boolean };
 type Drop = { id: number; x: number; y: number; color: RupeeColor };
+type HeartDrop = { id: number; x: number; y: number };
+type Fireball = { id: number; x: number; y: number; dir: Dir };
 
 const RUPEE_COLORS: RupeeColor[] = ["green", "green", "green", "blue", "blue", "red"];
 const randomRupee = (): RupeeColor => RUPEE_COLORS[Math.floor(Math.random() * RUPEE_COLORS.length)];
@@ -67,6 +71,10 @@ const ATTACK_MS = 260;
 const ARROW_MS = 80;
 const BOMB_FUSE_MS = 1500;
 const BOMB_FLASH_MS = 380;
+const FIREBALL_MS = 160;
+const FIREBALL_SPAWN_MS = 1800;
+/** Chance that a pot smashed at low HP drops a heart instead of a rupee. */
+const LOW_HEALTH_HEART_CHANCE = 0.5;
 const DELTA: Record<Dir, [number, number]> = {
   up: [0, -1],
   down: [0, 1],
@@ -88,7 +96,7 @@ const bottleSrc = (b: "empty" | "potion" | "fairy") =>
 
 export default function SceneView(props: Props) {
   const { scene, initialHero, onInteract, onPickup, onHit } = props;
-  const { onBossDefeated, onMonsterDefeated, onRupee } = props;
+  const { onBossDefeated, onMonsterDefeated, onRupee, onHeal } = props;
   const { paused, hasSword, hasBow, arrows, bombs, bottles, opened, unlockedDoors } = props;
   const { health, maxHearts, rupees, invulnerable } = props;
   const { hasBossKey, hasTriforce, smallKeys, consumeArrow, consumeBomb, useBottle } = props;
@@ -105,6 +113,10 @@ export default function SceneView(props: Props) {
   const [placedBombs, setPlacedBombs] = useState<Bomb[]>([]);
   /** Rupees dropped by broken pots, waiting for the hero to walk over them. */
   const [drops, setDrops] = useState<Drop[]>([]);
+  /** Recovery hearts dropped by pots smashed while Link is on his last heart. */
+  const [heartDrops, setHeartDrops] = useState<HeartDrop[]>([]);
+  /** Fireballs Ganondorf throws at Link inside his lair. */
+  const [fireballs, setFireballs] = useState<Fireball[]>([]);
   const nextId = useRef(0);
 
   const pushRock = useCallback(
@@ -123,6 +135,11 @@ export default function SceneView(props: Props) {
 
   const interact = useCallback(
     (l: LandmarkRef) => {
+      // Boss / mini-boss rooms lock the exit while the boss is still alive.
+      if (l.kind === "exit" && enemies.some((e) => e.random)) {
+        sound.sfx("lockedNo");
+        return;
+      }
       if (l.kind === "heart") sound.sfx("heart");
       else if (l.kind === "sword") sound.sfx("item");
       else if (l.kind === "door") sound.sfx("enterLair");
@@ -130,12 +147,13 @@ export default function SceneView(props: Props) {
       else if (l.kind === "project" || l.kind === "castle" || l.kind === "npc") sound.sfx("select");
       onInteract(l);
     },
-    [onInteract],
+    [onInteract, enemies],
   );
 
   const pickup = useCallback(
     (l: LandmarkRef) => {
       if (l.kind === "rupee") sound.sfx("pickup");
+      else if (l.kind === "recoveryHeart") sound.sfx("heartRefill");
       onPickup(l);
     },
     [onPickup],
@@ -284,16 +302,32 @@ export default function SceneView(props: Props) {
       if (pot) {
         sound.sfx("potBreak");
         setPots((ps) => ps.filter((p) => p.id !== pot.id));
-        // Drop a freshly-coloured rupee on the broken tile — the hero picks
-        // it up by walking onto it (see the drops useEffect below).
-        setDrops((ds) => [
-          ...ds,
-          { id: nextId.current++, x: pot.x, y: pot.y, color: randomRupee() },
-        ]);
+        // At low health (one heart or less), pots have a chance to drop a
+        // recovery heart instead of the usual random rupee — gives the hero
+        // a fighting chance to bottle a comeback.
+        const lowHealth = health <= 2;
+        if (lowHealth && Math.random() < LOW_HEALTH_HEART_CHANCE) {
+          setHeartDrops((ds) => [...ds, { id: nextId.current++, x: pot.x, y: pot.y }]);
+        } else {
+          setDrops((ds) => [
+            ...ds,
+            { id: nextId.current++, x: pot.x, y: pot.y, color: randomRupee() },
+          ]);
+        }
       }
     },
-    [enemies, pots, onBossDefeated, onMonsterDefeated],
+    [enemies, pots, health, onBossDefeated, onMonsterDefeated],
   );
+
+  // Pick up any heart dropped on the tile the hero just walked onto.
+  useEffect(() => {
+    if (paused) return;
+    const drop = heartDrops.find((d) => d.x === hero.x && d.y === hero.y);
+    if (!drop) return;
+    sound.sfx("heartRefill");
+    setHeartDrops((ds) => ds.filter((d) => d.id !== drop.id));
+    onHeal(2);
+  }, [hero, heartDrops, paused, onHeal]);
 
   // ── Sword: Space strikes the tile in front; kills enemies / wounds boss ──
   useEffect(() => {
@@ -401,6 +435,68 @@ export default function SceneView(props: Props) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [paused, shoot, dropBomb]);
+
+  // ── Ganondorf throws fireballs at Link ───────────────────────────────────
+  // Periodic spawn from Ganon's current tile toward Link's dominant axis.
+  // We read live positions through refs so the interval can run cheaply.
+  const enemiesRef = useRef(enemies);
+  useEffect(() => {
+    enemiesRef.current = enemies;
+  }, [enemies]);
+  const ganonAlive = enemies.some((e) => e.id === "ganondorf");
+  useEffect(() => {
+    if (paused || !ganonAlive) return;
+    const id = setInterval(() => {
+      const g = enemiesRef.current.find((e) => e.id === "ganondorf");
+      if (!g) return;
+      const h = heroRef.current;
+      const dxRaw = h.x - g.x;
+      const dyRaw = h.y - g.y;
+      const dir: Dir =
+        Math.abs(dxRaw) >= Math.abs(dyRaw)
+          ? dxRaw >= 0
+            ? "right"
+            : "left"
+          : dyRaw >= 0
+            ? "down"
+            : "up";
+      const [dx, dy] = DELTA[dir];
+      sound.sfx("fireballShoot");
+      setFireballs((fs) => [
+        ...fs,
+        { id: nextId.current++, x: g.x + dx, y: g.y + dy, dir },
+      ]);
+    }, FIREBALL_SPAWN_MS);
+    return () => clearInterval(id);
+  }, [paused, ganonAlive]);
+
+  // Step fireballs along their direction; despawn on walls / out of bounds /
+  // when they hit Link.
+  useEffect(() => {
+    if (paused || fireballs.length === 0) return;
+    const id = setInterval(() => {
+      setFireballs((prev) =>
+        prev.flatMap((f) => {
+          const h = heroRef.current;
+          if (f.x === h.x && f.y === h.y) {
+            sound.sfx("fireballBurn");
+            onHit();
+            return [];
+          }
+          const [dx, dy] = DELTA[f.dir];
+          const nx = f.x + dx;
+          const ny = f.y + dy;
+          if (nx < 0 || ny < 0 || nx >= scene.width || ny >= scene.height) return [];
+          if (BLOCKED.includes(scene.tiles[ny][nx])) {
+            sound.sfx("fireballBurn");
+            return [];
+          }
+          return [{ ...f, x: nx, y: ny }];
+        }),
+      );
+    }, FIREBALL_MS);
+    return () => clearInterval(id);
+  }, [paused, fireballs.length, scene, onHit]);
 
   const boss = enemies.find((e) => e.random);
 
@@ -551,6 +647,26 @@ export default function SceneView(props: Props) {
           />
         ))}
 
+        {heartDrops.map((d) => (
+          <img
+            key={`hd-${d.id}`}
+            className="drop-rupee drop-heart"
+            style={tileStyle(d.x, d.y)}
+            src={SPRITES.heart.full}
+            alt=""
+          />
+        ))}
+
+        {fireballs.map((f) => (
+          <img
+            key={`fb-${f.id}`}
+            className="fireball-fx"
+            style={tileStyle(f.x, f.y)}
+            src={SPRITES.fire}
+            alt=""
+          />
+        ))}
+
         {placedBombs.map((b) => (
           <img
             key={`bomb-${b.id}`}
@@ -623,6 +739,17 @@ export default function SceneView(props: Props) {
         >
           <img className="item-sprite" src={SPRITES.heart.full} alt="" />
         </button>
+      );
+    }
+    if (l.kind === "recoveryHeart") {
+      return (
+        <img
+          key={key}
+          className="rupee recovery-heart"
+          style={tileStyle(l.x, l.y)}
+          src={SPRITES.heart.full}
+          alt=""
+        />
       );
     }
     if (l.kind === "sword") {
