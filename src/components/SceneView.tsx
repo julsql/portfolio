@@ -129,7 +129,9 @@ export default function SceneView(props: Props) {
     [],
   );
   const drown = useCallback(() => {
+    // Splash + a hurt cry on top — Link doesn't go under in silence.
     sound.sfx("drown");
+    sound.sfx("hurt");
     onHit();
   }, [onHit]);
 
