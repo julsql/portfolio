@@ -665,6 +665,14 @@ img.npc-icon {
 .door-icon {
   animation: none;
 }
+.ladder-icon {
+  animation: none;
+  width: calc(var(--tile) * 1.1);
+  height: calc(var(--tile) * 1.4);
+  margin-left: calc(var(--tile) * -0.05);
+  margin-top: calc(var(--tile) * -0.35);
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.6));
+}
 .landmark-label {
   position: absolute;
   top: calc(var(--tile) * 1.1);

@@ -23,7 +23,8 @@
     "ganon_door": "Antre de Ganon",
     "cave": "Caverne",
     "fountain": "Fontaine des fées",
-    "bossDoor": "Porte du boss"
+    "bossDoor": "Porte du boss",
+    "ladder": "Échelle (remonter à la surface)"
   },
   "npc": {
     "name": "???",

@@ -4,7 +4,7 @@ import type { EnemySpec, Hero as HeroType, LandmarkRef, Pot, Scene, TileKind } f
 import type { Sfx } from "../audio/sound";
 import { castleById, projectById } from "../data/projects";
 import { BLOCKED } from "../data/map";
-import { OVERWORLD_ID } from "../data/scenes";
+import { CAVE_ID, OVERWORLD_ID } from "../data/scenes";
 import { SPRITES, type RupeeColor } from "../data/sprites";
 import { sound } from "../audio/sound";
 import { useMovement } from "../hooks/useMovement";
@@ -948,15 +948,20 @@ export default function SceneView(props: Props) {
       // Only flag the doorway as "Sortie" when it leaves to the open world;
       // internal doors (cave ↔ shop / fountain / back-rooms) are just doors.
       const labelled = l.ref === OVERWORLD_ID;
+      // The cave is a hole in the mountain — climb out via a ladder, not a
+      // door. Inner sub-rooms (shop / fountain / boss room) keep doors.
+      const isCaveLadder = labelled && scene.id === CAVE_ID;
+      const sprite = isCaveLadder ? SPRITES.ladder : SPRITES.doorOpen;
+      const iconClass = isCaveLadder ? "ladder-icon" : "door-icon";
       return (
         <button
           key={key}
           className={`landmark landmark-exit${labelled ? "" : " landmark-door-silent"}`}
           style={tileStyle(l.x, l.y)}
           onClick={() => interact(l)}
-          aria-label={t("world.exit")}
+          aria-label={t(isCaveLadder ? "world.ladder" : "world.exit")}
         >
-          <img className="landmark-icon door-icon" src={SPRITES.doorOpen} alt="" />
+          <img className={`landmark-icon ${iconClass}`} src={sprite} alt="" />
           {labelled && <span className="landmark-label">{t("world.exit")}</span>}
         </button>
       );

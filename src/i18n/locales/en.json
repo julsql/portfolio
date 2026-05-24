@@ -23,7 +23,8 @@
     "ganon_door": "Ganon's lair",
     "cave": "Cave",
     "fountain": "Fairy fountain",
-    "bossDoor": "Boss door"
+    "bossDoor": "Boss door",
+    "ladder": "Ladder (climb back up)"
   },
   "npc": {
     "name": "???",
