@@ -5,6 +5,7 @@ import {
   BOSS_ID,
   CASTLE_ID,
   CONSUMABLE_SHOP_REFS,
+  FAIRY_REFS,
   GANON_ID,
   GANON_RECOVERY_HEART_REFS,
   OVERWORLD_ID,
@@ -185,6 +186,21 @@ export default function App() {
     setHealth((h) => Math.max(h - 1, 0));
   }, []);
 
+  /**
+   * Release one captured fairy back to the fountain. Called whenever a fairy
+   * is consumed (auto-revive or manual potion) so the world always holds two
+   * fairies in total — bottled or fluttering on the pool.
+   */
+  const releaseOneFairy = useCallback(() => {
+    setOpened((s) => {
+      const captured = FAIRY_REFS.find((ref) => s.has(ref));
+      if (!captured) return s;
+      const next = new Set(s);
+      next.delete(captured);
+      return next;
+    });
+  }, []);
+
   useEffect(() => {
     if (!started) return;
     if (health <= 0) {
@@ -194,6 +210,8 @@ export default function App() {
         sound.sfx("fairyRevive");
         setBottles((bs) => bs.map((b, i) => (i === slot ? "empty" : b)));
         setHealth(Math.min(maxHealth, FAIRY_REVIVE_HEALTH));
+        // The consumed fairy flies back to her pool.
+        releaseOneFairy();
         invulnRef.current = true;
         setInvuln(true);
         setTimeout(() => {
@@ -204,7 +222,7 @@ export default function App() {
       }
       setGameOver(true);
     }
-  }, [started, health, bottles, maxHealth]);
+  }, [started, health, bottles, maxHealth, releaseOneFairy]);
 
   // Loop the low-health beep on top of the music while the hero is on his
   // last full heart, regardless of which scene he is in.
@@ -488,13 +506,16 @@ export default function App() {
       const content = bottles[slot];
       if (!content || content === "empty") return;
       if (content === "potion" || content === "fairy") {
-        if (content === "fairy") sound.sfx("fairyRevive");
-        else sound.drinkPotion();
+        if (content === "fairy") {
+          sound.sfx("fairyRevive");
+          // Releasing the fairy from the bottle sends her home to the fountain.
+          releaseOneFairy();
+        } else sound.drinkPotion();
         setHealth(maxHealth);
         setBottles((bs) => bs.map((b, i) => (i === slot ? "empty" : b)));
       }
     },
-    [bottles, maxHealth],
+    [bottles, maxHealth, releaseOneFairy],
   );
 
   // Quick "use bottle" shortcuts: U for slot 1, I for slot 2.

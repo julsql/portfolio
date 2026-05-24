@@ -270,6 +270,14 @@ export const CONSUMABLE_SHOP_REFS: ReadonlyArray<string> = [
 /** Recovery hearts that re-spawn each time the hero enters Ganon's room. */
 export const GANON_RECOVERY_HEART_REFS: ReadonlyArray<string> = ["heart-gn-1", "heart-gn-2"];
 
+/**
+ * Fairies that live in the fountain pool. Used to keep the world's fairy
+ * count steady: whenever one is consumed (auto-revive or manual potion),
+ * one ref is released from the "captured" set so a fairy reappears at the
+ * fountain. Two fairies always exist — bottled or fluttering.
+ */
+export const FAIRY_REFS: ReadonlyArray<string> = ["fairy-1", "fairy-2"];
+
 export const SCENES: Record<string, Scene> = {
   [OVERWORLD_ID]: overworld,
   [CASTLE_ID]: castle,
