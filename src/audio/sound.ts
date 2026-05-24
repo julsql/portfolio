@@ -37,6 +37,7 @@ export type Sfx =
   // Link state
   | "hurt"
   | "hurtBoss"
+  | "fall"
   | "drown"
   | "splash"
   | "burn"
@@ -117,6 +118,7 @@ const FILES: Partial<Record<Sfx, string | string[]>> = {
   // Link state — 3 variants for each so successive hits don't repeat.
   hurt: [`${S}/link-hurt-1.wav`, `${S}/link-hurt-2.wav`, `${S}/link-hurt-3.wav`],
   hurtBoss: [`${S}/link-fall-1.wav`, `${S}/link-fall-2.wav`, `${S}/link-fall-3.wav`],
+  fall: [`${S}/link-fall-1.wav`, `${S}/link-fall-2.wav`, `${S}/link-fall-3.wav`],
   drown: `${S}/link-splash.wav`,
   splash: `${S}/link-splash.wav`,
   burn: [`${S}/link-hurt-1.wav`, `${S}/link-hurt-2.wav`, `${S}/link-hurt-3.wav`],

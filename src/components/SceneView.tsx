@@ -146,7 +146,9 @@ export default function SceneView(props: Props) {
       if (l.kind === "heart") sound.sfx("heart");
       else if (l.kind === "sword") sound.sfx("item");
       else if (l.kind === "door") sound.sfx("enterLair");
-      else if (l.kind === "exit" || l.kind === "cave") sound.sfx("door");
+      // Caves are holes in the ground — Link cries as he drops in.
+      else if (l.kind === "cave") sound.sfx("fall");
+      else if (l.kind === "exit") sound.sfx("door");
       else if (l.kind === "project" || l.kind === "castle" || l.kind === "npc") sound.sfx("select");
       onInteract(l);
     },
