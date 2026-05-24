@@ -35,12 +35,27 @@ const IMG: Record<Item, string> = {
   triforce: SPRITES.triforcePiece,
 };
 
+/** Items that ship with a per-key usage tip rendered below the item name. */
+const ITEMS_WITH_HINT = new Set<Item>([
+  "sword",
+  "bow",
+  "arrow",
+  "bomb",
+  "smallKey",
+  "bossKey",
+  "bottle",
+  "potion",
+  "fairy",
+]);
+
 /** Zelda-style "item get" celebration; auto-dismisses. */
 export default function ItemGet({ item, onDone }: Props) {
   const { t } = useTranslation();
+  const hasHint = ITEMS_WITH_HINT.has(item);
 
   useEffect(() => {
-    const timer = setTimeout(onDone, 1600);
+    // Give the player extra time to read the usage tip when one is shown.
+    const timer = setTimeout(onDone, hasHint ? 3200 : 1600);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " " || e.key === "Escape") {
         sound.sfx("close");
@@ -52,7 +67,7 @@ export default function ItemGet({ item, onDone }: Props) {
       clearTimeout(timer);
       window.removeEventListener("keydown", onKey);
     };
-  }, [onDone]);
+  }, [onDone, hasHint]);
 
   return (
     <div
@@ -64,6 +79,7 @@ export default function ItemGet({ item, onDone }: Props) {
     >
       <img className="itemget-img" src={IMG[item]} alt="" />
       <p className="itemget-text">{t(`item.${item}`)}</p>
+      {hasHint && <p className="itemget-hint">{t(`itemHint.${item}`)}</p>}
     </div>
   );
 }

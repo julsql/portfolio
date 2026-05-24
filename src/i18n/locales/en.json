@@ -64,6 +64,17 @@
     "chestLocked": "Locked chest",
     "chestOpen": "Open chest"
   },
+  "itemHint": {
+    "sword": "Space to swing the sword",
+    "bow": "X to fire an arrow",
+    "arrow": "X to fire an arrow",
+    "bomb": "B to drop a bomb",
+    "smallKey": "Bump a locked chest to break the chain",
+    "bossKey": "Bump the Boss door to open it",
+    "bottle": "U / I to use bottle 1 / 2",
+    "potion": "U / I to drink the potion and heal up",
+    "fairy": "Auto-revives you on death, or release with U / I"
+  },
   "dialog": {
     "sage": {
       "name": "???",

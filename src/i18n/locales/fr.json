@@ -64,6 +64,17 @@
     "chestLocked": "Coffre verrouillé",
     "chestOpen": "Coffre ouvert"
   },
+  "itemHint": {
+    "sword": "Espace pour frapper à l'épée",
+    "bow": "X pour tirer une flèche",
+    "arrow": "X pour tirer une flèche",
+    "bomb": "B pour poser une bombe",
+    "smallKey": "Ouvre un coffre verrouillé en bumpant dessus",
+    "bossKey": "Ouvre la porte du Boss en bumpant dessus",
+    "bottle": "U / I pour utiliser le flacon 1 / 2",
+    "potion": "U / I pour boire la potion et te soigner",
+    "fairy": "Te ressuscite automatiquement, ou U / I pour la libérer"
+  },
   "dialog": {
     "sage": {
       "name": "???",

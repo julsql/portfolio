@@ -1359,6 +1359,15 @@ img.cave-mouth {
   text-align: center;
   text-shadow: 2px 2px 0 #7c4a02;
 }
+.itemget-hint {
+  margin-top: -8px;
+  font-family: var(--font-pixel);
+  font-size: clamp(8px, 2.2vw, 12px);
+  color: #d8e8b2;
+  text-align: center;
+  text-shadow: 1px 1px 0 #1a3a14;
+  max-width: min(420px, 90vw);
+}
 
 /* ================================================================ VICTORY */
 .victory {
