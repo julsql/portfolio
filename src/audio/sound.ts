@@ -128,7 +128,7 @@ const FILES: Partial<Record<Sfx, string | string[]>> = {
   heartRefill: `${S}/heart-refill.wav`,
   item: `${S}/fanfare-item.wav`,
   chest: `${S}/get-small-item.wav`,
-  buy: `${S}/get-small-item.wav`,
+  buy: `${S}/puzzle-solved.wav`,
   drink: `${S}/link-drink.wav`,
   triforceGet: `${S}/fanfare-item.wav`,
   fairyRevive: `${S}/fairy.wav`,

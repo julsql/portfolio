@@ -403,7 +403,7 @@ export default function App() {
           setDialog("needsBottlePotion");
           break;
         }
-        sound.sfx("chest");
+        sound.sfx("buy");
         setRupees((n) => n - price);
         setOpened((s) => new Set(s).add(l.ref));
         const item = applyDrop(l.drop);
