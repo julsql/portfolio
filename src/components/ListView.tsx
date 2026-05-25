@@ -73,7 +73,10 @@ export default function ListView({ onOpen, paused }: Props) {
             key={p.id}
             className={`p-card cat-${p.category}${i === sel ? " sel" : ""}`}
             onClick={() => onOpen(p)}
-            onMouseEnter={() => setSel(i)}
+            onMouseEnter={() => {
+              if (i !== sel) sound.sfx("cursor");
+              setSel(i);
+            }}
           >
             <span className="p-card-icon">{p.icon}</span>
             <span className="p-card-cat">{t(`modal.category.${p.category}`)}</span>

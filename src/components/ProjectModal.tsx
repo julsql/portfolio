@@ -100,7 +100,10 @@ export default function ProjectModal({ project, onClose }: Props) {
         href={link.url}
         target="_blank"
         rel="noreferrer"
-        onMouseEnter={() => setSel(i)}
+        onMouseEnter={() => {
+          if (i !== sel) sound.sfx("cursor");
+          setSel(i);
+        }}
       >
         {LINK_ICON[link.kind]} {t(`modal.${link.labelKey}`)}
       </a>
