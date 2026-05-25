@@ -54,10 +54,11 @@ export function buildOverworld(): TileKind[][] {
     // A wooden pier reaching from the shore out into the sea (walkable).
     if (x >= 14 && x <= 17 && y === 11) return "dock";
 
-    // Central plaza around the castle.
+    // Central plaza around the castle — all grass, so the path tile that used
+    // to peek out from behind the castle sprite blends back into the field.
     const dx = Math.abs(x - cx);
     const dy = Math.abs(y - cy);
-    if (dx <= 2 && dy <= 2) return dx + dy === 0 ? "path" : "grass";
+    if (dx <= 2 && dy <= 2) return "grass";
 
     const left = x < cx;
     const top = y < cy;
