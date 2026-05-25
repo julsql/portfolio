@@ -64,3 +64,54 @@ export const SPRITES = {
 export function linkFrame(dir: Dir, frame: 1 | 2, sword: boolean): string {
   return `${B}/link-${dir}-${frame}${sword ? "-sword" : ""}.svg`;
 }
+
+/**
+ * Prime the browser cache with every sprite the player will see in the
+ * first few seconds — chiefly the 16 Link walk frames (4 dirs × 2 frames
+ * × with/without sword) plus the HUD icons. Without this, on a slow link
+ * Link's first dash through the overworld renders stale frames while the
+ * browser races to fetch them on demand. Idempotent and fire-and-forget.
+ */
+let spritesPreloaded = false;
+export function preloadSprites(): void {
+  if (spritesPreloaded || typeof Image === "undefined") return;
+  spritesPreloaded = true;
+  const dirs: Dir[] = ["up", "down", "left", "right"];
+  const urls: string[] = [];
+  for (const d of dirs) {
+    for (const f of [1, 2] as const) {
+      urls.push(linkFrame(d, f, false));
+      urls.push(linkFrame(d, f, true));
+    }
+  }
+  urls.push(
+    SPRITES.heart.full,
+    SPRITES.heart.half,
+    SPRITES.heart.empty,
+    SPRITES.rupee.green,
+    SPRITES.rupee.blue,
+    SPRITES.rupee.red,
+    SPRITES.castle,
+    SPRITES.npc,
+    SPRITES.merchant,
+    SPRITES.bat,
+    SPRITES.scorpion,
+    SPRITES.rock,
+    SPRITES.pot,
+    SPRITES.chest,
+    SPRITES.chestOpen,
+    SPRITES.chestLocked,
+    SPRITES.swordPedestal,
+    SPRITES.doorOpen,
+    SPRITES.ladder,
+  );
+  for (const url of urls) {
+    const img = new Image();
+    img.src = url;
+  }
+}
+
+// Kick the preload off as soon as the module loads — the main bundle is
+// already in flight at this point and HTTP/2 multiplexes the sprites
+// alongside it, so they land in cache before the user even hits START.
+preloadSprites();
