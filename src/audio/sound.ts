@@ -49,6 +49,7 @@ export type Sfx =
   | "fall"
   | "drown"
   | "splash"
+  | "rockPush"
   | "burn"
   | "gameover"
   | "lowHealth"
@@ -130,6 +131,7 @@ const FILES: Partial<Record<Sfx, string | string[]>> = {
   fall: [`${S}/link-fall-1.wav`, `${S}/link-fall-2.wav`, `${S}/link-fall-3.wav`],
   drown: `${S}/link-splash.wav`,
   splash: `${S}/link-splash.wav`,
+  rockPush: `${S}/rock-push.wav`,
   burn: [`${S}/link-hurt-1.wav`, `${S}/link-hurt-2.wav`, `${S}/link-hurt-3.wav`],
   gameover: `${S}/link-die.wav`,
   lowHealth: `${S}/low-health.wav`,

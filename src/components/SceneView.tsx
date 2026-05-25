@@ -120,11 +120,10 @@ export default function SceneView(props: Props) {
   const [fireballs, setFireballs] = useState<Fireball[]>([]);
   const nextId = useRef(0);
 
-  const pushRock = useCallback(
-    (id: string, x: number, y: number) =>
-      setRocks((rs) => rs.map((r) => (r.id === id ? { ...r, x, y } : r))),
-    [],
-  );
+  const pushRock = useCallback((id: string, x: number, y: number) => {
+    sound.sfx("rockPush");
+    setRocks((rs) => rs.map((r) => (r.id === id ? { ...r, x, y } : r)));
+  }, []);
   const removeRock = useCallback((id: string) => {
     // The only path that drops a rock is heaving it into water — splash!
     sound.sfx("splash");

@@ -53,6 +53,7 @@ picks the matching bank and `sound.sfx()` plays one variant at random.
 | `bomb-drop.wav` | A bomb hitting the ground | [`OOT_Bomb_Drop.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Bomb_Drop.wav) |
 | `bomb-blow.wav` | A bomb exploding | [`OOT_Bomb_Blow.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Bomb_Blow.wav) |
 | `pot-shatter.wav` | A pot shattering | [`OOT_Pot_Shatter.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Pot_Shatter.wav) |
+| `rock-push.wav` | Heaving a pushable rock one tile across the floor | [`OOT_Block_Push.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Block_Push.wav) |
 | `fireball-shoot.wav` | Ganondorf throwing a fireball in his lair | [`OOT_Anubis_Fire_Shoot.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Anubis_Fire_Shoot.wav) |
 | `fireball-burn.wav` | A fireball hitting a wall / Link | [`OOT_Anubis_Fire_Burn.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Anubis_Fire_Burn.wav) |
 
@@ -116,6 +117,6 @@ overhaul and are kept as the ambient background.
 
 ---
 
-**Counts** — 60 SFX samples (OOT) + 5 music tracks.
+**Counts** — 61 SFX samples (OOT) + 5 music tracks.
 **Multi-variant banks** — 6 footstep banks (3-4 variants each) + `attackShout`
 (4) + `hurt` / `hurtBoss` / `burn` (3 each).
