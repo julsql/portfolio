@@ -47,6 +47,7 @@ export type Sfx =
   | "hurt"
   | "hurtBoss"
   | "fall"
+  | "scream"
   | "drown"
   | "splash"
   | "rockPush"
@@ -129,6 +130,9 @@ const FILES: Partial<Record<Sfx, string | string[]>> = {
   hurt: [`${S}/link-hurt-1.wav`, `${S}/link-hurt-2.wav`, `${S}/link-hurt-3.wav`],
   hurtBoss: [`${S}/link-fall-1.wav`, `${S}/link-fall-2.wav`, `${S}/link-fall-3.wav`],
   fall: [`${S}/link-fall-1.wav`, `${S}/link-fall-2.wav`, `${S}/link-fall-3.wav`],
+  // The long-fall cry — used when Link drowns, picked at random between the
+  // two variants so the dunk doesn't sound the same twice in a row.
+  scream: [`${S}/link-scream-1.wav`, `${S}/link-scream-2.wav`],
   drown: `${S}/link-splash.wav`,
   splash: `${S}/link-splash.wav`,
   rockPush: `${S}/rock-push.wav`,

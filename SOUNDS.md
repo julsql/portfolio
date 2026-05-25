@@ -68,6 +68,8 @@ picks the matching bank and `sound.sfx()` plays one variant at random.
 | `link-fall-2.wav` | Link knocked down (variant 2) | [`OOT_YoungLink_FallDown2.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_YoungLink_FallDown2.wav) |
 | `link-fall-3.wav` | Link knocked down (variant 3) | [`OOT_YoungLink_FallDown3.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_YoungLink_FallDown3.wav) |
 | `link-splash.wav` | Link splashing into water (drowning) | [`OOT_Link_Splash_In.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Link_Splash_In.wav) |
+| `link-scream-1.wav` | Link's long-fall scream — layered on top of the splash when he drowns (variant 1) | [`OOT_YoungLink_Scream1.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_YoungLink_Scream1.wav) |
+| `link-scream-2.wav` | Link's long-fall scream (variant 2) | [`OOT_YoungLink_Scream2.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_YoungLink_Scream2.wav) |
 | `link-die.wav` | Link's death scream | [`OOT_YoungLink_ChokeFull.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_YoungLink_ChokeFull.wav) |
 | `low-health.wav` | Low health beep (looped) | [`OOT_LowHealth.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_LowHealth.wav) |
 
@@ -117,6 +119,6 @@ overhaul and are kept as the ambient background.
 
 ---
 
-**Counts** — 61 SFX samples (OOT) + 5 music tracks.
+**Counts** — 63 SFX samples (OOT) + 5 music tracks.
 **Multi-variant banks** — 6 footstep banks (3-4 variants each) + `attackShout`
-(4) + `hurt` / `hurtBoss` / `burn` (3 each).
+(4) + `hurt` / `hurtBoss` / `burn` (3 each) + `scream` (2).
