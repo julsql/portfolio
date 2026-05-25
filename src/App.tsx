@@ -36,6 +36,18 @@ const MAX_BOTTLES = 2;
 const FAIRY_REVIVE_HEALTH = 6;
 /** Quiver / bomb bag cap. */
 const MAX_AMMO = 30;
+/** localStorage key for the mute toggle so it survives a page reload. */
+const MUTED_KEY = "portfolio-muted";
+
+/** Read the persisted mute flag, defaulting to unmuted. SSR-safe. */
+function readPersistedMuted(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(MUTED_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
 
 export default function App() {
   const { i18n } = useTranslation();
@@ -60,7 +72,7 @@ export default function App() {
   const [gameOver, setGameOver] = useState(false);
   const [victory, setVictory] = useState(false);
   const [triforceWon, setTriforceWon] = useState(false);
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState<boolean>(readPersistedMuted);
   const [dialog, setDialog] = useState<DialogKind>(null);
 
   // Side-quest inventory.
@@ -248,7 +260,14 @@ export default function App() {
       sound.music(sceneId === GANON_ID ? "ganon" : sceneId === CASTLE_ID ? "dungeon" : "overworld");
   }, [started, sceneId, gameOver]);
 
-  useEffect(() => sound.setMuted(muted), [muted]);
+  useEffect(() => {
+    sound.setMuted(muted);
+    try {
+      window.localStorage.setItem(MUTED_KEY, muted ? "1" : "0");
+    } catch {
+      // No-op if storage is unavailable (private mode, quota, etc.).
+    }
+  }, [muted]);
 
   // Retro "select" blip on every UI action (clicking a button/link/card/place),
   // except the movement D-pad / attack button.
