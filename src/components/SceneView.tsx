@@ -958,24 +958,20 @@ export default function SceneView(props: Props) {
       );
     }
     if (l.kind === "exit") {
-      // Only flag the doorway as "Sortie" when it leaves to the open world;
-      // internal doors (cave ↔ shop / fountain / back-rooms) are just doors.
-      const labelled = l.ref === OVERWORLD_ID;
       // The cave is a hole in the mountain — climb out via a ladder, not a
       // door. Inner sub-rooms (shop / fountain / boss room) keep doors.
-      const isCaveLadder = labelled && scene.id === CAVE_ID;
+      const isCaveLadder = l.ref === OVERWORLD_ID && scene.id === CAVE_ID;
       const sprite = isCaveLadder ? SPRITES.ladder : SPRITES.doorOpen;
       const iconClass = isCaveLadder ? "ladder-icon" : "door-icon";
       return (
         <button
           key={key}
-          className={`landmark landmark-exit${labelled ? "" : " landmark-door-silent"}`}
+          className="landmark landmark-exit"
           style={tileStyle(l.x, l.y)}
           onClick={() => interact(l)}
           aria-label={t(isCaveLadder ? "world.ladder" : "world.exit")}
         >
           <img className={`landmark-icon ${iconClass}`} src={sprite} alt="" />
-          {labelled && <span className="landmark-label">{t("world.exit")}</span>}
         </button>
       );
     }
