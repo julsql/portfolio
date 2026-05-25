@@ -102,7 +102,7 @@ const ganonRoom: Scene = {
   tiles: buildGanonRoom(),
   heroStart: { x: 5, y: 6, facing: "up" },
   landmarks: [
-    { x: 5, y: 7, kind: "exit", ref: CASTLE_ID, spawn: { x: 6, y: 3, facing: "down" } },
+    { x: 5, y: 7, kind: "exit", ref: CASTLE_ID, spawn: { x: 6, y: 1, facing: "down" } },
     { x: 1, y: 6, kind: "recoveryHeart", ref: "heart-gn-1", pickup: true },
     { x: 9, y: 6, kind: "recoveryHeart", ref: "heart-gn-2", pickup: true },
   ],
@@ -136,12 +136,12 @@ const secretCave: Scene = {
     { x: 9, y: 4, kind: "chest", ref: "chest-bombs", drop: { kind: "bombs", amount: 5 } },
     // Locked chest holding the empty bottle.
     { x: 6, y: 4, kind: "lockedChest", ref: "chest-bottle", drop: { kind: "bottle" } },
-    // The boss door — only the boss key opens it.
-    { x: 6, y: 1, kind: "bossDoor", ref: BOSS_ID, spawn: { x: 5, y: 6, facing: "up" } },
-    // Side passage to the shop.
-    { x: 11, y: 5, kind: "exit", ref: SHOP_ID, spawn: { x: 5, y: 6, facing: "up" } },
-    // Side passage to the fountain.
-    { x: 1, y: 5, kind: "exit", ref: FOUNTAIN_ID, spawn: { x: 5, y: 7, facing: "up" } },
+    // The boss door — only the boss key opens it. Sits inside the north wall.
+    { x: 6, y: 0, kind: "bossDoor", ref: BOSS_ID, spawn: { x: 5, y: 6, facing: "up" } },
+    // Side passage to the shop — east wall.
+    { x: 12, y: 5, kind: "exit", ref: SHOP_ID, spawn: { x: 5, y: 6, facing: "up" } },
+    // Side passage to the fountain — west wall.
+    { x: 0, y: 5, kind: "exit", ref: FOUNTAIN_ID, spawn: { x: 5, y: 7, facing: "up" } },
   ],
   decor: [
     { x: 1, y: 1, icon: SPRITES.fire, hazard: true },
@@ -165,7 +165,7 @@ const fountain: Scene = {
   heroStart: { x: 5, y: 7, facing: "up" },
   music: "fairy",
   landmarks: [
-    { x: 5, y: 8, kind: "exit", ref: CAVE_ID, spawn: { x: 1, y: 6, facing: "down" } },
+    { x: 5, y: 8, kind: "exit", ref: CAVE_ID, spawn: { x: 1, y: 5, facing: "right" } },
     // The basin altar — purely decorative, but bumping it triggers a sparkle.
     { x: 5, y: 3, kind: "fountain", ref: "fountain" },
     // Two fairies fluttering on the shores of the pool.
@@ -184,7 +184,7 @@ const bossRoom: Scene = {
   heroStart: { x: 5, y: 6, facing: "up" },
   music: "dungeon",
   landmarks: [
-    { x: 5, y: 7, kind: "exit", ref: CAVE_ID, spawn: { x: 6, y: 2, facing: "down" } },
+    { x: 5, y: 7, kind: "exit", ref: CAVE_ID, spawn: { x: 6, y: 1, facing: "down" } },
     { x: 5, y: 1, kind: "triforce", ref: "triforce-piece", pickup: true },
   ],
   decor: [
@@ -212,7 +212,7 @@ const shop: Scene = {
   heroStart: { x: 5, y: 6, facing: "up" },
   music: "dungeon",
   landmarks: [
-    { x: 5, y: 7, kind: "exit", ref: CAVE_ID, spawn: { x: 11, y: 5, facing: "down" } },
+    { x: 5, y: 7, kind: "exit", ref: CAVE_ID, spawn: { x: 11, y: 5, facing: "left" } },
     { x: 5, y: 2, kind: "npc", ref: "merchant" },
     // Five wares — bombs, arrows and red potion restock on every visit; the
     // bottle and the boss key are one-time purchases.

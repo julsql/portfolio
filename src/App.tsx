@@ -138,7 +138,7 @@ export default function App() {
       // guardian, take the piece, then come back to face him.
       landmarks = [
         ...landmarks,
-        { x: 6, y: 1, kind: "bossDoor", ref: GANON_ID, spawn: SCENES[GANON_ID].heroStart },
+        { x: 6, y: 0, kind: "bossDoor", ref: GANON_ID, spawn: SCENES[GANON_ID].heroStart },
       ];
     }
     // Bosses stay dead — wipe their spawn from the scene on subsequent visits.

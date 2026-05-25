@@ -161,8 +161,6 @@
 
 .field {
   position: relative;
-  width: calc(var(--tile) * var(--cols));
-  height: calc(var(--tile) * var(--rows));
   border: 6px solid var(--c-ui-border);
   border-radius: 4px;
   box-shadow:
@@ -267,6 +265,10 @@
   position: relative;
 }
 .tile-wall::after {
+  /* Each brick is fenced on every side: a dark line at the start AND end of
+     each gradient cycle. Without the leading line, the bricks against the
+     floor on the SOUTH/EAST walls bled into the floor and the wall looked
+     only one brick thick on those sides. */
   content: "";
   position: absolute;
   inset: 0;
