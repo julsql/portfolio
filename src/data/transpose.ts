@@ -24,27 +24,20 @@ export function transposeScene(scene: Scene): Scene {
     Array.from({ length: width }, (_, x) => scene.tiles[x][y]),
   );
 
+  // `spawn` fields point into *another* scene and are stored in canonical
+  // (landscape) coordinates — App re-transposes them at scene-entry time. So
+  // they must pass through untouched here, even when the host scene flips.
   return {
     ...scene,
     width,
     height,
     tiles,
     heroStart: transposeHero(scene.heroStart),
-    landmarks: scene.landmarks.map((l) => ({
-      ...l,
-      x: l.y,
-      y: l.x,
-      spawn: l.spawn ? transposeHero(l.spawn) : undefined,
-    })),
+    landmarks: scene.landmarks.map((l) => ({ ...l, x: l.y, y: l.x })),
     decor: scene.decor.map((d) => ({ ...d, x: d.y, y: d.x })),
     rocks: scene.rocks?.map((r) => ({ ...r, x: r.y, y: r.x })),
     pots: scene.pots?.map((p) => ({ ...p, x: p.y, y: p.x })),
-    breakables: scene.breakables?.map((b) => ({
-      ...b,
-      x: b.y,
-      y: b.x,
-      spawn: b.spawn ? transposeHero(b.spawn) : undefined,
-    })),
+    breakables: scene.breakables?.map((b) => ({ ...b, x: b.y, y: b.x })),
     enemies: scene.enemies?.map((e) => ({
       ...e,
       x: e.y,
