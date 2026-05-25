@@ -94,6 +94,7 @@ picks the matching bank and `sound.sfx()` plays one variant at random.
 | `puzzle-solved.wav` | "Riddle solved" jingle — first open of a boss / mini-boss door | [`OOT_Secret.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Secret.wav) |
 | `door-open.wav` | Opening a regular door (scene transitions) | [`OOT_Door_Regular_Open.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Door_Regular_Open.wav) |
 | `door-boss.wav` | Unlocking a boss-room door (Ganon's lair entry) | [`OOT_Door_Boss_Unlock.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Door_Boss_Unlock.wav) |
+| `link-climb.wav` | Link climbing the ladder out of the cave back to the overworld | [`OOT_Link_Climb.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_Link_Climb.wav) |
 | `error.wav` | Error sound — no key, not enough rupees, no empty bottle… | [`OOT_MainMenu_Error.wav`](https://noproblo.dayjo.org/zeldasounds/OOT/OOT_MainMenu_Error.wav) |
 
 ## 🖱️ UI
@@ -119,6 +120,6 @@ overhaul and are kept as the ambient background.
 
 ---
 
-**Counts** — 63 SFX samples (OOT) + 5 music tracks.
+**Counts** — 64 SFX samples (OOT) + 5 music tracks.
 **Multi-variant banks** — 6 footstep banks (3-4 variants each) + `attackShout`
 (4) + `hurt` / `hurtBoss` / `burn` (3 each) + `fall` (2).

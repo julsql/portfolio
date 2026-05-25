@@ -69,6 +69,7 @@ export type Sfx =
   | "puzzleSolved"
   | "door"
   | "enterLair"
+  | "ladderClimb"
   | "lockedNo"
   // UI
   | "cursor"
@@ -155,6 +156,7 @@ const FILES: Partial<Record<Sfx, string | string[]>> = {
   puzzleSolved: `${S}/puzzle-solved.wav`,
   door: `${S}/door-open.wav`,
   enterLair: `${S}/door-boss.wav`,
+  ladderClimb: `${S}/link-climb.wav`,
   lockedNo: `${S}/error.wav`,
 
   // UI.

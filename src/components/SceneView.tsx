@@ -148,6 +148,10 @@ export default function SceneView(props: Props) {
       else if (l.kind === "door") sound.sfx("enterLair");
       // Caves are holes in the ground — Link cries as he drops in.
       else if (l.kind === "cave") sound.sfx("fall");
+      // The cave-to-overworld exit is a ladder — Link climbs it back up,
+      // every other exit just opens like a regular door.
+      else if (l.kind === "exit" && l.ref === OVERWORLD_ID && scene.id === CAVE_ID)
+        sound.sfx("ladderClimb");
       else if (l.kind === "exit") sound.sfx("door");
       else if (l.kind === "project" || l.kind === "castle" || l.kind === "npc") sound.sfx("select");
       onInteract(l);
