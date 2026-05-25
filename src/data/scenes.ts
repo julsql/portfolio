@@ -79,7 +79,7 @@ const castle: Scene = {
     { x: 9, y: 4, kind: "project", ref: "thecode-apple" },
     { x: 3, y: 6, kind: "project", ref: "thecode-android" },
     { x: 9, y: 6, kind: "project", ref: "thecode-cli" },
-    { x: 6, y: 9, kind: "exit", ref: OVERWORLD_ID, spawn: { x: 10, y: 9, facing: "down" } },
+    { x: 6, y: 9, kind: "exit", ref: OVERWORLD_ID, spawn: { x: 10, y: 8, facing: "down" } },
     { x: 6, y: 1, kind: "heart", ref: "heart" },
   ],
   decor: [
