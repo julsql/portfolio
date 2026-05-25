@@ -3,8 +3,17 @@
  * shipped under public/sound/. When a mapping is an array we pick a random
  * sample each call — that lets footsteps (4 variants per surface), the
  * sword swing (4 attack shouts) and Link's hurts (3 variants) cycle through
- * small variants for a far more authentic Zelda feel. Music streams a
- * single looping <audio> tag.
+ * small variants for a far more authentic Zelda feel.
+ *
+ * SFX play through Web Audio AudioBufferSourceNode so they fire with zero
+ * decode latency once preloaded — the engine fetches and decodes every
+ * sample exactly once at init() time, then schedules cheap source nodes on
+ * every call. The previous `new Audio(url)` per call paid for a fresh HTTP
+ * fetch + decode in production every time, which is what made every shop
+ * purchase and every footstep audibly late on slow links.
+ *
+ * Music keeps a single looping <audio> tag (streaming a long file beats
+ * decoding it whole into memory).
  *
  * Sound credits: every sample in public/sound/ comes from HelpTheWretched
  * https://noproblo.dayjo.org/zeldasounds/ — sourced from
@@ -159,9 +168,12 @@ class SoundEngine {
   private track?: Track;
   /** Per-name audio element for SFX that need to keep playing (low-health). */
   private loops = new Map<Sfx, HTMLAudioElement>();
-  // Web Audio is only used to unlock playback on the first gesture.
   private ctx?: AudioContext;
   private master?: GainNode;
+  /** Decoded sample cache, keyed by URL — populated by preloadAllSfx(). */
+  private buffers = new Map<string, AudioBuffer>();
+  /** In-flight decode promises so concurrent callers don't fetch twice. */
+  private loading = new Map<string, Promise<AudioBuffer | undefined>>();
 
   init() {
     if (typeof window === "undefined") return;
@@ -175,6 +187,11 @@ class SoundEngine {
         this.master.gain.value = this.muted ? 0 : 0.85;
         this.master.connect(this.ctx.destination);
         void this.ctx.resume();
+        // Fire-and-forget: fetch + decode every SFX in parallel. The browser
+        // honors HTTP caching, so this is a one-time cost on first visit
+        // (and instant on every subsequent visit thanks to the immutable
+        // Cache-Control on /sound/).
+        void this.preloadAllSfx();
       }
       document.addEventListener("visibilitychange", () => {
         if (document.hidden) this.music_el?.pause();
@@ -216,9 +233,28 @@ class SoundEngine {
 
   sfx(name: Sfx) {
     if (this.muted) return;
-    void this.ctx?.resume();
+    const ctx = this.ctx;
+    const master = this.master;
     const url = pickFile(FILES[name]);
     if (!url) return;
+    // Fast path: AudioContext ready + buffer decoded → schedule a source.
+    if (ctx && master) {
+      void ctx.resume();
+      const buf = this.buffers.get(url);
+      if (buf) {
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        const gain = ctx.createGain();
+        gain.gain.value = SFX_VOL;
+        src.connect(gain).connect(master);
+        src.start(0);
+        return;
+      }
+      // Buffer not ready yet — kick off the decode for next time, fall back
+      // to the HTMLAudioElement path so the SFX still fires now.
+      void this.loadBuffer(url);
+    }
+    // Fallback for the brief window before Web Audio init / decode lands.
     const a = new Audio(url);
     a.volume = SFX_VOL;
     void a.play().catch(() => {});
@@ -263,6 +299,43 @@ class SoundEngine {
   stopMusic() {
     this.music_el?.pause();
     this.track = undefined;
+  }
+
+  /** Fetch and decode a single SFX, caching the result. Tolerant of failures. */
+  private async loadBuffer(url: string): Promise<AudioBuffer | undefined> {
+    const ctx = this.ctx;
+    if (!ctx) return undefined;
+    const cached = this.buffers.get(url);
+    if (cached) return cached;
+    const inflight = this.loading.get(url);
+    if (inflight) return inflight;
+    const p = (async () => {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) return undefined;
+        const data = await res.arrayBuffer();
+        const buf = await ctx.decodeAudioData(data);
+        this.buffers.set(url, buf);
+        return buf;
+      } catch {
+        return undefined;
+      } finally {
+        this.loading.delete(url);
+      }
+    })();
+    this.loading.set(url, p);
+    return p;
+  }
+
+  /** Walk the FILES map and decode every sample once. */
+  private async preloadAllSfx(): Promise<void> {
+    const urls = new Set<string>();
+    for (const entry of Object.values(FILES)) {
+      if (!entry) continue;
+      if (typeof entry === "string") urls.add(entry);
+      else entry.forEach((u) => urls.add(u));
+    }
+    await Promise.all(Array.from(urls).map((u) => this.loadBuffer(u)));
   }
 }
 
