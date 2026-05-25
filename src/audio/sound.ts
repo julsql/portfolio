@@ -354,3 +354,24 @@ const scope = (typeof window !== "undefined" ? window : globalThis) as unknown a
 };
 export const sound: SoundEngine =
   scope.__portfolioSound ?? (scope.__portfolioSound = new SoundEngine());
+
+/**
+ * Warm the HTTP cache for the SFX that fire in the very first second of
+ * play — the START click in particular has nowhere to hide: it triggers
+ * sound.sfx("select") synchronously, before the AudioContext-backed
+ * preload (which can only start on the user gesture) has had a chance to
+ * decode anything. Fetching these files now means the `new Audio()`
+ * fallback inside sfx() finds them already in browser cache and plays
+ * within milliseconds instead of waiting on a network round-trip.
+ */
+const CRITICAL_PREFETCH = [
+  `${S}/menu-select.wav`,
+  `${S}/menu-cursor.wav`,
+  `${S}/dialog-done.wav`,
+  `${S}/error.wav`,
+];
+if (typeof fetch !== "undefined") {
+  for (const url of CRITICAL_PREFETCH) {
+    fetch(url, { cache: "force-cache" }).catch(() => {});
+  }
+}
