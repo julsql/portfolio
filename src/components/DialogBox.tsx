@@ -11,7 +11,6 @@ export type DialogKind =
   | "bossLocked"
   | "ganonLocked"
   | "needsKey"
-  | "needsBottle"
   | "needsBottlePotion"
   | "needsBow"
   | "needsBombs"
@@ -29,7 +28,6 @@ const FACE: Record<NonNullable<DialogKind>, string> = {
   bossLocked: SPRITES.keyBoss,
   ganonLocked: SPRITES.triforcePiece,
   needsKey: SPRITES.keySmall,
-  needsBottle: SPRITES.bottleEmpty,
   needsBottlePotion: SPRITES.potion,
   needsBow: SPRITES.bowIcon,
   needsBombs: SPRITES.bomb,

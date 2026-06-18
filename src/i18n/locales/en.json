@@ -112,11 +112,6 @@
       "text": "Heavy chains bind this chest. Find a small key to break them.",
       "ok": "OK"
     },
-    "needsBottle": {
-      "name": "Wild fairy",
-      "text": "You can't catch the fairy with bare hands — bring an empty bottle to capture her.",
-      "ok": "Understood"
-    },
     "needsBottlePotion": {
       "name": "Merchant",
       "text": "I pour the potion, I don't sell the bottle! Come back with an empty bottle to take it home.",
