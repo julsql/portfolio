@@ -406,6 +406,9 @@ export default function App() {
         if (opened.has(l.ref)) break;
         if (smallKeys > 0 && l.drop) {
           sound.sfx("unlock");
+          // Let the chain-break click finish before the get-item fanfare,
+          // otherwise the ~0.9s unlock masks the fanfare intro.
+          setTimeout(() => sound.sfx("chest"), 900);
           setSmallKeys((n) => n - 1);
           setOpened((s) => new Set(s).add(l.ref));
           const item = applyDrop(l.drop);
