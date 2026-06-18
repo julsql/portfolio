@@ -1455,6 +1455,13 @@ img.cave-mouth {
 }
 .gameover-retry {
   font-size: 13px;
+  opacity: 1;
+  transition: opacity 0.4s ease-in;
+}
+/* Hidden and inert while the post-death lockout runs, then fades back in. */
+.gameover-retry:disabled {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* ============================================================== ANIMATIONS */
