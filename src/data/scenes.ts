@@ -41,8 +41,10 @@ const overworld: Scene = {
     { x: 6, y: 7, kind: "npc", ref: "sage" },
     { x: 3, y: 5, kind: "sword", ref: "sword" },
     {
+      // Cave mouth carved into the mountain itself — bump it from the grass
+      // tile just below to step inside.
       x: 17,
-      y: 4,
+      y: 3,
       kind: "cave",
       ref: CAVE_ID,
       spawn: { x: 6, y: 8, facing: "up" },
@@ -128,7 +130,7 @@ const secretCave: Scene = {
   music: "dungeon",
   landmarks: [
     // South exit back to the overworld (right next to the cave mouth).
-    { x: 6, y: 9, kind: "exit", ref: OVERWORLD_ID, spawn: { x: 17, y: 5, facing: "down" } },
+    { x: 6, y: 9, kind: "exit", ref: OVERWORLD_ID, spawn: { x: 17, y: 4, facing: "down" } },
     // Trove chests: bow + arrows on the left, bombs on the right, small key
     // tucked in a side alcove (needed to open the chained chest below).
     { x: 1, y: 3, kind: "chest", ref: "chest-key", drop: { kind: "smallKey" } },

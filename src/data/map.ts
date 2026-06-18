@@ -23,7 +23,13 @@ export const SHOP_W = 11;
 export const SHOP_H = 8;
 
 /** Tiles the hero cannot walk onto. Water is walkable but drowns (see useMovement). */
-export const BLOCKED: ReadonlyArray<TileKind> = ["tree", "rock", "wall", "mountain"];
+export const BLOCKED: ReadonlyArray<TileKind> = [
+  "tree",
+  "rock",
+  "wall",
+  "mountain",
+  "mountainCave",
+];
 
 /**
  * Themed overworld: a desert (NW), mountains (NE), a lake (SW) and the sea (SE),
@@ -46,6 +52,9 @@ export function buildOverworld(): TileKind[][] {
   return grid;
 
   function tile(x: number, y: number): TileKind {
+    // The secret-cave mouth is carved straight into the mountain range (its
+    // landmark sits on this same tile in scenes.ts — keep them in sync).
+    if (x === 17 && y === 3) return "mountainCave";
     // Frame: mountains north, sea south, forest east/west.
     if (y === 0 || (x === 0 && y < 7)) return "mountain";
     if (y === H - 1) return "water";

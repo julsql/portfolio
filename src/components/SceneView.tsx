@@ -146,8 +146,9 @@ export default function SceneView(props: Props) {
       if (l.kind === "heart") sound.sfx("heart");
       else if (l.kind === "sword") sound.sfx("item");
       else if (l.kind === "door") sound.sfx("enterLair");
-      // Caves are holes in the ground — Link cries as he drops in.
-      else if (l.kind === "cave") sound.sfx("fall");
+      // The cave is reached by a ladder down into the mountain — same climb
+      // cue going in (here) as coming back out (the exit below).
+      else if (l.kind === "cave") sound.sfx("ladderClimb");
       // The cave-to-overworld exit is a ladder — Link climbs it back up,
       // every other exit just opens like a regular door.
       else if (l.kind === "exit" && l.ref === OVERWORLD_ID && scene.id === CAVE_ID)
@@ -844,6 +845,8 @@ export default function SceneView(props: Props) {
       );
     }
     if (l.kind === "cave") {
+      // The cave mouth is painted by the underlying `mountainCave` tile; this
+      // button is just the (transparent) interaction zone sitting on top.
       return (
         <button
           key={key}
@@ -851,9 +854,7 @@ export default function SceneView(props: Props) {
           style={tileStyle(l.x, l.y)}
           onClick={() => interact(l)}
           aria-label={t("world.cave")}
-        >
-          <img className="cave-mouth" src={SPRITES.hole} alt="" />
-        </button>
+        />
       );
     }
     if (l.kind === "fountain") {

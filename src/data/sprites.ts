@@ -26,7 +26,6 @@ export const SPRITES = {
   doorDungeonOpen: `${B}/door-dungeon-open.png`,
   doorOpen: `${B}/door-open.png`,
   doorBossLocked: `${B}/door-boss-locked.png`,
-  hole: `${B}/hole.png`,
   ladder: `${B}/ladder.svg`,
   heart: {
     full: `${B}/heart-full.png`,

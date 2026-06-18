@@ -237,6 +237,13 @@
   background-repeat: no-repeat;
   image-rendering: pixelated;
 }
+.tile-mountainCave {
+  background-color: var(--c-grass-dark);
+  background-image: url("/sprites/mountain-cave.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
 .tile-flower {
   background: var(--c-grass);
   position: relative;
@@ -771,17 +778,6 @@ img.npc-icon {
   margin-left: calc(var(--tile) * -0.7);
   margin-top: calc(var(--tile) * -0.85);
   filter: drop-shadow(0 0 10px rgba(120, 200, 248, 0.8));
-}
-.landmark-cave {
-  display: grid;
-  place-items: center;
-}
-img.cave-mouth {
-  display: block;
-  width: calc(var(--tile) * 0.95);
-  height: calc(var(--tile) * 0.95);
-  object-fit: contain;
-  image-rendering: pixelated;
 }
 .landmark-boss-door {
   background: radial-gradient(circle at 50% 50%, rgba(216, 40, 0, 0.55), rgba(216, 40, 0, 0));
