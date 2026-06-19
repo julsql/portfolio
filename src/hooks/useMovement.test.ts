@@ -124,4 +124,16 @@ describe("useMovement", () => {
       facing: "right",
     });
   });
+
+  it("Shift + direction turns the hero in place without moving", () => {
+    const { result } = renderHook(() => useMovement(overworld, overworld.heroStart, handlers()));
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft", shiftKey: true }));
+    });
+    expect(result.current.hero).toMatchObject({
+      x: overworld.heroStart.x,
+      y: overworld.heroStart.y,
+      facing: "left",
+    });
+  });
 });

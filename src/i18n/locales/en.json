@@ -5,7 +5,7 @@
   "start": "START",
   "hud": {
     "explore": "Explore the world",
-    "hint": "Arrows / WASD to move · step onto a place to open it",
+    "hint": "Arrows / WASD to move · Shift + direction to turn in place · step onto a place to open it",
     "hint_touch": "Use the D-pad · tap a place to open it",
     "view_map": "Map",
     "view_list": "List",
@@ -13,7 +13,7 @@
     "sound": "Sound",
     "hint_sword": "Arrows / WASD to move · Space to swing the sword",
     "hint_bow": "Space: sword · X: bow · B: bomb · U/I: bottles",
-    "hint_move": "Arrows / WASD to move",
+    "hint_move": "Arrows / WASD to move · Shift to turn",
     "hint_seg_sword": "Space: sword",
     "hint_seg_bow": "X: bow",
     "hint_seg_bomb": "B: bomb",
