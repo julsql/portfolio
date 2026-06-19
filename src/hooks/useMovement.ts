@@ -145,17 +145,6 @@ export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMo
     ],
   );
 
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      const dir = KEY_TO_DIR[e.key];
-      if (!dir) return;
-      e.preventDefault();
-      move(dir);
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [move]);
-
   const face = useCallback((dir: Dir) => {
     const prev = heroRef.current;
     if (prev.facing === dir) return;
@@ -163,6 +152,19 @@ export function useMovement(scene: Scene, initial: Hero, h: MoveHandlers): UseMo
     heroRef.current = next;
     setHero(next);
   }, []);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const dir = KEY_TO_DIR[e.key];
+      if (!dir) return;
+      e.preventDefault();
+      // Shift + direction : pivoter sur place sans avancer.
+      if (e.shiftKey) return face(dir);
+      move(dir);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [move, face]);
 
   return { hero, steps, move, face, setEnabled };
 }

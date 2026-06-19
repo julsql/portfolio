@@ -5,7 +5,7 @@
   "start": "START",
   "hud": {
     "explore": "Explore le monde",
-    "hint": "Flèches / ZQSD pour bouger · marche sur un lieu pour l'ouvrir",
+    "hint": "Flèches / ZQSD pour bouger · Maj + direction pour pivoter sur place · marche sur un lieu pour l'ouvrir",
     "hint_touch": "Utilise la croix · touche un lieu pour l'ouvrir",
     "view_map": "Carte",
     "view_list": "Liste",
@@ -13,7 +13,7 @@
     "sound": "Son",
     "hint_sword": "Flèches / ZQSD pour bouger · Espace pour frapper à l'épée",
     "hint_bow": "Espace : épée · X : arc · B : bombe · U/I : flacons",
-    "hint_move": "Flèches / ZQSD pour bouger",
+    "hint_move": "Flèches / ZQSD pour bouger · Maj pour pivoter",
     "hint_seg_sword": "Espace : épée",
     "hint_seg_bow": "X : arc",
     "hint_seg_bomb": "B : bombe",
