@@ -46,10 +46,15 @@ export default function ProjectModal({ project, onClose }: Props) {
   const [sel, setSel] = useState(0);
   const actionsRef = useRef<HTMLDivElement>(null);
   // Guard against the bump-to-open gesture: on touch, the D-pad's pointerdown
-  // opens the modal, then the trailing click lands on the freshly rendered
-  // overlay and would close it instantly. Only close when the pointer actually
-  // went down on the overlay itself.
-  const downOnOverlay = useRef(false);
+  // opens the modal, then the browser's mouse-compat "ghost click" (~300ms
+  // later) lands on the freshly rendered overlay and would close it instantly.
+  // A pointerdown guard can't catch it — the ghost sequence emits its own
+  // pointerdown on the overlay first — so we ignore overlay closes during a
+  // short window right after the modal opens.
+  const openedAt = useRef(0);
+  useEffect(() => {
+    openedAt.current = Date.now();
+  }, []);
 
   // How many links sit on the first row (the layout can be 1 or 2 rows).
   const columns = () => {
@@ -118,12 +123,11 @@ export default function ProjectModal({ project, onClose }: Props) {
   return (
     <div
       className="modal-overlay"
-      onPointerDown={(e) => {
-        downOnOverlay.current = e.target === e.currentTarget;
-      }}
-      onClick={() => {
-        if (!downOnOverlay.current) return;
-        downOnOverlay.current = false;
+      onClick={(e) => {
+        // Only the overlay itself closes (clicks inside the modal stopPropagation).
+        if (e.target !== e.currentTarget) return;
+        // Swallow the touch ghost-click that immediately follows bump-to-open.
+        if (Date.now() - openedAt.current < 400) return;
         sound.sfx("close");
         onClose();
       }}
