@@ -80,9 +80,21 @@ Vitest. Couvre l'intégrité des scènes (`scenes.test.ts`), le déplacement/col
 
 ## Déploiement
 
-Docker multi-stage (Node build → nginx). CI GitHub Actions : `tests.yml` (lint/test/build +
-build image), `deploy.yml` (SSH `git pull` + `docker-compose up -d --build`). Le site est servi
-sur le **port 8011** ; secrets requis : `SSH_HOST`, `SSH_USER`, `SSH_KEY`, `DEPLOY_PATH`.
+Docker multi-stage (Node build → nginx). CI GitHub Actions :
+
+- `tests.yml` — lint / test / build (validation)
+- `docker.yml` — build & push de l'image sur GHCR (`ghcr.io/julsql/portfolio:latest`,
+  + tag `sha-<long>`). C'est le **seul** artefact produit par la CI ; elle ne touche
+  pas au cluster.
+
+Le site tourne sur **k3s** (VPS OVH `julsql-vps`, manifests dans `~/dev/server/k3s/`,
+namespace `portfolio`, sert `portfolio.julsql.fr` + `julsql.fr`). La CI ne fait que
+pousser l'image : c'est **Keel** (installé sur le cluster, cf. `~/dev/server/k3s/keel.yaml`)
+qui poll GHCR et **redéploie automatiquement** dès que le digest de `:latest` change —
+grâce aux annotations `keel.sh/*` sur le Deployment (`portfolio.yaml`).
+
+> Le workflow historique `deploy.yml` (SSH `git pull` + `docker-compose up`) et le port
+> `8011` ont disparu avec la migration docker-compose → k3s.
 
 ## Style commits
 
