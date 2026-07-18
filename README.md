@@ -76,28 +76,13 @@ et ses textes dans `src/i18n/locales/{fr,en}.json` sous la clé `projects.<id>`.
 ## 🤖 CI/CD
 
 - **`tests.yml`** : à chaque push / PR → lint, tests Vitest, build, build de l'image Docker.
-- **`deploy.yml`** : après un run « Tests » réussi sur `main` (ou manuellement), déploiement
-  SSH sur le serveur (`git pull` + `docker-compose up -d --build`).
+- **`docker.yml`** : sur `main`, build & push de l'image sur **GHCR**
+  (`ghcr.io/julsql/portfolio:latest`). C'est le seul artefact produit par la CI ;
+  elle ne touche jamais au cluster.
 
-### Secrets GitHub requis (Settings → Secrets and variables → Actions)
-
-| Secret        | Description                                        |
-| ------------- | -------------------------------------------------- |
-| `SSH_HOST`    | IP / hostname du serveur                           |
-| `SSH_USER`    | utilisateur SSH                                    |
-| `SSH_KEY`     | clé privée SSH                                     |
-| `DEPLOY_PATH` | chemin du repo cloné sur le serveur                |
-
-### Mise en place serveur (une fois)
-
-```bash
-git clone <repo> /chemin/vers/portfolio
-cd /chemin/vers/portfolio
-docker-compose up -d --build
-```
-
-Puis pointe ton reverse proxy (nginx / Traefik) vers le port **8011**, par ex.
-`portfolio.julsql.fr` → `http://127.0.0.1:8011`.
+Le site tourne sur **k3s**. Le déploiement est automatique : **Keel** (installé sur le
+cluster) poll GHCR et **redéploie** dès que le digest de `:latest` change (rollout au
+changement de digest). Les manifests vivent dans le repo privé **`k3s-manifests`**.
 
 ## 🎵 Crédits sons
 
