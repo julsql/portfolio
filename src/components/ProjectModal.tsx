@@ -45,6 +45,11 @@ export default function ProjectModal({ project, onClose }: Props) {
   );
   const [sel, setSel] = useState(0);
   const actionsRef = useRef<HTMLDivElement>(null);
+  // Guard against the bump-to-open gesture: on touch, the D-pad's pointerdown
+  // opens the modal, then the trailing click lands on the freshly rendered
+  // overlay and would close it instantly. Only close when the pointer actually
+  // went down on the overlay itself.
+  const downOnOverlay = useRef(false);
 
   // How many links sit on the first row (the layout can be 1 or 2 rows).
   const columns = () => {
@@ -113,7 +118,12 @@ export default function ProjectModal({ project, onClose }: Props) {
   return (
     <div
       className="modal-overlay"
+      onPointerDown={(e) => {
+        downOnOverlay.current = e.target === e.currentTarget;
+      }}
       onClick={() => {
+        if (!downOnOverlay.current) return;
+        downOnOverlay.current = false;
         sound.sfx("close");
         onClose();
       }}
