@@ -80,9 +80,9 @@ et ses textes dans `src/i18n/locales/{fr,en}.json` sous la clé `projects.<id>`.
   (`ghcr.io/julsql/portfolio:latest`). C'est le seul artefact produit par la CI ;
   elle ne touche jamais au cluster.
 
-Le site tourne sur **k3s**. Le déploiement est automatique : **Keel** (installé sur le
-cluster) poll GHCR et **redéploie** dès que le digest de `:latest` change (rollout au
-changement de digest). Les manifests vivent dans le repo privé **`k3s-manifests`**.
+Le site tourne sur **k3s**. Le déploiement est automatique : après le push, la CI
+notifie le serveur (webhook Keel), qui met à jour ses pods. Pas de SSH ni de
+`kubectl` manuel. Les manifests vivent dans le repo privé **`k3s-manifests`**.
 
 ## 🎵 Crédits sons
 
