@@ -51,12 +51,12 @@ export const PROJECTS: Project[] = [
     category: "app",
     icon: "🤖",
     tech: ["Spring Boot 3", "React Native", "Expo", "MariaDB", "LLM"],
-    repoUrl: "https://github.com/JIMIDevLab/jimi_api",
+    repoUrl: "https://github.com/julsql/jimi_api",
     links: [
       { kind: "live", labelKey: "api", url: "https://jimi-api.julsql.fr/swagger-ui/index.html#/" },
       { kind: "demo", labelKey: "app", url: "https://jimi.julsql.fr" },
-      { kind: "code", labelKey: "code_api", url: "https://github.com/JIMIDevLab/jimi_api" },
-      { kind: "code", labelKey: "code_app", url: "https://github.com/JIMIDevLab/jimi_app" },
+      { kind: "code", labelKey: "code_api", url: "https://github.com/julsql/jimi_api" },
+      { kind: "code", labelKey: "code_app", url: "https://github.com/julsql/jimi_app" },
     ],
   },
 
@@ -87,7 +87,7 @@ export const PROJECTS: Project[] = [
     tech: ["Vue", "TypeScript", "SHA-256"],
     group: "thecode",
     liveUrl: "https://thecode.julsql.fr",
-    repoUrl: "https://github.com/TheCodeDevLab/thecode-website",
+    repoUrl: "https://github.com/julsql/thecode-website",
   },
   {
     id: "thecode-extension",
@@ -96,7 +96,7 @@ export const PROJECTS: Project[] = [
     icon: "🧩",
     tech: ["JavaScript", "WebExtension", "Chrome", "Firefox"],
     group: "thecode",
-    repoUrl: "https://github.com/TheCodeDevLab/thecode-extension",
+    repoUrl: "https://github.com/julsql/thecode-extension",
   },
   {
     id: "thecode-apple",
@@ -105,14 +105,14 @@ export const PROJECTS: Project[] = [
     icon: "🍏",
     tech: ["Swift", "iOS", "macOS", "Safari Extension"],
     group: "thecode",
-    repoUrl: "https://github.com/TheCodeDevLab/thecode-apple",
+    repoUrl: "https://github.com/julsql/thecode-apple",
     links: [
       {
         kind: "store",
         labelKey: "appstore",
         url: "https://apps.apple.com/app/thecode-password-manager/id6753169043",
       },
-      { kind: "code", labelKey: "code", url: "https://github.com/TheCodeDevLab/thecode-apple" },
+      { kind: "code", labelKey: "code", url: "https://github.com/julsql/thecode-apple" },
     ],
   },
   {
@@ -122,14 +122,14 @@ export const PROJECTS: Project[] = [
     icon: "📱",
     tech: ["Java", "Material 3", "Autofill"],
     group: "thecode",
-    repoUrl: "https://github.com/TheCodeDevLab/thecode-android",
+    repoUrl: "https://github.com/julsql/thecode-android",
     links: [
       {
         kind: "store",
         labelKey: "playstore",
         url: "https://play.google.com/store/apps/details?id=fr.juliette.thecode&hl=fr",
       },
-      { kind: "code", labelKey: "code", url: "https://github.com/TheCodeDevLab/thecode-android" },
+      { kind: "code", labelKey: "code", url: "https://github.com/julsql/thecode-android" },
     ],
   },
   {
@@ -139,7 +139,7 @@ export const PROJECTS: Project[] = [
     icon: "⌨️",
     tech: ["Python", "CLI", "MIT"],
     group: "thecode",
-    repoUrl: "https://github.com/TheCodeDevLab/thecode-cli",
+    repoUrl: "https://github.com/julsql/thecode-cli",
   },
 ];
 
