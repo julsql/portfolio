@@ -87,7 +87,7 @@ export const PROJECTS: Project[] = [
     tech: ["Vue", "TypeScript", "SHA-256"],
     group: "thecode",
     liveUrl: "https://thecode.julsql.fr",
-    repoUrl: "https://github.com/julsql/thecode-website",
+    repoUrl: "https://github.com/julsql/thecode/tree/main/apps/website",
   },
   {
     id: "thecode-extension",
@@ -96,7 +96,7 @@ export const PROJECTS: Project[] = [
     icon: "🧩",
     tech: ["JavaScript", "WebExtension", "Chrome", "Firefox"],
     group: "thecode",
-    repoUrl: "https://github.com/julsql/thecode-extension",
+    repoUrl: "https://github.com/julsql/thecode/tree/main/apps/extension",
   },
   {
     id: "thecode-apple",
@@ -105,14 +105,18 @@ export const PROJECTS: Project[] = [
     icon: "🍏",
     tech: ["Swift", "iOS", "macOS", "Safari Extension"],
     group: "thecode",
-    repoUrl: "https://github.com/julsql/thecode-apple",
+    repoUrl: "https://github.com/julsql/thecode/tree/main/apps/apple",
     links: [
       {
         kind: "store",
         labelKey: "appstore",
         url: "https://apps.apple.com/app/thecode-password-manager/id6753169043",
       },
-      { kind: "code", labelKey: "code", url: "https://github.com/julsql/thecode-apple" },
+      {
+        kind: "code",
+        labelKey: "code",
+        url: "https://github.com/julsql/thecode/tree/main/apps/apple",
+      },
     ],
   },
   {
@@ -122,14 +126,18 @@ export const PROJECTS: Project[] = [
     icon: "📱",
     tech: ["Java", "Material 3", "Autofill"],
     group: "thecode",
-    repoUrl: "https://github.com/julsql/thecode-android",
+    repoUrl: "https://github.com/julsql/thecode/tree/main/apps/android",
     links: [
       {
         kind: "store",
         labelKey: "playstore",
         url: "https://play.google.com/store/apps/details?id=fr.juliette.thecode&hl=fr",
       },
-      { kind: "code", labelKey: "code", url: "https://github.com/julsql/thecode-android" },
+      {
+        kind: "code",
+        labelKey: "code",
+        url: "https://github.com/julsql/thecode/tree/main/apps/android",
+      },
     ],
   },
   {
@@ -139,7 +147,7 @@ export const PROJECTS: Project[] = [
     icon: "⌨️",
     tech: ["Python", "CLI", "MIT"],
     group: "thecode",
-    repoUrl: "https://github.com/julsql/thecode-cli",
+    repoUrl: "https://github.com/julsql/thecode/tree/main/apps/cli",
   },
 ];
 
