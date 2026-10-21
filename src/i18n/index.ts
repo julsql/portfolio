@@ -21,4 +21,12 @@ i18n
     },
   });
 
+// Keep <html lang> in sync with the active language (SEO + screen readers).
+const syncHtmlLang = (lng: string) => {
+  if (typeof document !== "undefined")
+    document.documentElement.lang = lng.startsWith("en") ? "en" : "fr";
+};
+if (i18n.language) syncHtmlLang(i18n.language);
+i18n.on("languageChanged", syncHtmlLang);
+
 export default i18n;

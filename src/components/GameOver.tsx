@@ -35,7 +35,7 @@ export default function GameOver({ onRetry }: Props) {
 
   return (
     <div className="gameover" role="alertdialog" aria-label={t("gameover.title")}>
-      <h1 className="gameover-title">{t("gameover.title")}</h1>
+      <h2 className="gameover-title">{t("gameover.title")}</h2>
       <p className="gameover-msg">🔥 {t("gameover.burned")}</p>
       <button
         className="btn btn-primary gameover-retry"

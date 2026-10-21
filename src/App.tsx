@@ -50,7 +50,7 @@ function readPersistedMuted(): boolean {
 }
 
 export default function App() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [started, setStarted] = useState(false);
   const [view, setView] = useState<View>("map");
   const [active, setActive] = useState<Project | null>(null);
@@ -114,8 +114,7 @@ export default function App() {
     if (hasSword) landmarks = landmarks.filter((l) => l.kind !== "sword");
     if (collected.size) {
       landmarks = landmarks.filter(
-        (l) =>
-          !((l.kind === "rupee" || l.kind === "recoveryHeart") && collected.has(l.ref)),
+        (l) => !((l.kind === "rupee" || l.kind === "recoveryHeart") && collected.has(l.ref)),
       );
     }
     if (opened.size) {
@@ -616,6 +615,9 @@ export default function App() {
 
   return (
     <div className="screen">
+      <h1 className="visually-hidden">
+        {t("title")} — {t("subtitle")}
+      </h1>
       <Hud
         view={view}
         onView={setView}

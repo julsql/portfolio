@@ -2,31 +2,95 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/triforce.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>JulSql — Développeur web fullstack · Portfolio façon Zelda</title>
     <meta
       name="description"
-      content="Portfolio de JulSql — développeur web fullstack. Explorez mes projets en production dans un monde façon Zelda. / JulSql's portfolio — explore my production projects in a Zelda-style world."
+      content="Portfolio de JulSql, développeur web fullstack : explorez mes projets en production (Speciarium, TheCode, JIMI…) dans un monde pixel-art façon Zelda."
     />
+    <meta name="author" content="JulSql" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://julsql.fr/" />
+
+    <link rel="icon" type="image/svg+xml" href="/triforce.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#1e3a1a" />
-    <meta property="og:title" content="JulSql — Portfolio" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="JulSql" />
+    <meta property="og:url" content="https://julsql.fr/" />
+    <meta property="og:title" content="JulSql — Développeur web fullstack · Portfolio façon Zelda" />
     <meta
       property="og:description"
-      content="A Zelda-style explorable portfolio of production projects by JulSql, fullstack web developer."
+      content="Portfolio de JulSql, développeur web fullstack : explorez mes projets en production (Speciarium, TheCode, JIMI…) dans un monde pixel-art façon Zelda."
     />
-    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://julsql.fr/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Écran titre du portfolio JulSql : triforce dorée sur fond vert" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:locale:alternate" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="JulSql — Développeur web fullstack · Portfolio façon Zelda" />
+    <meta
+      name="twitter:description"
+      content="Portfolio de JulSql, développeur web fullstack : explorez mes projets en production (Speciarium, TheCode, JIMI…) dans un monde pixel-art façon Zelda."
+    />
+    <meta name="twitter:image" content="https://julsql.fr/og-image.png" />
+    <meta name="twitter:image:alt" content="Écran titre du portfolio JulSql : triforce dorée sur fond vert" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://julsql.fr/#person",
+            "name": "JulSql",
+            "jobTitle": "Développeur web fullstack",
+            "url": "https://julsql.fr/",
+            "sameAs": ["https://github.com/julsql"]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://julsql.fr/#website",
+            "url": "https://julsql.fr/",
+            "name": "JulSql — Portfolio",
+            "description": "Portfolio de JulSql, développeur web fullstack : explorez mes projets en production dans un monde pixel-art façon Zelda.",
+            "inLanguage": ["fr", "en"],
+            "author": { "@id": "https://julsql.fr/#person" },
+            "publisher": { "@id": "https://julsql.fr/#person" }
+          }
+        ]
+      }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
+    />
     <link
       href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
       rel="stylesheet"
     />
-    <link rel="canonical" href="https://julsql.fr/" />
-    <meta property="og:url" content="https://julsql.fr/" />
-    <title>JulSql — Portfolio</title>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <h1>JulSql — Développeur web fullstack</h1>
+      <p>
+        Portfolio de JulSql, développeur web fullstack : explorez mes projets en production dans
+        un monde pixel-art façon Zelda. Activez JavaScript pour jouer.
+      </p>
+      <p><a href="https://github.com/julsql">GitHub</a></p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

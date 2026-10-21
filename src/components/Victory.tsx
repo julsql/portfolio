@@ -44,7 +44,7 @@ export default function Victory({ onClose, triforce = false }: Props) {
   return (
     <div className="victory" onClick={ready ? onClose : undefined}>
       <img className="victory-zelda" src={img} alt="" />
-      <h1 className="victory-title">{t(titleKey)}</h1>
+      <h2 className="victory-title">{t(titleKey)}</h2>
       <p className="victory-thanks">{t(thanksKey)}</p>
       {/* Always rendered (reserves its space) — just hidden until unlocked,
           so nothing already on screen shifts when it appears. */}
