@@ -9,6 +9,13 @@
 ![Vite](https://img.shields.io/badge/Vite-5-646cff?logo=vite&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)
 
+## 📸 Aperçu
+
+<p align="center">
+  <img src="docs/screenshots/title.png" alt="Écran titre" width="49%">
+  <img src="docs/screenshots/overworld.png" alt="Overworld explorable" width="49%">
+</p>
+
 ## ✨ Concept
 
 - **Overworld explorable** : déplace ton héros (flèches / ZQSD / WASD, ou croix tactile).
